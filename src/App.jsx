@@ -197,19 +197,30 @@ function App() {
     setShowModal(true);
   };
 
-  // 타이핑 애니메이션 함수
+  // 타이핑 애니메이션 함수 - 한글 인코딩 버그 수정
   const typeMessage = (message) => {
     if (typingRef.current) {
       clearTimeout(typingRef.current);
     }
     
+    // 메시지 유효성 검사
+    if (!message || typeof message !== 'string') {
+      console.warn('Invalid message:', message);
+      setDisplayMessage("오류가 발생했습니다. 다시 시도해주세요.");
+      setIsTyping(false);
+      return;
+    }
+    
     setIsTyping(true);
     setDisplayMessage("");
     
+    // 문자열을 배열로 변환하여 한글 문자 처리 개선
+    const chars = Array.from(message);
     let index = 0;
+    
     const type = () => {
-      if (index < message.length) {
-        setDisplayMessage(prev => prev + message.charAt(index));
+      if (index < chars.length) {
+        setDisplayMessage(prev => prev + chars[index]);
         index++;
         typingRef.current = setTimeout(type, 30 + Math.random() * 20);
       } else {

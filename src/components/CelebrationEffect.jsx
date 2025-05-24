@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 // 축하 애니메이션 컴포넌트
 const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
   const [particles, setParticles] = useState([]);
   const [showMessage, setShowMessage] = useState(false);
+  const timerRef = useRef(null);
   
   // onComplete를 useCallback으로 안정화
   const stableOnComplete = useCallback(() => {
@@ -12,7 +13,23 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
     }
   }, [onComplete]);
   
+  // 상태 초기화 함수
+  const clearStates = useCallback(() => {
+    setShowMessage(false);
+    setParticles([]);
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+  
   useEffect(() => {
+    // 이전 타이머 정리
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    
     if (isActive && celebration) {
       // 파티클 생성
       const newParticles = Array.from({ length: 20 }, (_, i) => ({
@@ -28,25 +45,22 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
       setParticles(newParticles);
       setShowMessage(true);
       
-      // 3초 후 정리
-      const timer = setTimeout(() => {
-        setShowMessage(false);
-        setParticles([]);
+      // 3초 후 정리 (강제 정리)
+      timerRef.current = setTimeout(() => {
+        clearStates();
         stableOnComplete();
       }, 3000);
       
-      return () => {
-        clearTimeout(timer);
-        // cleanup 시에도 상태 초기화
-        setShowMessage(false);
-        setParticles([]);
-      };
     } else {
-      // isActive가 false가 되면 즉시 정리
-      setShowMessage(false);
-      setParticles([]);
+      // isActive가 false면 즉시 정리
+      clearStates();
     }
-  }, [isActive, celebration, stableOnComplete]);
+    
+    // cleanup
+    return () => {
+      clearStates();
+    };
+  }, [isActive, celebration, stableOnComplete, clearStates]);
   
   if (!isActive || !celebration) return null;
   

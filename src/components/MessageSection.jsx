@@ -14,10 +14,10 @@ const MessageSection = ({
   return (
     <div 
       ref={messageRef}
-      className={`relative mb-6 cursor-pointer group ${messageShake ? 'animate-bounce' : ''}`}
+      className={`relative mb-6 cursor-pointer group transition-all duration-300 ${messageShake ? 'animate-bounce' : ''}`}
       onClick={onRefreshMessage}
     >
-      {/* 카드 배경 */}
+      {/* 카드 배경 - transform 제거로 위치 버그 해결 */}
       <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-6 lg:p-8 min-h-[120px] flex items-center justify-center relative overflow-hidden">
         {/* 배경 패턴 */}
         <div className="absolute inset-0 opacity-5">
@@ -27,8 +27,8 @@ const MessageSection = ({
         </div>
         
         {/* 메인 텍스트 - 폰트 크기 줄임 */}
-        <div className="relative z-10 text-center">
-          <p className={`text-base lg:text-xl xl:text-2xl leading-relaxed font-medium text-white ${
+        <div className="relative z-10 text-center w-full">
+          <p className={`text-base lg:text-xl xl:text-2xl leading-relaxed font-medium text-white transition-all duration-300 ${
             isTyping ? 'animate-pulse' : ''
           }`}>
             {displayMessage}
