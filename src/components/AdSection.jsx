@@ -2,8 +2,8 @@ import React from 'react';
 import { Clock, Zap } from 'lucide-react';
 import { getRecommendedProduct } from '../data/coupangProducts';
 
-// 광고 영역 컴포넌트
-const AdSection = ({ showAd, adMessage, extremeMode, elapsedTime, onProductClick }) => {
+// 광고 영역 컴포넌트 - React.memo로 최적화
+const AdSection = React.memo(({ showAd, adMessage, extremeMode, elapsedTime, onProductClick }) => {
   const product = getRecommendedProduct(elapsedTime);
 
   return (
@@ -41,6 +41,6 @@ const AdSection = ({ showAd, adMessage, extremeMode, elapsedTime, onProductClick
       )}
     </div>
   );
-};
+});
 
 export default AdSection;

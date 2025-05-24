@@ -291,13 +291,21 @@ function App() {
     return () => clearInterval(interval);
   }, [startTime, isPageVisible, showAd, extremeMode]);
 
-  // 광고 메시지 업데이트 (안정화된 버전 + 타이핑 고려)
+  // 광고 메시지 업데이트 (버그 완전 해결 버전)
   useEffect(() => {
-    if (elapsedTime >= 60 && !isTyping) { // 타이핑 중이 아닐 때만 업데이트
-      const adIndex = Math.min(Math.floor((elapsedTime - 60) / 30), AD_MESSAGES.length - 1);
-      setAdMessage(AD_MESSAGES[adIndex]);
+    if (!showAd) return; // 광고가 안 보이면 업데이트 안 함
+    if (isTyping) return; // 타이핑 중이면 업데이트 안 함
+    
+    // 1분마다 광고 메시지 변경 (단순하게)
+    const currentMinute = Math.floor(elapsedTime / 60);
+    const adIndex = Math.min(currentMinute - 1, AD_MESSAGES.length - 1); // 1분부터 시작이니까 -1
+    
+    if (adIndex >= 0 && adIndex < AD_MESSAGES.length) {
+      const newAdMessage = AD_MESSAGES[adIndex];
+      console.log(`광고 업데이트: ${currentMinute}분, 인덱스: ${adIndex}, 메시지: ${newAdMessage}`);
+      setAdMessage(newAdMessage);
     }
-  }, [elapsedTime >= 60 ? Math.floor((elapsedTime - 60) / 30) : -1, isTyping]); // 타이핑 상태도 고려
+  }, [showAd, isTyping, Math.floor(elapsedTime / 60)]); // 분 단위로만 업데이트
 
   // 페이지 가시성 감지
   useEffect(() => {

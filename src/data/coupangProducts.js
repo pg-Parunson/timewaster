@@ -66,14 +66,19 @@ export const COUPANG_PRODUCTS = [
   }
 ];
 
-// 시간대별 상황에 맞는 상품 추천 로직
+// 시간대별 상황에 맞는 상품 추천 로직 - 안정화된 버전
 export const getRecommendedProduct = (elapsedSeconds) => {
-  // 시간대별 추천 로직
+  // 시간 기반으로 고정된 상품 선택 (랜덤 제거)
+  const timeSlot = Math.floor(elapsedSeconds / 120); // 2분마다 변경
+  
   if (elapsedSeconds < 300) { // 5분 미만
-    return COUPANG_PRODUCTS[Math.floor(Math.random() * 3)]; // 쿠팡홈, 덤벨, 도서 중 랜덤
+    const productIndex = timeSlot % 3; // 0, 1, 2 순환
+    return COUPANG_PRODUCTS[productIndex]; // 쿠팡홈, 덤벨, 도서 순환
   } else if (elapsedSeconds < 600) { // 10분 미만
-    return COUPANG_PRODUCTS[3 + Math.floor(Math.random() * 3)]; // 알람시계, 영양제, 보드게임 중
+    const productIndex = 3 + (timeSlot % 3); // 3, 4, 5 순환
+    return COUPANG_PRODUCTS[productIndex]; // 알람시계, 영양제, 보드게임 순환
   } else { // 10분 이상
-    return COUPANG_PRODUCTS[6 + Math.floor(Math.random() * 2)]; // 차, DIY 중
+    const productIndex = 6 + (timeSlot % 2); // 6, 7 순환
+    return COUPANG_PRODUCTS[productIndex]; // 차, DIY 순환
   }
 };
