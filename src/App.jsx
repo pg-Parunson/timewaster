@@ -291,13 +291,13 @@ function App() {
     return () => clearInterval(interval);
   }, [startTime, isPageVisible, showAd, extremeMode]);
 
-  // 광고 메시지 업데이트 (별도 useEffect로 분리)
+  // 광고 메시지 업데이트 (안정화된 버전 + 타이핑 고려)
   useEffect(() => {
-    if (elapsedTime >= 60) {
+    if (elapsedTime >= 60 && !isTyping) { // 타이핑 중이 아닐 때만 업데이트
       const adIndex = Math.min(Math.floor((elapsedTime - 60) / 30), AD_MESSAGES.length - 1);
       setAdMessage(AD_MESSAGES[adIndex]);
     }
-  }, [Math.floor((elapsedTime - 60) / 30)]); // 30초마다만 실행되도록 최적화
+  }, [elapsedTime >= 60 ? Math.floor((elapsedTime - 60) / 30) : -1, isTyping]); // 타이핑 상태도 고려
 
   // 페이지 가시성 감지
   useEffect(() => {
@@ -436,6 +436,7 @@ function App() {
             totalTimeWasted={totalTimeWasted}
             concurrentUsers={concurrentUsers}
             extremeMode={extremeMode}
+            currentElapsedTime={elapsedTime}
           />
 
           {/* 사이트 제목 헤더 */}
