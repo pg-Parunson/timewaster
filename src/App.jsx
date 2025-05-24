@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Clock, Share2, MessageCircle, Copy, ExternalLink, Zap, Heart, Skull, Sparkles, Target, Brain, ArrowRight } from 'lucide-react';
+import { Clock, Share2, MessageCircle, Copy, ExternalLink, Zap, Heart, Skull, Sparkles, Target, Brain } from 'lucide-react';
 
 // 시간별 실제 활동 매칭 데이터베이스 - 강화버전
 const TIME_BASED_ACTIVITIES = [
@@ -267,7 +267,7 @@ function App() {
     const messagePatterns = [
       `이 시간에 "${currentActivity.activity}" 할 수 있었는데... ${randomRoast}`,
       `${currentActivity.icon} ${currentActivity.activity}를 할 수 있었는 소중한 시간이었어요. ${randomRoast}`,
-      `🕰️ ${formatTime(elapsedTime)} 동안 "${currentActivity.activity}" 같은 ${currentActivity.category} 활동을 했다면... ${randomRoast}`,
+      `⏰ ${formatTime(elapsedTime)} 동안 "${currentActivity.activity}" 같은 ${currentActivity.category} 활동을 했다면... ${randomRoast}`,
       `${currentActivity.icon} 지금 이 순간에도 "${currentActivity.activity}"로 더 나은 자신이 될 수 있었는데... ${randomRoast}`
     ];
     
@@ -366,9 +366,9 @@ function App() {
 
       {/* 메인 컨테이너 */}
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 lg:p-12 w-full max-w-7xl">
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-6 lg:p-8 w-full max-w-7xl">
           {/* 상단 통계 바 */}
-          <div className="flex items-center justify-between mb-8 p-4 bg-white/5 backdrop-blur rounded-2xl border border-white/10">
+          <div className="flex items-center justify-between mb-6 p-4 bg-white/5 backdrop-blur rounded-2xl border border-white/10">
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
@@ -398,62 +398,97 @@ function App() {
             </div>
           </div>
 
-          {/* 중앙 타이머 섹션 */}
-          <div className="text-center mb-12">
-            {/* 타이머 디스플레이 */}
-            <div className="relative mb-8">
-              <div className="inline-flex items-center justify-center">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-pink-500 rounded-full filter blur-2xl opacity-50 animate-pulse"></div>
-                  <div 
-                    className={`relative text-6xl md:text-8xl lg:text-9xl font-mono font-bold ${
-                      extremeMode 
-                        ? 'text-red-400 animate-pulse' 
-                        : 'bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent'
-                    }`}
-                    style={{
-                      textShadow: extremeMode 
-                        ? '0 0 30px rgba(239, 68, 68, 0.8)' 
-                        : '0 0 20px rgba(239, 68, 68, 0.5)'
-                    }}
-                  >
-                    {formatTime(elapsedTime)}
+          {/* 메인 콘텐츠 영역 - 2단 레이아웃 */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            {/* 왼쪽: 타이머 + 활동 제안 */}
+            <div className="lg:col-span-2">
+              {/* 타이머 디스플레이 */}
+              <div className="text-center mb-6">
+                <div className="relative mb-6">
+                  <div className="inline-flex items-center justify-center">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-pink-500 rounded-full filter blur-2xl opacity-50 animate-pulse"></div>
+                      <div 
+                        className={`relative text-5xl md:text-7xl lg:text-8xl font-mono font-bold ${
+                          extremeMode 
+                            ? 'text-red-400 animate-pulse' 
+                            : 'bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent'
+                        }`}
+                        style={{
+                          textShadow: extremeMode 
+                            ? '0 0 30px rgba(239, 68, 68, 0.8)' 
+                            : '0 0 20px rgba(239, 68, 68, 0.5)'
+                        }}
+                      >
+                        {formatTime(elapsedTime)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 활동 제안 카드 */}
+                <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-4">
+                  <div className="flex items-center justify-center gap-3 mb-3">
+                    <Brain className="w-5 h-5 text-purple-400" />
+                    <span className="text-white/80 font-medium text-sm">지금 이 시간에 할 수 있었던 일</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-center gap-3 mb-3">
+                    <div className="text-2xl">{getTimeBasedActivity(elapsedTime).icon}</div>
+                    <div className="text-xl lg:text-2xl font-bold text-white">
+                      {getTimeBasedActivity(elapsedTime).activity}
+                    </div>
+                  </div>
+                  
+                  <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r ${
+                    CATEGORY_COLORS[getTimeBasedActivity(elapsedTime).category] || CATEGORY_COLORS["기본"]
+                  } shadow-lg`}>
+                    <span className="font-medium text-sm">{getTimeBasedActivity(elapsedTime).category}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* 활동 제안 카드 */}
-            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 mb-8">
-              <div className="flex items-center justify-center gap-4 mb-4">
-                <Brain className="w-6 h-6 text-purple-400" />
-                <span className="text-white/80 font-medium">지금 이 시간에 할 수 있었던 일</span>
-              </div>
-              
-              <div className="flex items-center justify-center gap-4 mb-4">
-                <div className="text-4xl">{getTimeBasedActivity(elapsedTime).icon}</div>
-                <div className="text-2xl lg:text-3xl font-bold text-white">
-                  {getTimeBasedActivity(elapsedTime).activity}
+            {/* 오른쪽: 광고 영역 (항상 표시) */}
+            <div className="lg:col-span-1">
+              {showAd ? (
+                <div className={`bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur border border-yellow-500/30 rounded-2xl p-4 h-full flex flex-col justify-center ${
+                  extremeMode ? 'animate-pulse' : ''
+                }`}>
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <Zap className="w-4 h-4 text-yellow-400 animate-bounce" />
+                    <span className="text-yellow-200 font-medium text-center text-sm leading-tight">{adMessage}</span>
+                    <Zap className="w-4 h-4 text-yellow-400 animate-bounce" />
+                  </div>
+                  
+                  <div className="flex justify-center">
+                    <button
+                      onClick={handleAdClick}
+                      className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold px-6 py-3 rounded-xl transform hover:scale-105 transition-all duration-200 shadow-lg w-full"
+                    >
+                      💰 광고 클릭하기 💰
+                    </button>
+                  </div>
                 </div>
-              </div>
-              
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${
-                CATEGORY_COLORS[getTimeBasedActivity(elapsedTime).category] || CATEGORY_COLORS["기본"]
-              } shadow-lg`}>
-                <span className="font-medium">{getTimeBasedActivity(elapsedTime).category}</span>
-                <ArrowRight className="w-4 h-4" />
-              </div>
+              ) : (
+                <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-4 h-full flex items-center justify-center">
+                  <div className="text-center text-white/50">
+                    <Clock className="w-8 h-8 mx-auto mb-2 animate-spin-slow" />
+                    <p className="text-sm">1분 후 광고가 나타납니다</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
           {/* 메시지 영역 - 완전히 새로운 디자인 */}
           <div 
             ref={messageRef}
-            className={`relative mb-8 cursor-pointer group ${messageShake ? 'animate-bounce' : ''}`}
+            className={`relative mb-6 cursor-pointer group ${messageShake ? 'animate-bounce' : ''}`}
             onClick={refreshMessage}
           >
             {/* 카드 배경 */}
-            <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-8 lg:p-12 min-h-[200px] flex items-center justify-center relative overflow-hidden">
+            <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-6 lg:p-8 min-h-[150px] flex items-center justify-center relative overflow-hidden">
               {/* 배경 패턴 */}
               <div className="absolute inset-0 opacity-5">
                 <div className="absolute top-4 left-4 w-2 h-2 bg-white rounded-full animate-ping"></div>
@@ -463,7 +498,7 @@ function App() {
               
               {/* 메인 텍스트 */}
               <div className="relative z-10 text-center">
-                <p className={`text-xl lg:text-3xl xl:text-4xl leading-relaxed font-medium text-white ${
+                <p className={`text-lg lg:text-2xl xl:text-3xl leading-relaxed font-medium text-white ${
                   isTyping ? 'animate-pulse' : ''
                 }`}>
                   {displayMessage}
@@ -491,15 +526,15 @@ function App() {
           </div>
 
           {/* 메인 액션 버튼 */}
-          <div className="flex justify-center mb-8">
+          <div className="flex justify-center mb-6">
             <button
               onClick={refreshMessage}
               disabled={isTyping}
               className={`
-                group relative px-8 lg:px-12 py-4 lg:py-6 
+                group relative px-6 lg:px-8 py-3 lg:py-4 
                 bg-gradient-to-r from-red-500 to-pink-500 
                 hover:from-red-600 hover:to-pink-600
-                text-white font-bold text-lg lg:text-xl
+                text-white font-bold text-base lg:text-lg
                 rounded-2xl shadow-2xl
                 transform hover:scale-105 active:scale-95
                 transition-all duration-200
@@ -514,58 +549,36 @@ function App() {
             </button>
           </div>
 
-          {/* 광고 섹션 */}
-          {showAd && (
-            <div className={`bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur border border-yellow-500/30 rounded-2xl p-6 mb-8 ${
-              extremeMode ? 'animate-pulse' : ''
-            }`}>
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <Zap className="w-5 h-5 text-yellow-400 animate-bounce" />
-                <span className="text-yellow-200 font-medium text-lg">{adMessage}</span>
-                <Zap className="w-5 h-5 text-yellow-400 animate-bounce" />
-              </div>
-              
-              <div className="flex justify-center">
-                <button
-                  onClick={handleAdClick}
-                  className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold px-8 py-3 rounded-xl transform hover:scale-105 transition-all duration-200 shadow-lg"
-                >
-                  💰 광고 클릭하기 💰
-                </button>
-              </div>
-            </div>
-          )}
-
           {/* 공유 섹션 */}
-          <div className="border-t border-white/10 pt-8">
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <Heart className="w-6 h-6 text-pink-400 animate-pulse" />
-              <span className="text-white/80 text-lg font-medium">친구들도 시간 낭비시켜보자</span>
-              <Share2 className="w-6 h-6 text-blue-400" />
+          <div className="border-t border-white/10 pt-6">
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <Heart className="w-5 h-5 text-pink-400 animate-pulse" />
+              <span className="text-white/80 text-base font-medium">친구들도 시간 낭비시켜보자</span>
+              <Share2 className="w-5 h-5 text-blue-400" />
             </div>
             
-            <div className="flex gap-4 justify-center flex-wrap">
+            <div className="flex gap-3 justify-center flex-wrap">
               <button
                 onClick={shareToTwitter}
-                className="bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-200 px-6 py-3 rounded-xl flex items-center gap-3 transform hover:scale-105 transition-all duration-200 backdrop-blur"
+                className="bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-200 px-4 py-2 rounded-xl flex items-center gap-2 transform hover:scale-105 transition-all duration-200 backdrop-blur text-sm"
               >
-                <ExternalLink className="w-5 h-5" />
+                <ExternalLink className="w-4 h-4" />
                 <span>X에 공유</span>
               </button>
               
               <button
                 onClick={shareToKakao}
-                className="bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/50 text-yellow-200 px-6 py-3 rounded-xl flex items-center gap-3 transform hover:scale-105 transition-all duration-200 backdrop-blur"
+                className="bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/50 text-yellow-200 px-4 py-2 rounded-xl flex items-center gap-2 transform hover:scale-105 transition-all duration-200 backdrop-blur text-sm"
               >
-                <MessageCircle className="w-5 h-5" />
+                <MessageCircle className="w-4 h-4" />
                 <span>카카오톡</span>
               </button>
               
               <button
                 onClick={() => copyToClipboard()}
-                className="bg-gray-500/20 hover:bg-gray-500/30 border border-gray-500/50 text-gray-200 px-6 py-3 rounded-xl flex items-center gap-3 transform hover:scale-105 transition-all duration-200 backdrop-blur"
+                className="bg-gray-500/20 hover:bg-gray-500/30 border border-gray-500/50 text-gray-200 px-4 py-2 rounded-xl flex items-center gap-2 transform hover:scale-105 transition-all duration-200 backdrop-blur text-sm"
               >
-                <Copy className="w-5 h-5" />
+                <Copy className="w-4 h-4" />
                 <span>링크 복사</span>
               </button>
             </div>
@@ -573,22 +586,22 @@ function App() {
 
           {/* 극한 모드 추가 경고 */}
           {extremeMode && (
-            <div className="mt-8 p-4 bg-red-500/20 border border-red-500/50 rounded-2xl backdrop-blur">
-              <div className="flex items-center justify-center gap-3">
-                <Skull className="w-6 h-6 text-red-400 animate-bounce" />
-                <p className="text-red-200 font-bold text-lg">
+            <div className="mt-4 p-3 bg-red-500/20 border border-red-500/50 rounded-2xl backdrop-blur">
+              <div className="flex items-center justify-center gap-2">
+                <Skull className="w-5 h-5 text-red-400 animate-bounce" />
+                <p className="text-red-200 font-bold text-base">
                   경고: 5분을 넘겼습니다! 이제 정말로 심각한 시간낭비입니다!
                 </p>
-                <Skull className="w-6 h-6 text-red-400 animate-bounce" />
+                <Skull className="w-5 h-5 text-red-400 animate-bounce" />
               </div>
             </div>
           )}
 
           {/* 이스터에그 */}
           {elapsedTime > 600 && (
-            <div className="mt-6 text-center animate-fade-in">
-              <div className="bg-purple-500/20 border border-purple-500/50 rounded-2xl px-6 py-4 backdrop-blur">
-                <p className="text-purple-200 text-lg font-medium">
+            <div className="mt-4 text-center animate-fade-in">
+              <div className="bg-purple-500/20 border border-purple-500/50 rounded-2xl px-4 py-3 backdrop-blur">
+                <p className="text-purple-200 text-base font-medium">
                   🏆 축하합니다. 당신은 이제 공식적으로 시간낭비의 달인입니다. 🏆
                 </p>
               </div>
