@@ -205,10 +205,12 @@ function App() {
     setShowModal(true);
   };
 
-  // 타이핑 애니메이션 함수 - 한글 인코딩 버그 수정
+  // 타이핑 애니메이션 함수 - 중복 문자 버그 수정
   const typeMessage = (message) => {
+    // 이전 타이머 완전 정리
     if (typingRef.current) {
       clearTimeout(typingRef.current);
+      typingRef.current = null;
     }
     
     // 메시지 유효성 검사
@@ -220,15 +222,17 @@ function App() {
     }
     
     setIsTyping(true);
-    setDisplayMessage("");
+    setDisplayMessage(""); // 완전 초기화
     
     // 문자열을 배열로 변환하여 한글 문자 처리 개선
     const chars = Array.from(message);
+    let currentText = ""; // 로컬 변수로 현재 텍스트 추적
     let index = 0;
     
     const type = () => {
       if (index < chars.length) {
-        setDisplayMessage(prev => prev + chars[index]);
+        currentText += chars[index]; // 로컬 변수에 추가
+        setDisplayMessage(currentText); // 전체 대체
         index++;
         typingRef.current = setTimeout(type, 30 + Math.random() * 20);
       } else {
