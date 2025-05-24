@@ -7,7 +7,7 @@ const StatsBar = ({ visits, adClicks, totalTimeWasted, concurrentUsers, extremeM
     <div className="flex items-center justify-between mb-6 p-4 bg-white/5 backdrop-blur rounded-2xl border border-white/10">
       <div className="flex items-center gap-8">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-green-500 rounded-full status-indicator"></div>
+          <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
           <span className="text-white/80 text-sm">실시간 추적</span>
         </div>
         <div className="flex items-center gap-2">
