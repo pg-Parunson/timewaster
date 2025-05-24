@@ -1,0 +1,381 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+body {
+  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.gradient-text {
+  background: linear-gradient(45deg, #ef4444, #f97316, #eab308, #22c55e, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 3s ease-in-out infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { 
+    background-position: 0% 50%; 
+  }
+  50% { 
+    background-position: 100% 50%; 
+  }
+}
+
+.timer-glow {
+  text-shadow: 
+    0 0 10px rgba(239, 68, 68, 0.5), 
+    0 0 20px rgba(239, 68, 68, 0.3),
+    0 0 30px rgba(239, 68, 68, 0.2);
+}
+
+/* 비난 메시지 가시성 강화 효과들 */
+.glow-text-strong {
+  text-shadow: 
+    0 0 10px rgba(239, 68, 68, 0.8),
+    0 0 20px rgba(239, 68, 68, 0.6),
+    0 0 30px rgba(239, 68, 68, 0.4),
+    2px 2px 4px rgba(0, 0, 0, 0.3);
+  animation: text-glow-strong 3s ease-in-out infinite alternate;
+}
+
+@keyframes text-glow-strong {
+  from {
+    text-shadow: 
+      0 0 10px rgba(239, 68, 68, 0.8),
+      0 0 20px rgba(239, 68, 68, 0.6),
+      0 0 30px rgba(239, 68, 68, 0.4),
+      2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  to {
+    text-shadow: 
+      0 0 20px rgba(239, 68, 68, 1),
+      0 0 35px rgba(239, 68, 68, 0.8),
+      0 0 50px rgba(239, 68, 68, 0.6),
+      3px 3px 6px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* 박스 자체에 부드러운 glow 효과 */
+.animate-glow-soft {
+  animation: glow-soft 4s ease-in-out infinite alternate;
+}
+
+@keyframes glow-soft {
+  from {
+    box-shadow: 
+      0 0 20px rgba(239, 68, 68, 0.2),
+      0 0 40px rgba(239, 68, 68, 0.1),
+      inset 0 0 20px rgba(255, 255, 255, 0.1);
+  }
+  to {
+    box-shadow: 
+      0 0 30px rgba(239, 68, 68, 0.4),
+      0 0 60px rgba(239, 68, 68, 0.2),
+      inset 0 0 30px rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* 강화된 위글 애니메이션 */
+.animate-wiggle-strong {
+  animation: wiggle-strong 0.8s ease-in-out infinite;
+}
+
+@keyframes wiggle-strong {
+  0%, 100% { transform: rotate(-3deg) scale(1); }
+  25% { transform: rotate(3deg) scale(1.02); }
+  50% { transform: rotate(-2deg) scale(1.01); }
+  75% { transform: rotate(2deg) scale(1.02); }
+}
+
+/* 반짝이는 배경 효과 */
+.shimmer-bg {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* 극한 모드용 네온 효과 강화 */
+.neon-text-extreme {
+  color: #ff0040;
+  font-weight: 900;
+  text-shadow: 
+    0 0 5px #ff0040,
+    0 0 10px #ff0040,
+    0 0 15px #ff0040,
+    0 0 20px #ff0040,
+    0 0 35px #ff0040,
+    0 0 50px #ff0040,
+    3px 3px 0px #000,
+    -1px -1px 0px #000,
+    1px -1px 0px #000,
+    -1px 1px 0px #000;
+  animation: neon-flicker-extreme 2s infinite alternate;
+}
+
+@keyframes neon-flicker-extreme {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {
+    text-shadow: 
+      0 0 5px #ff0040,
+      0 0 10px #ff0040,
+      0 0 15px #ff0040,
+      0 0 20px #ff0040,
+      0 0 35px #ff0040,
+      0 0 50px #ff0040,
+      3px 3px 0px #000;
+  }
+  20%, 24%, 55% {
+    text-shadow: 
+      0 0 2px #ff0040,
+      3px 3px 0px #000;
+  }
+}
+
+/* 메시지 박스 터치 효과 */
+.message-box-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.message-box-hover:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(239, 68, 68, 0.2),
+    0 0 60px rgba(239, 68, 68, 0.1),
+    inset 0 0 30px rgba(255, 255, 255, 0.3);
+}
+
+.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Enhanced animations for PC experience */
+.animate-spin-slow {
+  animation: spin 3s linear infinite;
+}
+
+.animate-bounce-slow {
+  animation: bounce 2s infinite;
+}
+
+.animate-wiggle {
+  animation: wiggle 1s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px rgba(239, 68, 68, 0.5);
+  }
+  to {
+    box-shadow: 
+      0 0 20px rgba(239, 68, 68, 0.8), 
+      0 0 30px rgba(239, 68, 68, 0.6);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-slow {
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.8;
+    transform: scale(1.02);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Typing cursor animation */
+.typing-cursor {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* PC 친화적 반응형 개선 */
+@media (min-width: 768px) {
+  .timer-pc {
+    font-size: 8rem;
+  }
+  
+  .message-pc {
+    font-size: 3rem;
+    min-height: 250px;
+    padding: 3rem;
+  }
+  
+  .button-pc {
+    font-size: 2rem;
+    padding: 2rem 3rem;
+  }
+  
+  .activity-suggestion-pc {
+    padding: 2rem 3rem;
+    font-size: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .timer-pc {
+    font-size: 10rem;
+  }
+  
+  .message-pc {
+    font-size: 3.5rem;
+    min-height: 280px;
+    padding: 3.5rem;
+  }
+  
+  .button-pc {
+    font-size: 2.5rem;
+    padding: 2.5rem 4rem;
+  }
+  
+  .activity-suggestion-pc {
+    padding: 2.5rem 4rem;
+    font-size: 1.75rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .timer-pc {
+    font-size: 12rem;
+  }
+  
+  .message-pc {
+    font-size: 4rem;
+    min-height: 320px;
+    padding: 4rem;
+  }
+  
+  .button-pc {
+    font-size: 3rem;
+    padding: 3rem 5rem;
+  }
+  
+  .activity-suggestion-pc {
+    padding: 3rem 5rem;
+    font-size: 2rem;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #ef4444, #f97316);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, #dc2626, #ea580c);
+}
+
+/* Button hover effects enhancement */
+.button-hover-glow:hover {
+  box-shadow: 
+    0 0 20px rgba(239, 68, 68, 0.4),
+    0 0 40px rgba(239, 68, 68, 0.2);
+  transform: translateY(-2px) scale(1.05);
+}
+
+/* Message container improvements */
+.message-container {
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.2) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Enhanced shadow effects */
+.enhanced-shadow {
+  box-shadow: 
+    0 10px 25px rgba(0,0,0,0.1),
+    0 20px 40px rgba(0,0,0,0.05);
+}
+
+/* Neon text effect for extreme mode */
+.neon-text {
+  color: #ff073a;
+  text-shadow: 
+    0 0 5px #ff073a,
+    0 0 10px #ff073a,
+    0 0 15px #ff073a,
+    0 0 20px #ff073a,
+    0 0 30px #ff073a,
+    0 0 40px #ff073a;
+  animation: neon-flicker 1.5s infinite alternate;
+}
+
+@keyframes neon-flicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {
+    text-shadow: 
+      0 0 5px #ff073a,
+      0 0 10px #ff073a,
+      0 0 15px #ff073a,
+      0 0 20px #ff073a,
+      0 0 30px #ff073a,
+      0 0 40px #ff073a;
+  }
+  20%, 24%, 55% {
+    text-shadow: none;
+  }
+}
