@@ -745,11 +745,11 @@ function App() {
   };
 
   // 공유 기능들
-  const shareToTwitter = () => {
+  const shareToX = () => {
     // Google Analytics 이벤트 추적
     if (typeof gtag !== 'undefined') {
       gtag('event', 'share', {
-        method: 'twitter',
+        method: 'x',
         content_type: 'time_wasted',
         time_wasted_seconds: elapsedTime
       });
@@ -1105,11 +1105,16 @@ function App() {
             
             <div className="flex gap-3 justify-center flex-wrap">
               <button
-                onClick={shareToTwitter}
-                className="bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-200 px-4 py-2 rounded-xl flex items-center gap-2 transform hover:scale-105 transition-all duration-200 backdrop-blur text-sm"
+                onClick={shareToX}
+                className="bg-black/30 hover:bg-black/50 border border-gray-400/50 text-white px-4 py-2 rounded-xl flex items-center gap-2 transform hover:scale-105 transition-all duration-200 backdrop-blur text-sm"
               >
-                <ExternalLink className="w-4 h-4" />
-                <span>X에 공유</span>
+                <div className="w-4 h-4 flex items-center justify-center">
+                  {/* X 로고 SVG */}
+                  <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current" aria-hidden="true">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                </div>
+                <span>X에서 공유</span>
               </button>
               
               <button
