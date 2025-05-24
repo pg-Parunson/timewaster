@@ -108,8 +108,9 @@ function App() {
       }
       
       @keyframes rainbow {
-        0% { filter: hue-rotate(0deg); }
-        100% { filter: hue-rotate(360deg); }
+        0% { opacity: 1; }
+        50% { opacity: 0.8; }
+        100% { opacity: 1; }
       }
       
       @keyframes shake {
@@ -127,30 +128,24 @@ function App() {
       @keyframes unicorn {
         0% { 
           transform: translateX(-50%) translateY(-50%) rotate(0deg);
-          filter: hue-rotate(0deg) brightness(1);
         }
         50% { 
           transform: translateX(-50%) translateY(-50%) rotate(5deg);
-          filter: hue-rotate(180deg) brightness(1.2);
         }
         100% { 
           transform: translateX(-50%) translateY(-50%) rotate(0deg);
-          filter: hue-rotate(360deg) brightness(1);
         }
       }
       
       @keyframes dragon {
         0% { 
           transform: translateX(-50%) translateY(-50%) scale(1);
-          filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.8));
         }
         50% { 
           transform: translateX(-50%) translateY(-50%) scale(1.2);
-          filter: drop-shadow(0 0 40px rgba(255, 0, 0, 1));
         }
         100% { 
           transform: translateX(-50%) translateY(-50%) scale(1);
-          filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.8));
         }
       }
       
