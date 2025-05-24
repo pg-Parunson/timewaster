@@ -1,6 +1,73 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Clock, Share2, MessageCircle, Copy, ExternalLink, Zap, Heart, Skull, Sparkles, Target, Brain, Users, DoorOpen, AlertTriangle } from 'lucide-react';
 
+// 축하 이펙트 데이터베이스
+const CELEBRATION_EFFECTS = [
+  {
+    minSeconds: 60,
+    message: "1분 달성! 👏 박수박수! 👏",
+    effects: ["👏", "✨", "🎯"],
+    color: "from-blue-400 to-cyan-400",
+    animation: "bounce"
+  },
+  {
+    minSeconds: 120,
+    message: "2분 돌파! 🎉 대단해요! 🎉",
+    effects: ["🎉", "🎊", "✨", "🌟"],
+    color: "from-green-400 to-emerald-400",
+    animation: "spin"
+  },
+  {
+    minSeconds: 180,
+    message: "3분 완주! 🏆 챔피언! 🏆",
+    effects: ["🏆", "👑", "⭐", "✨"],
+    color: "from-yellow-400 to-orange-400",
+    animation: "pulse"
+  },
+  {
+    minSeconds: 240,
+    message: "4분 신기록! 🚀 우주로! 🚀",
+    effects: ["🚀", "🌟", "💫", "⚡"],
+    color: "from-purple-400 to-pink-400",
+    animation: "float"
+  },
+  {
+    minSeconds: 300,
+    message: "5분 레전드! 💎 다이아몬드! 💎",
+    effects: ["💎", "👑", "🌟", "✨", "🎆"],
+    color: "from-indigo-400 to-purple-400",
+    animation: "rainbow"
+  },
+  {
+    minSeconds: 420,
+    message: "7분 마스터! 🔥 불타는 열정! 🔥",
+    effects: ["🔥", "⚡", "💥", "🌟"],
+    color: "from-red-400 to-orange-400",
+    animation: "shake"
+  },
+  {
+    minSeconds: 600,
+    message: "10분 영웅! 💪 무적모드! 💪",
+    effects: ["💪", "👑", "🔥", "⚡", "💥"],
+    color: "from-pink-400 to-red-400",
+    animation: "mega"
+  },
+  {
+    minSeconds: 900,
+    message: "15분 전설! 🦄 유니콘급! 🦄",
+    effects: ["🦄", "🌈", "✨", "💖", "🌟"],
+    color: "from-cyan-400 to-pink-400",
+    animation: "unicorn"
+  },
+  {
+    minSeconds: 1200,
+    message: "20분 신화! 🐉 드래곤킹! 🐉",
+    effects: ["🐉", "👑", "🔥", "⚡", "💎"],
+    color: "from-purple-600 to-red-600",
+    animation: "dragon"
+  }
+];
+
 // 시간별 실제 활동 매칭 데이터베이스 - 강화버전
 const TIME_BASED_ACTIVITIES = [
   { minSeconds: 0, activity: "심호흡 3번", category: "건강", icon: "🫁" },
@@ -102,6 +169,82 @@ const BUTTON_TEXTS = [
   "시간의 소중함 무시하기"
 ];
 
+// 축하 애니메이션 컴포넌트
+const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
+  const [particles, setParticles] = useState([]);
+  const [showMessage, setShowMessage] = useState(false);
+  
+  useEffect(() => {
+    if (isActive && celebration) {
+      // 파티클 생성
+      const newParticles = Array.from({ length: 20 }, (_, i) => ({
+        id: i,
+        emoji: celebration.effects[Math.floor(Math.random() * celebration.effects.length)],
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        delay: Math.random() * 1000,
+        duration: 2000 + Math.random() * 1000,
+        size: 1 + Math.random() * 2
+      }));
+      
+      setParticles(newParticles);
+      setShowMessage(true);
+      
+      // 3초 후 정리
+      const timer = setTimeout(() => {
+        setShowMessage(false);
+        setParticles([]);
+        onComplete();
+      }, 3000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isActive, celebration, onComplete]);
+  
+  if (!isActive || !celebration) return null;
+  
+  return (
+    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+      {/* 메인 축하 메시지 */}
+      {showMessage && (
+        <div className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-${celebration.animation}`}>
+          <div className={`bg-gradient-to-r ${celebration.color} text-white px-6 lg:px-8 py-3 lg:py-4 rounded-3xl shadow-2xl backdrop-blur-xl border-2 border-white/30`}>
+            <div className="text-xl lg:text-3xl font-bold text-center animate-pulse">
+              {celebration.message}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* 파티클 효과 */}
+      {particles.map((particle) => (
+        <div
+          key={particle.id}
+          className={`absolute text-2xl lg:text-4xl animate-celebration-float`}
+          style={{
+            left: `${particle.x}%`,
+            top: `${particle.y}%`,
+            animationDelay: `${particle.delay}ms`,
+            animationDuration: `${particle.duration}ms`,
+            fontSize: `${particle.size}rem`,
+            transform: `scale(${particle.size})`
+          }}
+        >
+          {particle.emoji}
+        </div>
+      ))}
+      
+      {/* 화면 전체 글로우 효과 */}
+      {showMessage && (
+        <div 
+          className={`absolute inset-0 bg-gradient-to-br ${celebration.color} opacity-10 animate-pulse`}
+          style={{ mixBlendMode: 'overlay' }}
+        />
+      )}
+    </div>
+  );
+};
+
 // 세련된 모달 컴포넌트
 const ModernModal = ({ isOpen, onClose, onConfirm, title, message, type = 'info', showCancel = false }) => {
   // ESC 키 이벤트 처리
@@ -179,6 +322,51 @@ const ModernModal = ({ isOpen, onClose, onConfirm, title, message, type = 'info'
   );
 };
 
+// 축하 시스템 훅
+const useCelebrationSystem = (elapsedTime) => {
+  const [celebrationHistory, setCelebrationHistory] = useState(new Set());
+  const [currentCelebration, setCurrentCelebration] = useState(null);
+  const [showCelebration, setShowCelebration] = useState(false);
+  
+  useEffect(() => {
+    // 새로운 마일스톤 체크
+    const availableCelebrations = CELEBRATION_EFFECTS.filter(
+      (effect) => elapsedTime >= effect.minSeconds && !celebrationHistory.has(effect.minSeconds)
+    );
+    
+    if (availableCelebrations.length > 0) {
+      const celebration = availableCelebrations[availableCelebrations.length - 1];
+      
+      // 축하 이벤트 트리거
+      setCurrentCelebration(celebration);
+      setShowCelebration(true);
+      
+      // 히스토리에 추가
+      setCelebrationHistory(prev => new Set([...prev, celebration.minSeconds]));
+      
+      // Google Analytics 이벤트
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'milestone_achieved', {
+          event_category: 'engagement',
+          milestone_seconds: celebration.minSeconds,
+          milestone_message: celebration.message
+        });
+      }
+    }
+  }, [elapsedTime, celebrationHistory]);
+  
+  const handleCelebrationComplete = () => {
+    setShowCelebration(false);
+    setCurrentCelebration(null);
+  };
+  
+  return {
+    showCelebration,
+    currentCelebration,
+    handleCelebrationComplete
+  };
+};
+
 function App() {
   const [startTime] = useState(Date.now());
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -201,6 +389,121 @@ function App() {
   const timerRef = useRef(null);
   const messageRef = useRef(null);
   const typingRef = useRef(null);
+  
+  // 축하 시스템 초기화
+  const { showCelebration, currentCelebration, handleCelebrationComplete } = useCelebrationSystem(elapsedTime);
+
+  // CSS 애니메이션 스타일 주입
+  useEffect(() => {
+    const celebrationStyles = `
+      @keyframes celebration-float {
+        0% {
+          transform: translateY(100vh) rotate(0deg) scale(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        50% {
+          transform: translateY(-20px) rotate(180deg) scale(1.2);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-100vh) rotate(360deg) scale(0.5);
+          opacity: 0;
+        }
+      }
+      
+      @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+          transform: translateY(0) translateX(-50%);
+        }
+        40% {
+          transform: translateY(-30px) translateX(-50%);
+        }
+        60% {
+          transform: translateY(-15px) translateX(-50%);
+        }
+      }
+      
+      @keyframes spin {
+        from {
+          transform: rotate(0deg) translateX(-50%) translateY(-50%);
+        }
+        to {
+          transform: rotate(360deg) translateX(-50%) translateY(-50%);
+        }
+      }
+      
+      @keyframes float {
+        0%, 100% {
+          transform: translateY(0px) translateX(-50%) translateY(-50%);
+        }
+        50% {
+          transform: translateY(-20px) translateX(-50%) translateY(-50%);
+        }
+      }
+      
+      @keyframes rainbow {
+        0% { filter: hue-rotate(0deg); }
+        100% { filter: hue-rotate(360deg); }
+      }
+      
+      @keyframes shake {
+        0%, 100% { transform: translateX(-50%) translateY(-50%); }
+        25% { transform: translateX(-50%) translateY(-50%) translateX(5px); }
+        75% { transform: translateX(-50%) translateY(-50%) translateX(-5px); }
+      }
+      
+      @keyframes mega {
+        0% { transform: scale(1) translateX(-50%) translateY(-50%); }
+        50% { transform: scale(1.3) translateX(-50%) translateY(-50%); }
+        100% { transform: scale(1) translateX(-50%) translateY(-50%); }
+      }
+      
+      @keyframes unicorn {
+        0% { 
+          transform: translateX(-50%) translateY(-50%) rotate(0deg);
+          filter: hue-rotate(0deg) brightness(1);
+        }
+        50% { 
+          transform: translateX(-50%) translateY(-50%) rotate(5deg);
+          filter: hue-rotate(180deg) brightness(1.2);
+        }
+        100% { 
+          transform: translateX(-50%) translateY(-50%) rotate(0deg);
+          filter: hue-rotate(360deg) brightness(1);
+        }
+      }
+      
+      @keyframes dragon {
+        0% { 
+          transform: translateX(-50%) translateY(-50%) scale(1);
+          filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.8));
+        }
+        50% { 
+          transform: translateX(-50%) translateY(-50%) scale(1.2);
+          filter: drop-shadow(0 0 40px rgba(255, 0, 0, 1));
+        }
+        100% { 
+          transform: translateX(-50%) translateY(-50%) scale(1);
+          filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.8));
+        }
+      }
+      
+      .animate-celebration-float {
+        animation: celebration-float linear forwards;
+      }
+    `;
+    
+    const styleElement = document.createElement('style');
+    styleElement.textContent = celebrationStyles;
+    document.head.appendChild(styleElement);
+    
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
 
   // 실시간 동시 접속자 시뮬레이션
   useEffect(() => {
@@ -840,13 +1143,31 @@ function App() {
             </div>
           )}
 
-          {/* 이스터에그 */}
-          {elapsedTime > 600 && (
+          {/* 이스터에그 - 업그레이드된 버전 */}
+          {elapsedTime >= 600 && (
             <div className="mt-4 text-center animate-fade-in">
-              <div className="bg-purple-500/20 border border-purple-500/50 rounded-2xl px-4 py-3 backdrop-blur">
-                <p className="text-purple-200 text-base font-medium">
-                  🏆 축하합니다. 당신은 이제 공식적으로 시간낭비의 달인입니다. 🏆
-                </p>
+              <div className="bg-gradient-to-r from-purple-500/30 via-pink-500/30 to-yellow-500/30 border-2 border-purple-400/50 rounded-3xl px-6 py-4 backdrop-blur-xl shadow-2xl relative overflow-hidden">
+                {/* 배경 애니메이션 */}
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20 animate-pulse"></div>
+                <div className="absolute top-2 left-4 w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
+                <div className="absolute top-4 right-6 w-1 h-1 bg-pink-400 rounded-full animate-ping delay-500"></div>
+                <div className="absolute bottom-3 right-8 w-1.5 h-1.5 bg-purple-400 rounded-full animate-ping delay-1000"></div>
+                
+                {/* 메인 콘텐츠 */}
+                <div className="relative z-10 flex items-center justify-center gap-3">
+                  <div className="text-2xl animate-bounce">🏆</div>
+                  <p className="text-xl font-bold bg-gradient-to-r from-yellow-300 via-pink-300 to-purple-300 bg-clip-text text-transparent animate-pulse">
+                    축하합니다! 당신은 이제 공식적으로 시간낭비의 달인입니다!
+                  </p>
+                  <div className="text-2xl animate-bounce delay-200">🏆</div>
+                </div>
+                
+                {/* 다이냅믹 이팩트 */}
+                <div className="absolute -top-2 -right-2">
+                  <div className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse shadow-lg">
+                    🎆 레전드!
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -868,6 +1189,13 @@ function App() {
           </div>
         </button>
       )}
+
+      {/* 축하 이팩트 컴포넌트 */}
+      <CelebrationEffect 
+        isActive={showCelebration}
+        celebration={currentCelebration}
+        onComplete={handleCelebrationComplete}
+      />
 
       {/* 세련된 모달 */}
       <ModernModal
