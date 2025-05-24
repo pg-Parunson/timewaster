@@ -2,22 +2,147 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom styles */
+/* 기본 폰트 및 스무싱 */
 body {
-  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
+/* 현대적 그라디언트 텍스트 애니메이션 */
 .gradient-text {
-  background: linear-gradient(45deg, #ef4444, #f97316, #eab308, #22c55e, #3b82f6, #8b5cf6);
+  background: linear-gradient(
+    45deg,
+    #ff6b6b,
+    #4ecdc4,
+    #45b7d1,
+    #96ceb4,
+    #feca57,
+    #ff9ff3,
+    #54a0ff
+  );
+  background-size: 400% 400%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: gradient-shift 3s ease-in-out infinite;
+  animation: gradient-shift 4s ease-in-out infinite;
 }
 
 @keyframes gradient-shift {
+  0%, 100% { 
+    background-position: 0% 50%; 
+  }
+  25% { 
+    background-position: 100% 50%; 
+  }
+  50% { 
+    background-position: 100% 100%; 
+  }
+  75% { 
+    background-position: 0% 100%; 
+  }
+}
+
+/* 현대적 타이머 글로우 효과 */
+.timer-glow {
+  text-shadow: 
+    0 0 20px rgba(239, 68, 68, 0.8),
+    0 0 40px rgba(239, 68, 68, 0.6),
+    0 0 60px rgba(239, 68, 68, 0.4),
+    0 0 80px rgba(239, 68, 68, 0.2);
+  filter: drop-shadow(0 0 30px rgba(239, 68, 68, 0.5));
+}
+
+/* 강화된 텍스트 글로우 - 현대적 네온 사인 효과 */
+.glow-text-strong {
+  text-shadow: 
+    0 0 10px rgba(255, 255, 255, 0.8),
+    0 0 20px rgba(239, 68, 68, 0.8),
+    0 0 30px rgba(239, 68, 68, 0.6),
+    0 0 40px rgba(239, 68, 68, 0.4),
+    0 0 70px rgba(239, 68, 68, 0.1),
+    0 0 80px rgba(239, 68, 68, 0.1);
+  animation: text-glow-pulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes text-glow-pulse {
+  from {
+    text-shadow: 
+      0 0 10px rgba(255, 255, 255, 0.8),
+      0 0 20px rgba(239, 68, 68, 0.8),
+      0 0 30px rgba(239, 68, 68, 0.6),
+      0 0 40px rgba(239, 68, 68, 0.4);
+    filter: brightness(1);
+  }
+  to {
+    text-shadow: 
+      0 0 15px rgba(255, 255, 255, 1),
+      0 0 35px rgba(239, 68, 68, 1),
+      0 0 50px rgba(239, 68, 68, 0.8),
+      0 0 70px rgba(239, 68, 68, 0.6),
+      0 0 100px rgba(239, 68, 68, 0.4);
+    filter: brightness(1.1);
+  }
+}
+
+/* 부드러운 박스 글로우 애니메이션 */
+.animate-glow-soft {
+  animation: glow-soft 4s ease-in-out infinite alternate;
+}
+
+@keyframes glow-soft {
+  from {
+    box-shadow: 
+      0 0 20px rgba(139, 92, 246, 0.3),
+      0 0 40px rgba(139, 92, 246, 0.2),
+      0 0 60px rgba(139, 92, 246, 0.1),
+      inset 0 0 20px rgba(255, 255, 255, 0.05);
+  }
+  to {
+    box-shadow: 
+      0 0 30px rgba(139, 92, 246, 0.5),
+      0 0 60px rgba(139, 92, 246, 0.3),
+      0 0 90px rgba(139, 92, 246, 0.2),
+      inset 0 0 30px rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* 현대적 위글 애니메이션 */
+.animate-wiggle-strong {
+  animation: wiggle-strong 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+}
+
+@keyframes wiggle-strong {
+  0%, 100% { 
+    transform: rotate(-2deg) scale(1) translateX(0px); 
+  }
+  25% { 
+    transform: rotate(2deg) scale(1.01) translateX(-2px); 
+  }
+  50% { 
+    transform: rotate(-1deg) scale(1.02) translateX(2px); 
+  }
+  75% { 
+    transform: rotate(1deg) scale(1.01) translateX(-1px); 
+  }
+}
+
+/* 유려한 배경 시머 효과 */
+.shimmer-bg {
+  background: linear-gradient(
+    110deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0.05) 75%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  background-size: 300% 100%;
+  animation: shimmer 4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
   0%, 100% { 
     background-position: 0% 50%; 
   }
@@ -26,333 +151,337 @@ body {
   }
 }
 
-.timer-glow {
-  text-shadow: 
-    0 0 10px rgba(239, 68, 68, 0.5), 
-    0 0 20px rgba(239, 68, 68, 0.3),
-    0 0 30px rgba(239, 68, 68, 0.2);
-}
-
-/* 비난 메시지 가시성 강화 효과들 */
-.glow-text-strong {
-  text-shadow: 
-    0 0 10px rgba(239, 68, 68, 0.8),
-    0 0 20px rgba(239, 68, 68, 0.6),
-    0 0 30px rgba(239, 68, 68, 0.4),
-    2px 2px 4px rgba(0, 0, 0, 0.3);
-  animation: text-glow-strong 3s ease-in-out infinite alternate;
-}
-
-@keyframes text-glow-strong {
-  from {
-    text-shadow: 
-      0 0 10px rgba(239, 68, 68, 0.8),
-      0 0 20px rgba(239, 68, 68, 0.6),
-      0 0 30px rgba(239, 68, 68, 0.4),
-      2px 2px 4px rgba(0, 0, 0, 0.3);
-  }
-  to {
-    text-shadow: 
-      0 0 20px rgba(239, 68, 68, 1),
-      0 0 35px rgba(239, 68, 68, 0.8),
-      0 0 50px rgba(239, 68, 68, 0.6),
-      3px 3px 6px rgba(0, 0, 0, 0.4);
-  }
-}
-
-/* 박스 자체에 부드러운 glow 효과 */
-.animate-glow-soft {
-  animation: glow-soft 4s ease-in-out infinite alternate;
-}
-
-@keyframes glow-soft {
-  from {
-    box-shadow: 
-      0 0 20px rgba(239, 68, 68, 0.2),
-      0 0 40px rgba(239, 68, 68, 0.1),
-      inset 0 0 20px rgba(255, 255, 255, 0.1);
-  }
-  to {
-    box-shadow: 
-      0 0 30px rgba(239, 68, 68, 0.4),
-      0 0 60px rgba(239, 68, 68, 0.2),
-      inset 0 0 30px rgba(255, 255, 255, 0.2);
-  }
-}
-
-/* 강화된 위글 애니메이션 */
-.animate-wiggle-strong {
-  animation: wiggle-strong 0.8s ease-in-out infinite;
-}
-
-@keyframes wiggle-strong {
-  0%, 100% { transform: rotate(-3deg) scale(1); }
-  25% { transform: rotate(3deg) scale(1.02); }
-  50% { transform: rotate(-2deg) scale(1.01); }
-  75% { transform: rotate(2deg) scale(1.02); }
-}
-
-/* 반짝이는 배경 효과 */
-.shimmer-bg {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.3) 50%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 3s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-/* 극한 모드용 네온 효과 강화 */
+/* 극한 모드 강화된 네온 효과 */
 .neon-text-extreme {
-  color: #ff0040;
+  color: #ff073a;
   font-weight: 900;
   text-shadow: 
-    0 0 5px #ff0040,
-    0 0 10px #ff0040,
-    0 0 15px #ff0040,
-    0 0 20px #ff0040,
-    0 0 35px #ff0040,
-    0 0 50px #ff0040,
-    3px 3px 0px #000,
-    -1px -1px 0px #000,
-    1px -1px 0px #000,
-    -1px 1px 0px #000;
-  animation: neon-flicker-extreme 2s infinite alternate;
+    0 0 5px #ff073a,
+    0 0 10px #ff073a,
+    0 0 15px #ff073a,
+    0 0 20px #ff073a,
+    0 0 35px #ff073a,
+    0 0 50px #ff073a,
+    0 0 75px #ff073a,
+    2px 2px 0px rgba(0, 0, 0, 0.8);
+  animation: neon-flicker-extreme 1.5s infinite alternate-reverse;
+  filter: brightness(1.2) contrast(1.1);
 }
 
 @keyframes neon-flicker-extreme {
-  0%, 18%, 22%, 25%, 53%, 57%, 100% {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
     text-shadow: 
-      0 0 5px #ff0040,
-      0 0 10px #ff0040,
-      0 0 15px #ff0040,
-      0 0 20px #ff0040,
-      0 0 35px #ff0040,
-      0 0 50px #ff0040,
-      3px 3px 0px #000;
+      0 0 5px #ff073a,
+      0 0 10px #ff073a,
+      0 0 15px #ff073a,
+      0 0 20px #ff073a,
+      0 0 35px #ff073a,
+      0 0 50px #ff073a,
+      0 0 75px #ff073a,
+      2px 2px 0px rgba(0, 0, 0, 0.8);
+    filter: brightness(1.2) contrast(1.1);
   }
   20%, 24%, 55% {
     text-shadow: 
-      0 0 2px #ff0040,
-      3px 3px 0px #000;
+      0 0 2px #ff073a,
+      2px 2px 0px rgba(0, 0, 0, 0.8);
+    filter: brightness(0.8) contrast(0.9);
   }
 }
 
-/* 메시지 박스 터치 효과 */
+/* 메시지 박스 현대적 호버 효과 */
 .message-box-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+  backdrop-filter: blur(20px);
 }
 
 .message-box-hover:hover {
-  transform: translateY(-4px) scale(1.02);
+  transform: translateY(-8px) scale(1.02);
   box-shadow: 
-    0 20px 40px rgba(239, 68, 68, 0.2),
-    0 0 60px rgba(239, 68, 68, 0.1),
-    inset 0 0 30px rgba(255, 255, 255, 0.3);
+    0 25px 50px rgba(139, 92, 246, 0.25),
+    0 0 80px rgba(139, 92, 246, 0.15),
+    inset 0 0 40px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(30px);
 }
 
+.message-box-hover:active {
+  transform: translateY(-4px) scale(1.01);
+}
+
+/* 현대적 쉐이크 애니메이션 */
 .shake {
-  animation: shake 0.5s ease-in-out;
+  animation: shake-modern 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+@keyframes shake-modern {
+  10%, 90% {
+    transform: translate3d(-2px, 0, 0) rotate(-1deg);
+  }
+  20%, 80% {
+    transform: translate3d(4px, 0, 0) rotate(1deg);
+  }
+  30%, 50%, 70% {
+    transform: translate3d(-6px, 0, 0) rotate(-1deg);
+  }
+  40%, 60% {
+    transform: translate3d(6px, 0, 0) rotate(1deg);
+  }
 }
 
+/* 부드러운 플로팅 애니메이션 */
 .float {
-  animation: float 3s ease-in-out infinite;
+  animation: float-smooth 6s ease-in-out infinite;
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+@keyframes float-smooth {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg); 
+  }
+  33% { 
+    transform: translateY(-10px) rotate(1deg); 
+  }
+  66% { 
+    transform: translateY(-5px) rotate(-1deg); 
+  }
 }
 
-/* Enhanced animations for PC experience */
+/* 향상된 PC 경험을 위한 애니메이션들 */
 .animate-spin-slow {
-  animation: spin 3s linear infinite;
+  animation: spin-smooth 4s linear infinite;
+}
+
+@keyframes spin-smooth {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .animate-bounce-slow {
-  animation: bounce 2s infinite;
+  animation: bounce-gentle 3s infinite;
+}
+
+@keyframes bounce-gentle {
+  0%, 100% {
+    transform: translateY(0px);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(-15px);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
 }
 
 .animate-wiggle {
-  animation: wiggle 1s ease-in-out infinite;
+  animation: wiggle-subtle 2s ease-in-out infinite;
 }
 
-@keyframes wiggle {
-  0%, 100% { transform: rotate(-2deg); }
-  50% { transform: rotate(2deg); }
+@keyframes wiggle-subtle {
+  0%, 100% { transform: rotate(-1deg); }
+  25% { transform: rotate(1deg); }
+  50% { transform: rotate(-0.5deg); }
+  75% { transform: rotate(0.5deg); }
 }
 
+/* 고급 글로우 효과 */
 .animate-glow {
-  animation: glow 2s ease-in-out infinite alternate;
+  animation: glow-advanced 2.5s ease-in-out infinite alternate;
 }
 
-@keyframes glow {
+@keyframes glow-advanced {
   from {
-    box-shadow: 0 0 5px rgba(239, 68, 68, 0.5);
+    box-shadow: 
+      0 0 10px rgba(239, 68, 68, 0.5),
+      0 0 20px rgba(239, 68, 68, 0.3),
+      0 0 30px rgba(239, 68, 68, 0.1);
   }
   to {
     box-shadow: 
       0 0 20px rgba(239, 68, 68, 0.8), 
-      0 0 30px rgba(239, 68, 68, 0.6);
+      0 0 40px rgba(239, 68, 68, 0.6),
+      0 0 60px rgba(239, 68, 68, 0.4),
+      0 0 80px rgba(239, 68, 68, 0.2);
   }
 }
 
+/* 부드러운 펄스 애니메이션 */
 .animate-pulse-slow {
-  animation: pulse-slow 3s ease-in-out infinite;
+  animation: pulse-smooth 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-@keyframes pulse-slow {
+@keyframes pulse-smooth {
   0%, 100% { 
     opacity: 1;
     transform: scale(1);
   }
   50% { 
     opacity: 0.8;
-    transform: scale(1.02);
+    transform: scale(1.03);
   }
 }
 
+/* 우아한 페이드인 */
 .animate-fade-in {
-  animation: fadeIn 1s ease-in;
+  animation: fadeIn-smooth 1.2s cubic-bezier(0.23, 1, 0.320, 1);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes fadeIn-smooth {
+  from { 
+    opacity: 0; 
+    transform: translateY(30px) scale(0.95); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
 }
 
-/* Typing cursor animation */
+/* 타이핑 커서 현대적 효과 */
 .typing-cursor {
-  animation: blink 1s infinite;
+  animation: blink-smooth 1.2s ease-in-out infinite;
 }
 
-@keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+@keyframes blink-smooth {
+  0%, 45% { opacity: 1; }
+  50%, 95% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
-/* PC 친화적 반응형 개선 */
+/* 반응형 PC 친화적 스타일 개선 */
 @media (min-width: 768px) {
   .timer-pc {
     font-size: 8rem;
+    letter-spacing: -0.05em;
   }
   
   .message-pc {
-    font-size: 3rem;
-    min-height: 250px;
-    padding: 3rem;
+    font-size: 2.5rem;
+    line-height: 1.4;
+    min-height: 220px;
+    padding: 2.5rem;
   }
   
   .button-pc {
-    font-size: 2rem;
-    padding: 2rem 3rem;
+    font-size: 1.5rem;
+    padding: 1.5rem 2.5rem;
+    border-radius: 1rem;
   }
   
   .activity-suggestion-pc {
-    padding: 2rem 3rem;
-    font-size: 1.5rem;
+    padding: 2rem 2.5rem;
+    font-size: 1.25rem;
   }
 }
 
 @media (min-width: 1024px) {
   .timer-pc {
     font-size: 10rem;
+    letter-spacing: -0.08em;
   }
   
   .message-pc {
-    font-size: 3.5rem;
-    min-height: 280px;
-    padding: 3.5rem;
+    font-size: 3rem;
+    line-height: 1.3;
+    min-height: 250px;
+    padding: 3rem;
   }
   
   .button-pc {
-    font-size: 2.5rem;
-    padding: 2.5rem 4rem;
+    font-size: 1.75rem;
+    padding: 2rem 3rem;
+    border-radius: 1.25rem;
   }
   
   .activity-suggestion-pc {
-    padding: 2.5rem 4rem;
-    font-size: 1.75rem;
+    padding: 2.5rem 3rem;
+    font-size: 1.5rem;
+    line-height: 1.4;
   }
 }
 
 @media (min-width: 1280px) {
   .timer-pc {
     font-size: 12rem;
+    letter-spacing: -0.1em;
   }
   
   .message-pc {
-    font-size: 4rem;
-    min-height: 320px;
-    padding: 4rem;
+    font-size: 3.5rem;
+    line-height: 1.2;
+    min-height: 280px;
+    padding: 3.5rem;
   }
   
   .button-pc {
-    font-size: 3rem;
-    padding: 3rem 5rem;
+    font-size: 2rem;
+    padding: 2.5rem 4rem;
+    border-radius: 1.5rem;
   }
   
   .activity-suggestion-pc {
-    padding: 3rem 5rem;
-    font-size: 2rem;
+    padding: 3rem 4rem;
+    font-size: 1.75rem;
+    line-height: 1.3;
   }
 }
 
-/* Scrollbar styling */
+/* 현대적 스크롤바 스타일링 */
 ::-webkit-scrollbar {
-  width: 12px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, #ef4444, #f97316);
-  border-radius: 6px;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  border-radius: 4px;
+  transition: all 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(45deg, #dc2626, #ea580c);
+  background: linear-gradient(45deg, #764ba2, #667eea);
+  box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
 }
 
-/* Button hover effects enhancement */
+/* 향상된 버튼 호버 효과 */
 .button-hover-glow:hover {
   box-shadow: 
-    0 0 20px rgba(239, 68, 68, 0.4),
-    0 0 40px rgba(239, 68, 68, 0.2);
-  transform: translateY(-2px) scale(1.05);
+    0 0 30px rgba(239, 68, 68, 0.5),
+    0 0 60px rgba(239, 68, 68, 0.3),
+    0 0 90px rgba(239, 68, 68, 0.1);
+  transform: translateY(-4px) scale(1.05);
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
 }
 
-/* Message container improvements */
+.button-hover-glow:active {
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* 메시지 컨테이너 고급 효과 */
 .message-container {
-  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.2) 100%);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.2);
+  background: linear-gradient(
+    135deg, 
+    rgba(255, 255, 255, 0.15) 0%, 
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(31, 38, 135, 0.37),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-/* Enhanced shadow effects */
+/* 향상된 그림자 효과 */
 .enhanced-shadow {
   box-shadow: 
-    0 10px 25px rgba(0,0,0,0.1),
-    0 20px 40px rgba(0,0,0,0.05);
+    0 20px 40px rgba(0, 0, 0, 0.1),
+    0 40px 80px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
-/* Neon text effect for extreme mode */
+/* 고급 네온 텍스트 효과 */
 .neon-text {
   color: #ff073a;
   text-shadow: 
@@ -360,22 +489,71 @@ body {
     0 0 10px #ff073a,
     0 0 15px #ff073a,
     0 0 20px #ff073a,
-    0 0 30px #ff073a,
-    0 0 40px #ff073a;
-  animation: neon-flicker 1.5s infinite alternate;
+    0 0 40px #ff073a,
+    0 0 80px #ff073a,
+    0 0 120px #ff073a;
+  animation: neon-flicker-advanced 2s ease-in-out infinite alternate;
+  filter: brightness(1.1) contrast(1.2);
 }
 
-@keyframes neon-flicker {
+@keyframes neon-flicker-advanced {
   0%, 18%, 22%, 25%, 53%, 57%, 100% {
     text-shadow: 
       0 0 5px #ff073a,
       0 0 10px #ff073a,
       0 0 15px #ff073a,
       0 0 20px #ff073a,
-      0 0 30px #ff073a,
-      0 0 40px #ff073a;
+      0 0 40px #ff073a,
+      0 0 80px #ff073a,
+      0 0 120px #ff073a;
+    filter: brightness(1.1) contrast(1.2);
   }
   20%, 24%, 55% {
-    text-shadow: none;
+    text-shadow: 
+      0 0 2px #ff073a,
+      0 0 5px #ff073a;
+    filter: brightness(0.9) contrast(1);
+  }
+}
+
+/* 글래스모피즘 효과 */
+.glassmorphism {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.05)
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* 고성능 하드웨어 가속 */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* 접근성 개선 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 다크모드 최적화 */
+@media (prefers-color-scheme: dark) {
+  .auto-dark {
+    filter: brightness(0.9) contrast(1.1);
   }
 }

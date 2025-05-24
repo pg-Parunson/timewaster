@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Clock, Share2, MessageCircle, Copy, ExternalLink, Zap, Heart, Skull } from 'lucide-react';
+import { Clock, Share2, MessageCircle, Copy, ExternalLink, Zap, Heart, Skull, Sparkles, Target, Brain, ArrowRight } from 'lucide-react';
 
 // 시간별 실제 활동 매칭 데이터베이스 - 강화버전
 const TIME_BASED_ACTIVITIES = [
@@ -31,27 +31,27 @@ const TIME_BASED_ACTIVITIES = [
   { minSeconds: 2400, activity: "새로운 도전 목표 세우기", category: "목표", icon: "🎯" }
 ];
 
-// 카테고리별 색상 매핑
+// 세련된 카테고리별 색상 매핑
 const CATEGORY_COLORS = {
-  "건강": "text-green-600 bg-green-50 border-green-200",
-  "운동": "text-blue-600 bg-blue-50 border-blue-200",
-  "환경": "text-emerald-600 bg-emerald-50 border-emerald-200",
-  "계획": "text-purple-600 bg-purple-50 border-purple-200",
-  "학습": "text-indigo-600 bg-indigo-50 border-indigo-200",
-  "멘탈": "text-pink-600 bg-pink-50 border-pink-200",
-  "집안일": "text-orange-600 bg-orange-50 border-orange-200",
-  "인간관계": "text-yellow-600 bg-yellow-50 border-yellow-200",
-  "효도": "text-red-600 bg-red-50 border-red-200",
-  "생산성": "text-gray-700 bg-gray-50 border-gray-200",
-  "자기계발": "text-cyan-600 bg-cyan-50 border-cyan-200",
-  "취업": "text-amber-600 bg-amber-50 border-amber-200",
-  "재정": "text-lime-600 bg-lime-50 border-lime-200",
-  "취미": "text-fuchsia-600 bg-fuchsia-50 border-fuchsia-200",
-  "철학": "text-slate-600 bg-slate-50 border-slate-200",
-  "가족": "text-rose-600 bg-rose-50 border-rose-200",
-  "목표": "text-violet-600 bg-violet-50 border-violet-200",
-  "요리": "text-teal-600 bg-teal-50 border-teal-200",
-  "기본": "text-gray-600 bg-gray-50 border-gray-200"
+  "건강": "from-emerald-500 to-teal-500 text-white",
+  "운동": "from-blue-500 to-cyan-500 text-white",
+  "환경": "from-green-500 to-emerald-500 text-white",
+  "계획": "from-purple-500 to-violet-500 text-white",
+  "학습": "from-indigo-500 to-blue-500 text-white",
+  "멘탈": "from-pink-500 to-rose-500 text-white",
+  "집안일": "from-orange-500 to-amber-500 text-white",
+  "인간관계": "from-yellow-500 to-orange-500 text-white",
+  "효도": "from-red-500 to-pink-500 text-white",
+  "생산성": "from-gray-600 to-slate-600 text-white",
+  "자기계발": "from-cyan-500 to-blue-500 text-white",
+  "취업": "from-amber-500 to-orange-500 text-white",
+  "재정": "from-lime-500 to-green-500 text-white",
+  "취미": "from-fuchsia-500 to-pink-500 text-white",
+  "철학": "from-slate-500 to-gray-500 text-white",
+  "가족": "from-rose-500 to-red-500 text-white",
+  "목표": "from-violet-500 to-purple-500 text-white",
+  "요리": "from-teal-500 to-cyan-500 text-white",
+  "기본": "from-gray-500 to-slate-500 text-white"
 };
 
 // 비난 멘트 데이터베이스 - 강화된 버전
@@ -92,14 +92,14 @@ const AD_MESSAGES = [
 
 // 버튼 텍스트 변형
 const BUTTON_TEXTS = [
-  "내가 지금 뭐 하는 거지?",
-  "더 많은 시간을 낭비하기",
-  "또 다른 현실 직시하기",
-  "계속 여기 있기",
+  "지금 내가 뭐 하는 거지?",
+  "더 깊은 현실 직시하기",
   "시간 낭비 레벨업",
   "더 뼈아픈 진실 듣기",
+  "생산성 완전 포기하기",
   "현실 도피 계속하기",
-  "생산성 완전 포기하기"
+  "또 다른 핑계 찾기",
+  "시간의 소중함 무시하기"
 ];
 
 function App() {
@@ -136,7 +136,7 @@ function App() {
       if (index < message.length) {
         setDisplayMessage(prev => prev + message.charAt(index));
         index++;
-        typingRef.current = setTimeout(type, 50 + Math.random() * 30);
+        typingRef.current = setTimeout(type, 30 + Math.random() * 20);
       } else {
         setIsTyping(false);
       }
@@ -343,208 +343,258 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-teal-600 flex items-center justify-center p-4">
-      {/* 배경 애니메이션 */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-4 -left-4 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-bounce-slow"></div>
-        <div className="absolute -top-4 -right-4 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-bounce-slow"></div>
-        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-green-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-bounce-slow"></div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+      {/* 현대적 배경 효과 */}
+      <div className="absolute inset-0">
+        {/* 글로우 효과 */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full filter blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/20 rounded-full filter blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-500/10 rounded-full filter blur-3xl animate-pulse delay-2000"></div>
+        
+        {/* 그리드 패턴 */}
+        <div className="absolute inset-0 opacity-10">
+          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+                <path d="M 50 0 L 0 0 0 50" fill="none" stroke="white" strokeWidth="1"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+          </svg>
+        </div>
       </div>
 
-      {/* PC 친화적 메인 컨테이너 */}
-      <div className="relative bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-10 w-full max-w-6xl text-center overflow-hidden">
-        {/* 향상된 상단 통계 - PC에 적합한 디자인 */}
-        <div className="absolute top-6 right-6 bg-white/90 px-6 py-4 rounded-2xl shadow-lg border border-gray-200">
-          <div className="flex flex-col items-end text-sm text-gray-600 space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="text-green-600">📊</span>
-              <span>방문: <strong className="text-green-700">{visits}회</strong></span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-blue-600">📱</span>
-              <span>광고: <strong className="text-blue-700">{adClicks}회</strong></span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-red-600">⏱️</span>
-              <span>총 낭비: <strong className="text-red-700">{Math.floor(totalTimeWasted / 60)}분</strong></span>
-            </div>
-          </div>
-        </div>
-
-        {/* 극한 모드 표시 */}
-        {extremeMode && (
-          <div className="absolute top-6 left-6 text-sm text-red-600 bg-red-100 px-3 py-2 rounded-full animate-pulse border border-red-300">
-            <Skull className="inline w-4 h-4 mr-1"/>
-            🔥 극한모드 활성화 🔥
-          </div>
-        )}
-
-        {/* 상단 테두리 애니메이션 */}
-        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 animate-pulse rounded-t-3xl"></div>
-
-        {/* PC 최적화된 타이머 섹션 */}
-        <div className={`mb-16 ${extremeMode ? 'animate-wiggle' : ''}`}>
-          <div className="flex items-center justify-center mb-8">
-            <Clock className="text-red-500 animate-spin-slow mr-6" size={80} />
-            <div 
-              ref={timerRef}
-              className={`text-9xl md:text-[10rem] font-bold font-mono timer-glow ${
-                extremeMode ? 'text-red-600 animate-pulse' : 'text-red-500'
-              } ${elapsedTime > 300 ? 'animate-bounce' : ''}`}
-            >
-              {formatTime(elapsedTime)}
-            </div>
-          </div>
-          
-          {/* PC 최적화된 활동 제안 - 더 큰 화면 활용 */}
-          <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 px-12 py-6 rounded-3xl border-2 border-blue-200 shadow-xl">
-            <div className="flex items-center justify-center gap-4 mb-4">
-              <span className="text-4xl">{getTimeBasedActivity(elapsedTime).icon}</span>
-              <span className="text-2xl font-semibold text-gray-700">지금까지 이런 것들을 할 수 있었어요:</span>
-            </div>
-            <div className="text-center space-y-3">
-              <div className="text-3xl font-bold text-blue-700 mb-2">
-                "{getTimeBasedActivity(elapsedTime).activity}"
+      {/* 메인 컨테이너 */}
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 lg:p-12 w-full max-w-7xl">
+          {/* 상단 통계 바 */}
+          <div className="flex items-center justify-between mb-8 p-4 bg-white/5 backdrop-blur rounded-2xl border border-white/10">
+            <div className="flex items-center gap-8">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-white/80 text-sm">실시간 추적</span>
               </div>
-              <div className={`inline-block px-4 py-2 rounded-full text-base font-medium border-2 shadow-sm ${
-                CATEGORY_COLORS[getTimeBasedActivity(elapsedTime).category] || "text-gray-600 bg-gray-50 border-gray-200"
-              }`}>
-                {getTimeBasedActivity(elapsedTime).category} 활동
+              {extremeMode && (
+                <div className="flex items-center gap-2">
+                  <Skull className="w-4 h-4 text-red-500" />
+                  <span className="text-red-400 text-sm font-medium">극한 모드</span>
+                </div>
+              )}
+            </div>
+            
+            <div className="flex items-center gap-6 text-sm">
+              <div className="flex items-center gap-2">
+                <Target className="w-4 h-4 text-blue-400" />
+                <span className="text-white/70">방문 <span className="text-blue-400 font-semibold">{visits}</span></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-yellow-400" />
+                <span className="text-white/70">광고 <span className="text-yellow-400 font-semibold">{adClicks}</span></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-red-400" />
+                <span className="text-white/70">총 낭비 <span className="text-red-400 font-semibold">{Math.floor(totalTimeWasted / 60)}분</span></span>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* 개선된 메시지 영역 - 가시성 대폭 강화 */}
-        <div 
-          ref={messageRef}
-          className={`bg-gradient-to-r from-yellow-50 via-red-50 to-orange-50 border-4 border-red-500 p-10 mb-8 rounded-3xl min-h-[220px] flex items-center justify-center shadow-2xl message-box-hover cursor-pointer ${
-            messageShake ? 'shake animate-wiggle-strong' : ''
-          } ${extremeMode ? 'from-red-100 to-red-200 border-red-700 animate-pulse-slow neon-text-extreme' : 'animate-glow-soft shimmer-bg'}`}
-          onClick={refreshMessage}
-        >
-          <div className="text-center relative">
-            {/* 메시지 백그라운드 강조 */}
-            <div className="absolute inset-0 bg-white/80 rounded-2xl transform rotate-1 shadow-lg"></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-red-100/50 to-orange-100/50 rounded-2xl transform -rotate-1 shadow-lg"></div>
-            
-            {/* 메인 텍스트 - 가시성 대폭 강화 */}
-            <p className={`relative z-10 text-4xl md:text-5xl leading-relaxed font-bold text-center ${
-              extremeMode ? 'text-red-900 drop-shadow-lg' : 'text-gray-900 drop-shadow-md'
-            } ${isTyping ? 'glow-text-strong animate-pulse' : 'glow-text-strong'}`}
-              style={{
-                textShadow: extremeMode 
-                  ? '3px 3px 6px rgba(220, 38, 38, 0.3), 0 0 20px rgba(220, 38, 38, 0.2)'
-                  : '2px 2px 4px rgba(0, 0, 0, 0.1), 0 0 15px rgba(59, 130, 246, 0.1)'
-              }}
-            >
-              {displayMessage}
-              {isTyping && <span className="animate-ping text-red-600 ml-1 text-6xl">|</span>}
-            </p>
-            
-            {/* 추가 강조 효과들 */}
-            {!isTyping && (
-              <div className="absolute -top-4 -right-4 animate-bounce-slow">
-                <div className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg transform rotate-12">
-                  📢 주목!
+          {/* 중앙 타이머 섹션 */}
+          <div className="text-center mb-12">
+            {/* 타이머 디스플레이 */}
+            <div className="relative mb-8">
+              <div className="inline-flex items-center justify-center">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-pink-500 rounded-full filter blur-2xl opacity-50 animate-pulse"></div>
+                  <div 
+                    className={`relative text-6xl md:text-8xl lg:text-9xl font-mono font-bold ${
+                      extremeMode 
+                        ? 'text-red-400 animate-pulse' 
+                        : 'bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent'
+                    }`}
+                    style={{
+                      textShadow: extremeMode 
+                        ? '0 0 30px rgba(239, 68, 68, 0.8)' 
+                        : '0 0 20px rgba(239, 68, 68, 0.5)'
+                    }}
+                  >
+                    {formatTime(elapsedTime)}
+                  </div>
                 </div>
               </div>
-            )}
-            
-            {extremeMode && (
-              <div className="absolute -bottom-4 -left-4 animate-wiggle">
-                <div className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg transform -rotate-12">
-                  🚨 긴급!
+            </div>
+
+            {/* 활동 제안 카드 */}
+            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 mb-8">
+              <div className="flex items-center justify-center gap-4 mb-4">
+                <Brain className="w-6 h-6 text-purple-400" />
+                <span className="text-white/80 font-medium">지금 이 시간에 할 수 있었던 일</span>
+              </div>
+              
+              <div className="flex items-center justify-center gap-4 mb-4">
+                <div className="text-4xl">{getTimeBasedActivity(elapsedTime).icon}</div>
+                <div className="text-2xl lg:text-3xl font-bold text-white">
+                  {getTimeBasedActivity(elapsedTime).activity}
                 </div>
               </div>
-            )}
+              
+              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${
+                CATEGORY_COLORS[getTimeBasedActivity(elapsedTime).category] || CATEGORY_COLORS["기본"]
+              } shadow-lg`}>
+                <span className="font-medium">{getTimeBasedActivity(elapsedTime).category}</span>
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* PC 최적화된 메인 버튼 */}
-        <button
-          onClick={refreshMessage}
-          className={`w-full max-w-4xl bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-bold py-8 px-12 rounded-full mb-12 transform hover:scale-105 transition-all duration-200 shadow-xl hover:shadow-2xl text-3xl ${
-            extremeMode ? 'animate-glow' : ''
-          }`}
-          disabled={isTyping}
-        >
-          {isTyping ? '메시지 생성 중...' : buttonText}
-        </button>
+          {/* 메시지 영역 - 완전히 새로운 디자인 */}
+          <div 
+            ref={messageRef}
+            className={`relative mb-8 cursor-pointer group ${messageShake ? 'animate-bounce' : ''}`}
+            onClick={refreshMessage}
+          >
+            {/* 카드 배경 */}
+            <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-8 lg:p-12 min-h-[200px] flex items-center justify-center relative overflow-hidden">
+              {/* 배경 패턴 */}
+              <div className="absolute inset-0 opacity-5">
+                <div className="absolute top-4 left-4 w-2 h-2 bg-white rounded-full animate-ping"></div>
+                <div className="absolute top-8 right-8 w-1 h-1 bg-white rounded-full animate-ping delay-1000"></div>
+                <div className="absolute bottom-6 left-8 w-1.5 h-1.5 bg-white rounded-full animate-ping delay-2000"></div>
+              </div>
+              
+              {/* 메인 텍스트 */}
+              <div className="relative z-10 text-center">
+                <p className={`text-xl lg:text-3xl xl:text-4xl leading-relaxed font-medium text-white ${
+                  isTyping ? 'animate-pulse' : ''
+                }`}>
+                  {displayMessage}
+                  {isTyping && <span className="animate-ping text-red-400 ml-1">|</span>}
+                </p>
+                
+                {/* 호버 효과 표시 */}
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 mt-4">
+                  <div className="flex items-center justify-center gap-2 text-white/50 text-sm">
+                    <Sparkles className="w-4 h-4" />
+                    <span>클릭해서 새로운 메시지 보기</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* 극한 모드 효과 */}
+              {extremeMode && (
+                <div className="absolute -top-2 -right-2">
+                  <div className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-bounce">
+                    🚨 극한!
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
 
-        {/* 광고 섹션 */}
-        {showAd && (
-          <div className={`bg-yellow-50 border-3 border-dashed border-yellow-400 rounded-2xl p-8 mb-8 animate-pulse-slow ${
-            extremeMode ? 'bg-red-50 border-red-400' : ''
-          }`}>
-            <div className="flex items-center justify-center mb-4">
-              <Zap className="text-yellow-500 mr-3 animate-bounce" size={24} />
-              <span className={`font-bold text-xl ${extremeMode ? 'text-red-700' : 'text-yellow-700'}`}>
-                {adMessage}
+          {/* 메인 액션 버튼 */}
+          <div className="flex justify-center mb-8">
+            <button
+              onClick={refreshMessage}
+              disabled={isTyping}
+              className={`
+                group relative px-8 lg:px-12 py-4 lg:py-6 
+                bg-gradient-to-r from-red-500 to-pink-500 
+                hover:from-red-600 hover:to-pink-600
+                text-white font-bold text-lg lg:text-xl
+                rounded-2xl shadow-2xl
+                transform hover:scale-105 active:scale-95
+                transition-all duration-200
+                disabled:opacity-50 disabled:cursor-not-allowed
+                ${extremeMode ? 'animate-pulse shadow-red-500/50' : ''}
+              `}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-pink-600 rounded-2xl filter blur opacity-50 group-hover:opacity-75 transition-opacity"></div>
+              <span className="relative">
+                {isTyping ? '메시지 생성 중...' : buttonText}
               </span>
-              <Zap className="text-yellow-500 ml-3 animate-bounce" size={24} />
+            </button>
+          </div>
+
+          {/* 광고 섹션 */}
+          {showAd && (
+            <div className={`bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur border border-yellow-500/30 rounded-2xl p-6 mb-8 ${
+              extremeMode ? 'animate-pulse' : ''
+            }`}>
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <Zap className="w-5 h-5 text-yellow-400 animate-bounce" />
+                <span className="text-yellow-200 font-medium text-lg">{adMessage}</span>
+                <Zap className="w-5 h-5 text-yellow-400 animate-bounce" />
+              </div>
+              
+              <div className="flex justify-center">
+                <button
+                  onClick={handleAdClick}
+                  className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold px-8 py-3 rounded-xl transform hover:scale-105 transition-all duration-200 shadow-lg"
+                >
+                  💰 광고 클릭하기 💰
+                </button>
+              </div>
             </div>
-            <button
-              onClick={handleAdClick}
-              className={`w-full max-w-lg bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold py-4 px-8 rounded-full transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl text-xl ${
-                extremeMode ? 'animate-bounce' : ''
-              }`}
-            >
-              👉 광고 누르기 👈
-            </button>
-          </div>
-        )}
+          )}
 
-        {/* PC 최적화된 공유 섹션 */}
-        <div className="border-t-2 border-gray-200 pt-10">
-          <div className="flex items-center justify-center mb-8">
-            <Heart className="text-pink-500 mr-4 animate-pulse" size={32} />
-            <span className="text-gray-600 font-medium text-2xl">"친구도 시간 낭비시켜보자"</span>
-            <Share2 className="text-blue-500 ml-4 animate-bounce" size={32} />
-          </div>
-          
-          <div className="flex gap-6 justify-center flex-wrap">
-            <button
-              onClick={shareToTwitter}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-2xl flex items-center gap-3 transform hover:scale-105 transition-all duration-200 text-xl font-medium shadow-lg hover:shadow-xl"
-            >
-              <ExternalLink size={24} />
-              트위터에 공유
-            </button>
+          {/* 공유 섹션 */}
+          <div className="border-t border-white/10 pt-8">
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <Heart className="w-6 h-6 text-pink-400 animate-pulse" />
+              <span className="text-white/80 text-lg font-medium">친구들도 시간 낭비시켜보자</span>
+              <Share2 className="w-6 h-6 text-blue-400" />
+            </div>
             
-            <button
-              onClick={shareToKakao}
-              className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 px-8 py-4 rounded-2xl flex items-center gap-3 transform hover:scale-105 transition-all duration-200 text-xl font-medium shadow-lg hover:shadow-xl"
-            >
-              <MessageCircle size={24} />
-              카카오톡 공유
-            </button>
-            
-            <button
-              onClick={() => copyToClipboard()}
-              className="bg-gray-600 hover:bg-gray-700 text-white px-8 py-4 rounded-2xl flex items-center gap-3 transform hover:scale-105 transition-all duration-200 text-xl font-medium shadow-lg hover:shadow-xl"
-            >
-              <Copy size={24} />
-              링크 복사
-            </button>
+            <div className="flex gap-4 justify-center flex-wrap">
+              <button
+                onClick={shareToTwitter}
+                className="bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-200 px-6 py-3 rounded-xl flex items-center gap-3 transform hover:scale-105 transition-all duration-200 backdrop-blur"
+              >
+                <ExternalLink className="w-5 h-5" />
+                <span>X에 공유</span>
+              </button>
+              
+              <button
+                onClick={shareToKakao}
+                className="bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/50 text-yellow-200 px-6 py-3 rounded-xl flex items-center gap-3 transform hover:scale-105 transition-all duration-200 backdrop-blur"
+              >
+                <MessageCircle className="w-5 h-5" />
+                <span>카카오톡</span>
+              </button>
+              
+              <button
+                onClick={() => copyToClipboard()}
+                className="bg-gray-500/20 hover:bg-gray-500/30 border border-gray-500/50 text-gray-200 px-6 py-3 rounded-xl flex items-center gap-3 transform hover:scale-105 transition-all duration-200 backdrop-blur"
+              >
+                <Copy className="w-5 h-5" />
+                <span>링크 복사</span>
+              </button>
+            </div>
           </div>
+
+          {/* 극한 모드 추가 경고 */}
+          {extremeMode && (
+            <div className="mt-8 p-4 bg-red-500/20 border border-red-500/50 rounded-2xl backdrop-blur">
+              <div className="flex items-center justify-center gap-3">
+                <Skull className="w-6 h-6 text-red-400 animate-bounce" />
+                <p className="text-red-200 font-bold text-lg">
+                  경고: 5분을 넘겼습니다! 이제 정말로 심각한 시간낭비입니다!
+                </p>
+                <Skull className="w-6 h-6 text-red-400 animate-bounce" />
+              </div>
+            </div>
+          )}
+
+          {/* 이스터에그 */}
+          {elapsedTime > 600 && (
+            <div className="mt-6 text-center animate-fade-in">
+              <div className="bg-purple-500/20 border border-purple-500/50 rounded-2xl px-6 py-4 backdrop-blur">
+                <p className="text-purple-200 text-lg font-medium">
+                  🏆 축하합니다. 당신은 이제 공식적으로 시간낭비의 달인입니다. 🏆
+                </p>
+              </div>
+            </div>
+          )}
         </div>
-
-        {/* 극한 모드 추가 메시지 */}
-        {extremeMode && (
-          <div className="mt-8 p-6 bg-red-100 border border-red-300 rounded-2xl animate-pulse">
-            <p className="text-red-800 font-bold text-lg">
-              🚨 경고: 5분을 넘겼습니다! 이제 정말로 심각한 시간낭비입니다! 🚨
-            </p>
-          </div>
-        )}
-
-        {/* 숨겨진 이스터에그 */}
-        {elapsedTime > 600 && (
-          <div className="mt-6 text-gray-500 animate-fade-in">
-            <p className="text-lg">🏆 축하합니다. 당신은 이제 공식적으로 시간낭비의 달인입니다. 🏆</p>
-          </div>
-        )}
       </div>
 
       {/* 플로팅 액션 버튼 (긴급 탈출용) */}
@@ -555,7 +605,7 @@ function App() {
               window.close();
             }
           }}
-          className="fixed bottom-8 right-8 bg-red-600 hover:bg-red-700 text-white p-4 rounded-full shadow-xl animate-bounce z-50 text-xl"
+          className="fixed bottom-8 right-8 bg-red-500 hover:bg-red-600 text-white p-4 rounded-full shadow-2xl animate-bounce z-50 backdrop-blur border border-red-400"
           title="긴급 탈출"
         >
           🚨
