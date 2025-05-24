@@ -157,6 +157,14 @@ function App() {
       .animate-celebration-float {
         animation: celebration-float linear forwards;
       }
+      
+      /* 메시지 박스 안정화 */
+      .message-container {
+        transform: none !important;
+        position: relative;
+        width: 100%;
+        max-width: 100%;
+      }
     `;
     
     const styleElement = document.createElement('style');
@@ -333,11 +341,11 @@ function App() {
     const currentActivity = getTimeBasedActivity(elapsedTime);
     const randomRoast = ROAST_MESSAGES[Math.floor(Math.random() * ROAST_MESSAGES.length)];
     
-    // 다양한 메시지 패턴
+    // 다양한 메시지 패턴 - 긴 메시지 방지
     const messagePatterns = [
       `이 시간에 "${currentActivity.activity}" 할 수 있었는데... ${randomRoast}`,
-      `${currentActivity.icon} ${currentActivity.activity}를 할 수 있었는 소중한 시간이었어요. ${randomRoast}`,
-      `⏰ ${formatTime(elapsedTime)} 동안 "${currentActivity.activity}" 같은 ${currentActivity.category} 활동을 했다면... ${randomRoast}`,
+      `${currentActivity.icon} ${currentActivity.activity}를 위한 소중한 시간이었어요. ${randomRoast}`,
+      `⏰ ${formatTime(elapsedTime)} 동안 "${currentActivity.activity}" 같은 ${currentActivity.category} 활동을 할 수 있었어요... ${randomRoast}`,
       `${currentActivity.icon} 지금 이 순간에도 "${currentActivity.activity}"로 더 나은 자신이 될 수 있었는데... ${randomRoast}`
     ];
     

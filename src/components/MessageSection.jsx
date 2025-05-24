@@ -14,7 +14,7 @@ const MessageSection = ({
   return (
     <div 
       ref={messageRef}
-      className={`relative mb-6 cursor-pointer group transition-all duration-300 ${messageShake ? 'animate-bounce' : ''}`}
+      className={`message-container relative mb-6 cursor-pointer group transition-all duration-300 ${messageShake ? 'animate-bounce' : ''}`}
       onClick={onRefreshMessage}
     >
       {/* 카드 배경 - transform 제거로 위치 버그 해결 */}
@@ -26,11 +26,17 @@ const MessageSection = ({
           <div className="absolute bottom-6 left-8 w-1.5 h-1.5 bg-white rounded-full animate-ping delay-2000"></div>
         </div>
         
-        {/* 메인 텍스트 - 폰트 크기 줄임 */}
-        <div className="relative z-10 text-center w-full">
-          <p className={`text-base lg:text-xl xl:text-2xl leading-relaxed font-medium text-white transition-all duration-300 ${
+        {/* 메인 텍스트 - 긴 메시지 대응 개선 */}
+        <div className="relative z-10 text-center w-full max-w-full px-2">
+          <p className={`text-base lg:text-xl xl:text-2xl leading-relaxed font-medium text-white transition-all duration-300 break-words ${
             isTyping ? 'animate-pulse' : ''
-          }`}>
+          }`}
+          style={{ 
+            wordBreak: 'keep-all',
+            overflowWrap: 'break-word',
+            hyphens: 'auto',
+            maxWidth: '100%'
+          }}>
             {displayMessage}
             {isTyping && <span className="animate-ping text-red-400 ml-1">|</span>}
           </p>
