@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Clock, Share2, MessageCircle, Copy, ExternalLink, Zap, Heart, Skull, Sparkles, Target, Brain } from 'lucide-react';
+import { Clock, Share2, MessageCircle, Copy, ExternalLink, Zap, Heart, Skull, Sparkles, Target, Brain, Users, DoorOpen, AlertTriangle } from 'lucide-react';
 
 // 시간별 실제 활동 매칭 데이터베이스 - 강화버전
 const TIME_BASED_ACTIVITIES = [
@@ -102,6 +102,52 @@ const BUTTON_TEXTS = [
   "시간의 소중함 무시하기"
 ];
 
+// 세련된 모달 컴포넌트
+const ModernModal = ({ isOpen, onClose, title, message, type = 'info' }) => {
+  if (!isOpen) return null;
+
+  const iconMap = {
+    success: '🎉',
+    warning: '⚠️',
+    info: 'ℹ️',
+    exit: '🚪'
+  };
+
+  const colorMap = {
+    success: 'from-green-500 to-emerald-500',
+    warning: 'from-yellow-500 to-orange-500',
+    info: 'from-blue-500 to-cyan-500',
+    exit: 'from-red-500 to-pink-500'
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl max-w-md w-full p-6 shadow-2xl animate-fade-in">
+        {/* 헤더 */}
+        <div className="text-center mb-6">
+          <div className="text-4xl mb-3">{iconMap[type]}</div>
+          <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+        </div>
+        
+        {/* 메시지 */}
+        <div className="text-center mb-6">
+          <p className="text-white/90 text-base leading-relaxed">{message}</p>
+        </div>
+        
+        {/* 버튼 */}
+        <div className="flex justify-center">
+          <button
+            onClick={onClose}
+            className={`px-6 py-3 bg-gradient-to-r ${colorMap[type]} text-white font-semibold rounded-xl transform hover:scale-105 transition-all duration-200 shadow-lg`}
+          >
+            확인
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 function App() {
   const [startTime] = useState(Date.now());
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -117,10 +163,42 @@ function App() {
   const [isPageVisible, setIsPageVisible] = useState(true);
   const [extremeMode, setExtremeMode] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [concurrentUsers, setConcurrentUsers] = useState(3);
+  const [showModal, setShowModal] = useState(false);
+  const [modalConfig, setModalConfig] = useState({});
   
   const timerRef = useRef(null);
   const messageRef = useRef(null);
   const typingRef = useRef(null);
+
+  // 실시간 동시 접속자 시뮬레이션
+  useEffect(() => {
+    const updateConcurrentUsers = () => {
+      const hour = new Date().getHours();
+      let baseUsers = 3;
+      let timeWeight = 1;
+      
+      if (hour >= 9 && hour <= 12) timeWeight = 1.3;
+      else if (hour >= 14 && hour <= 18) timeWeight = 1.5;
+      else if (hour >= 19 && hour <= 23) timeWeight = 1.8;
+      else if (hour >= 0 && hour <= 2) timeWeight = 1.2;
+      else timeWeight = 0.8;
+
+      const variation = (Math.random() - 0.5) * 4;
+      const newUsers = Math.max(1, Math.min(15, Math.round(baseUsers * timeWeight + variation)));
+      setConcurrentUsers(newUsers);
+    };
+
+    updateConcurrentUsers();
+    const interval = setInterval(updateConcurrentUsers, 25000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // 세련된 모달 표시 함수
+  const showModernModal = (title, message, type = 'info') => {
+    setModalConfig({ title, message, type });
+    setShowModal(true);
+  };
 
   // 타이핑 애니메이션 함수
   const typeMessage = (message) => {
@@ -289,15 +367,15 @@ function App() {
   // 광고 클릭
   const handleAdClick = () => {
     const responses = [
-      "광고를 클릭해주셔서 감사합니다! (실제 광고는 아니에요)",
       "우와! 정말 눌러주셨네요! 고마워요! 🎉",
-      "광고 클릭 완료! 이제 더 많은 시간을 낭비해보세요!",
       "훌륭한 선택입니다! 시간낭비의 달인이시네요!",
-      "광고 클릭으로 이 사이트를 후원해주셨습니다!"
+      "광고 클릭으로 이 사이트를 후원해주셨습니다!",
+      "감사합니다! 더 나은 시간낭비 경험을 제공하겠어요!",
+      "완벽합니다! 이제 더 많은 시간을 낭비해보세요!"
     ];
     
     const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-    alert(randomResponse);
+    showModernModal("광고 클릭 완료!", randomResponse, 'success');
     
     const newAdClicks = adClicks + 1;
     setAdClicks(newAdClicks);
@@ -322,7 +400,7 @@ function App() {
       });
     } else {
       copyToClipboard(text);
-      alert('카카오톡 공유 메시지가 클립보드에 복사되었습니다!');
+      showModernModal("공유 완료!", "카카오톡 공유 메시지가 클립보드에 복사되었습니다!", 'success');
     }
   };
 
@@ -339,7 +417,21 @@ function App() {
       document.execCommand('copy');
       document.body.removeChild(textArea);
     }
-    alert('공유 메시지가 클립보드에 복사되었습니다!');
+    showModernModal("복사 완료!", "공유 메시지가 클립보드에 복사되었습니다!", 'success');
+  };
+
+  // 종료 확인
+  const handleExit = () => {
+    showModernModal(
+      "현실로 돌아가시겠습니까?",
+      "정말로 이 환상적인 시간낭비를 끝내시겠습니까? 지금까지의 모든 노력이 물거품이 될 수 있어요!",
+      'exit'
+    );
+  };
+
+  const confirmExit = () => {
+    setShowModal(false);
+    window.close();
   };
 
   return (
@@ -371,8 +463,12 @@ function App() {
           <div className="flex items-center justify-between mb-6 p-4 bg-white/5 backdrop-blur rounded-2xl border border-white/10">
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                <div className="w-3 h-3 bg-green-500 rounded-full status-indicator"></div>
                 <span className="text-white/80 text-sm">실시간 추적</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-blue-400" />
+                <span className="text-white/70">동시 접속 <span className="text-blue-400 font-semibold">{concurrentUsers}</span></span>
               </div>
               {extremeMode && (
                 <div className="flex items-center gap-2">
@@ -481,14 +577,14 @@ function App() {
             </div>
           </div>
 
-          {/* 메시지 영역 - 완전히 새로운 디자인 */}
+          {/* 메시지 영역 - 폰트 크기 조정 */}
           <div 
             ref={messageRef}
             className={`relative mb-6 cursor-pointer group ${messageShake ? 'animate-bounce' : ''}`}
             onClick={refreshMessage}
           >
             {/* 카드 배경 */}
-            <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-6 lg:p-8 min-h-[150px] flex items-center justify-center relative overflow-hidden">
+            <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-6 lg:p-8 min-h-[120px] flex items-center justify-center relative overflow-hidden">
               {/* 배경 패턴 */}
               <div className="absolute inset-0 opacity-5">
                 <div className="absolute top-4 left-4 w-2 h-2 bg-white rounded-full animate-ping"></div>
@@ -496,9 +592,9 @@ function App() {
                 <div className="absolute bottom-6 left-8 w-1.5 h-1.5 bg-white rounded-full animate-ping delay-2000"></div>
               </div>
               
-              {/* 메인 텍스트 */}
+              {/* 메인 텍스트 - 폰트 크기 줄임 */}
               <div className="relative z-10 text-center">
-                <p className={`text-lg lg:text-2xl xl:text-3xl leading-relaxed font-medium text-white ${
+                <p className={`text-base lg:text-xl xl:text-2xl leading-relaxed font-medium text-white ${
                   isTyping ? 'animate-pulse' : ''
                 }`}>
                   {displayMessage}
@@ -514,10 +610,10 @@ function App() {
                 </div>
               </div>
               
-              {/* 극한 모드 효과 */}
+              {/* 극한 모드 효과 - 위치 조정 */}
               {extremeMode && (
-                <div className="absolute -top-2 -right-2">
-                  <div className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-bounce">
+                <div className="absolute top-4 right-4 z-20">
+                  <div className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold extreme-badge">
                     🚨 극한!
                   </div>
                 </div>
@@ -610,20 +706,30 @@ function App() {
         </div>
       </div>
 
-      {/* 플로팅 액션 버튼 (긴급 탈출용) */}
+      {/* 플로팅 액션 버튼 (개선된 디자인) */}
       {elapsedTime > 180 && (
         <button
-          onClick={() => {
-            if (confirm('정말로 이 환상적인 시간낭비를 끝내시겠습니까?')) {
-              window.close();
-            }
-          }}
-          className="fixed bottom-8 right-8 bg-red-500 hover:bg-red-600 text-white p-4 rounded-full shadow-2xl animate-bounce z-50 backdrop-blur border border-red-400"
-          title="긴급 탈출"
+          onClick={handleExit}
+          className="fixed bottom-8 right-8 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white p-4 rounded-full shadow-2xl animate-bounce z-50 backdrop-blur border border-red-400 group floating-button"
+          title="현실로 돌아가기"
         >
-          🚨
+          <div className="flex items-center gap-2">
+            <DoorOpen className="w-6 h-6" />
+            <span className="hidden group-hover:block text-sm font-medium whitespace-nowrap bg-black/70 px-2 py-1 rounded absolute bottom-full mb-2 right-0">
+              현실로 돌아가기
+            </span>
+          </div>
         </button>
       )}
+
+      {/* 세련된 모달 */}
+      <ModernModal
+        isOpen={showModal}
+        onClose={modalConfig.type === 'exit' ? confirmExit : () => setShowModal(false)}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
+      />
     </div>
   );
 }
