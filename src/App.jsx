@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 // 컴포넌트 imports
-import StatsBar from './components/StatsBar';
-import TimerSection from './components/TimerSection';
-import AdSection from './components/AdSection';
-import ModernModal from './components/ModernModal';
-import CelebrationEffect from './components/CelebrationEffect';
-import ShareSection from './components/ShareSection';
-import ExtremeMode from './components/ExtremeMode';
-import EasterEgg from './components/EasterEgg';
-import FloatingExitButton from './components/FloatingExitButton';
-import MessageSection from './components/MessageSection';
-import SiteHeader from './components/SiteHeader';
-import MainActionButton from './components/MainActionButton';
-import BackgroundEffects from './components/BackgroundEffects';
+import StatsBar from './components/StatsBar.jsx';
+import TimerSection from './components/TimerSection.jsx';
+import AdSection from './components/AdSection.jsx';
+import ModernModal from './components/ModernModal.jsx';
+import CelebrationEffect from './components/CelebrationEffect.jsx';
+import ShareSection from './components/ShareSection.jsx';
+import ExtremeMode from './components/ExtremeMode.jsx';
+import EasterEgg from './components/EasterEgg.jsx';
+import FloatingExitButton from './components/FloatingExitButton.jsx';
+import MessageSection from './components/MessageSection.jsx';
+import SiteHeader from './components/SiteHeader.jsx';
+import MainActionButton from './components/MainActionButton.jsx';
+import BackgroundEffects from './components/BackgroundEffects.jsx';
 
 // 훅스 imports
 import { useCelebrationSystem } from './hooks/useCelebrationSystem';
