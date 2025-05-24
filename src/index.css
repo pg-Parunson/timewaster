@@ -696,3 +696,36 @@ body {
     padding: 2.5rem;
   }
 }
+
+/* 사이트 제목 애니메이션 */
+.site-title {
+  animation: title-glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes title-glow {
+  0% {
+    text-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+    filter: brightness(1);
+  }
+  100% {
+    text-shadow: 0 0 30px rgba(239, 68, 68, 0.8), 0 0 40px rgba(236, 72, 153, 0.6);
+    filter: brightness(1.1);
+  }
+}
+
+/* 제목 아이콘 애니메이션 */
+.title-icon {
+  animation: icon-bounce 2s ease-in-out infinite;
+}
+
+@keyframes icon-bounce {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-5px) rotate(5deg);
+  }
+  75% {
+    transform: translateY(-2px) rotate(-3deg);
+  }
+}
