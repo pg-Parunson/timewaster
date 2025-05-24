@@ -1,68 +1,68 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Clock, Share2, MessageCircle, Copy, ExternalLink, Zap, Heart, Skull, Sparkles, Target, Brain, Users, DoorOpen, AlertTriangle } from 'lucide-react';
 
-// 축하 이펙트 데이터베이스
+// 축하 이펙트 데이터베이스 - 간격 조정 및 화려함 점진적 증가
 const CELEBRATION_EFFECTS = [
   {
-    minSeconds: 60,
-    message: "1분 달성! 👏 박수박수! 👏",
-    effects: ["👏", "✨", "🎯"],
+    minSeconds: 120, // 2분 (첫 번째를 늦춤)
+    message: "2분 달성! 👏 시작이 좋네요! 👏",
+    effects: ["👏", "✨"],
     color: "from-blue-400 to-cyan-400",
     animation: "bounce"
   },
   {
-    minSeconds: 120,
-    message: "2분 돌파! 🎉 대단해요! 🎉",
+    minSeconds: 300, // 5분 (3분 간격)
+    message: "5분 돌파! 🎉 집중력 대단해요! 🎉",
     effects: ["🎉", "🎊", "✨", "🌟"],
     color: "from-green-400 to-emerald-400",
     animation: "spin"
   },
   {
-    minSeconds: 180,
-    message: "3분 완주! 🏆 챔피언! 🏆",
-    effects: ["🏆", "👑", "⭐", "✨"],
+    minSeconds: 600, // 10분 (5분 간격) - 더 화려하게
+    message: "10분 완주! 🏆 진정한 챔피언! 🏆",
+    effects: ["🏆", "👑", "⭐", "✨", "🎆"],
     color: "from-yellow-400 to-orange-400",
     animation: "pulse"
   },
   {
-    minSeconds: 240,
-    message: "4분 신기록! 🚀 우주로! 🚀",
-    effects: ["🚀", "🌟", "💫", "⚡"],
+    minSeconds: 900, // 15분 (5분 간격) - 레벨업!
+    message: "15분 신기록! 🚀 우주급 집중력! 🚀",
+    effects: ["🚀", "🌟", "💫", "⚡", "🌙"],
     color: "from-purple-400 to-pink-400",
     animation: "float"
   },
   {
-    minSeconds: 300,
-    message: "5분 레전드! 💎 다이아몬드! 💎",
-    effects: ["💎", "👑", "🌟", "✨", "🎆"],
+    minSeconds: 1500, // 25분 (10분 간격) - 포모도로 완성!
+    message: "25분 마스터! 💎 포모도로 레전드! 💎",
+    effects: ["💎", "👑", "🌟", "✨", "🎆", "🔥"],
     color: "from-indigo-400 to-purple-400",
     animation: "rainbow"
   },
   {
-    minSeconds: 420,
-    message: "7분 마스터! 🔥 불타는 열정! 🔥",
-    effects: ["🔥", "⚡", "💥", "🌟"],
+    minSeconds: 2400, // 40분 (15분 간격) - 진정한 달인
+    message: "40분 달인! 🔥 불타는 의지력! 🔥",
+    effects: ["🔥", "⚡", "💥", "🌟", "👑", "💪"],
     color: "from-red-400 to-orange-400",
     animation: "shake"
   },
   {
-    minSeconds: 600,
-    message: "10분 영웅! 💪 무적모드! 💪",
-    effects: ["💪", "👑", "🔥", "⚡", "💥"],
+    minSeconds: 3600, // 1시간 (20분 간격) - 역사적 순간!
+    message: "1시간 영웅! 💪 역사적인 순간! 💪",
+    effects: ["💪", "👑", "🔥", "⚡", "💥", "🏆", "🌟"],
     color: "from-pink-400 to-red-400",
     animation: "mega"
   },
   {
-    minSeconds: 900,
-    message: "15분 전설! 🦄 유니콘급! 🦄",
-    effects: ["🦄", "🌈", "✨", "💖", "🌟"],
+    minSeconds: 5400, // 1시간 30분 (30분 간격) - 전설 등극!
+    message: "90분 전설! 🦄 유니콘급 끈기! 🦄",
+    effects: ["🦄", "🌈", "✨", "💖", "🌟", "👑", "🔥"],
     color: "from-cyan-400 to-pink-400",
     animation: "unicorn"
   },
   {
-    minSeconds: 1200,
-    message: "20분 신화! 🐉 드래곤킹! 🐉",
-    effects: ["🐉", "👑", "🔥", "⚡", "💎"],
+    minSeconds: 7200, // 2시간 (30분 간격) - 신화 창조!
+    message: "2시간 신화! 🐉 드래곤 엠페러! 🐉",
+    effects: ["🐉", "👑", "🔥", "⚡", "💎", "🌟", "💥", "🏆"],
     color: "from-purple-600 to-red-600",
     animation: "dragon"
   }
@@ -324,25 +324,25 @@ const ModernModal = ({ isOpen, onClose, onConfirm, title, message, type = 'info'
 
 // 축하 시스템 훅
 const useCelebrationSystem = (elapsedTime) => {
-  const [celebrationHistory, setCelebrationHistory] = useState(new Set());
+  const celebrationHistoryRef = useRef(new Set());
   const [currentCelebration, setCurrentCelebration] = useState(null);
   const [showCelebration, setShowCelebration] = useState(false);
   
   useEffect(() => {
     // 새로운 마일스톤 체크
     const availableCelebrations = CELEBRATION_EFFECTS.filter(
-      (effect) => elapsedTime >= effect.minSeconds && !celebrationHistory.has(effect.minSeconds)
+      (effect) => elapsedTime >= effect.minSeconds && !celebrationHistoryRef.current.has(effect.minSeconds)
     );
     
     if (availableCelebrations.length > 0) {
       const celebration = availableCelebrations[availableCelebrations.length - 1];
       
+      // 먼저 히스토리에 추가 (중복 방지)
+      celebrationHistoryRef.current.add(celebration.minSeconds);
+      
       // 축하 이벤트 트리거
       setCurrentCelebration(celebration);
       setShowCelebration(true);
-      
-      // 히스토리에 추가
-      setCelebrationHistory(prev => new Set([...prev, celebration.minSeconds]));
       
       // Google Analytics 이벤트
       if (typeof gtag !== 'undefined') {
@@ -353,7 +353,7 @@ const useCelebrationSystem = (elapsedTime) => {
         });
       }
     }
-  }, [elapsedTime, celebrationHistory]);
+  }, [elapsedTime]);
   
   const handleCelebrationComplete = () => {
     setShowCelebration(false);
@@ -1144,7 +1144,7 @@ function App() {
           )}
 
           {/* 이스터에그 - 업그레이드된 버전 */}
-          {elapsedTime >= 600 && (
+          {elapsedTime >= 1800 && (
             <div className="mt-4 text-center animate-fade-in">
               <div className="bg-gradient-to-r from-purple-500/30 via-pink-500/30 to-yellow-500/30 border-2 border-purple-400/50 rounded-3xl px-6 py-4 backdrop-blur-xl shadow-2xl relative overflow-hidden">
                 {/* 배경 애니메이션 */}
