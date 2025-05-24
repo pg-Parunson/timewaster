@@ -121,3 +121,87 @@ git push origin main
 작업 시간: 2025-05-25 오후 (약 30분)
 담당: Claude + 사용자 협업
 상태: ✅ 수정 완료, 테스트 대기
+
+## 🐛 **추가 버그 수정 (2025-05-25 오후 #2)**
+
+### 문제 5: 탈출 버튼 더블 모달 문제
+**증상**: "현실로 돌아가시겠습니까?" 확인 후 브라우저 기본 모달 "사이트에서 나가시겠습니까?" 추가 출현
+**원인**: confirmExit에서 window.close() 호출 시 beforeunload 이벤트 추가 발생
+**해결**: beforeunload 이벤트 리스너 제거 + 지연 후 페이지 나가기
+
+### 개선 6: 카카오톡 아이콘 현대화
+**현재**: 일반적인 MessageCircle 아이콘
+**개선**: 카카오톡 전용 말풍선 SVG 아이콘으로 교체
+**효과**: 더 직관적이고 브랜드 일관성 있는 UI
+
+### ✅ 추가 수정 완료 (2025-05-25 오후 #2)
+
+#### 1. App.jsx confirmExit 함수 재작성
+```javascript
+// 기존 (더블 모달 발생)
+const confirmExit = () => {
+  analytics.trackExit(elapsedTime);
+  setShowModal(false);
+  if (window.history.length > 1) {
+    window.history.back();
+  } else {
+    window.close();
+  }
+};
+
+// 수정 후 (더블 모달 방지)
+const confirmExit = () => {
+  analytics.trackExit(elapsedTime);
+  storage.updateTotalTimeWasted(elapsedTime); // 시간 저장 추가
+  setShowModal(false);
+  
+  // beforeunload 비활성화 (핵심!)
+  window.removeEventListener('beforeunload', handleBeforeUnload);
+  
+  setTimeout(() => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.reload(); // 안전한 대안
+    }
+  }, 100);
+};
+```
+
+#### 2. ShareSection.jsx 카카오톡 아이콘 업데이트
+- MessageCircle 아이콘 → 카카오톡 전용 말풍선 SVG
+- 색상도 더 카카오톡다운 yellow-400로 조정
+- 브랜드 일관성 및 직관성 향상
+
+## 🎯 **최종 수정 결과**
+
+### 탈출 버튼 동작
+- **기존**: 커스텀 모달 → (확인) → 브라우저 모달 (더블 확인)
+- **수정 후**: 커스텀 모달 → (확인) → 바로 나가기 (싱글 확인)
+- **추가 개선**: 시간 저장 보장, 안전한 페이지 종료
+
+### 카카오톡 공유 버튼
+- **기존**: 일반 메시지 아이콘
+- **수정 후**: 카카오톡 전용 말풍선 아이콘
+- **색상**: yellow-500 → yellow-400 (더 밝고 현대적)
+
+## 🚀 **업데이트된 배포 명령어**
+
+```bash
+npm run build
+git add .
+git commit -m "[FIX] 탈출 버튼 더블 모달 해결 + 카카오톡 아이콘 현대화 - beforeunload 방지, 브랜드 일관성 개선"
+git push origin main
+```
+
+## 🔍 **추가 테스트 항목**
+
+4. **탈출 버튼 테스트**:
+   - 탈출 버튼 클릭 → "현실로 돌아가시겠습니까?" 모달 확인
+   - "확인" 클릭 → 추가 브라우저 모달 없이 바로 나가기
+   - 시간이 제대로 저장되는지 확인 (다음 방문시)
+
+5. **카카오톡 공유 테스트**:
+   - 카카오톡 버튼에 말풍선 아이콘 표시 확인
+   - 더 밝은 노란색 스타일 확인
+   - 공유 기능 정상 동작 확인

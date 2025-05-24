@@ -420,13 +420,24 @@ function App() {
     // Google Analytics 종료 이벤트 추적
     analytics.trackExit(elapsedTime);
     
+    // 시간 저장
+    storage.updateTotalTimeWasted(elapsedTime);
+    
     setShowModal(false);
-    // 브라우저 창 닫기 시도
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      window.close();
-    }
+    
+    // beforeunload 이벤트 비활성화 (더블 모달 방지)
+    window.removeEventListener('beforeunload', handleBeforeUnload);
+    
+    // 지연을 두고 페이지 나가기 (더 안정적)
+    setTimeout(() => {
+      // 브라우저 창 닫기 시도
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        // 페이지 리로드로 초기화 (대안)
+        window.location.reload();
+      }
+    }, 100);
   };
 
   return (

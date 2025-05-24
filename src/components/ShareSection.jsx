@@ -40,9 +40,14 @@ const ShareSection = ({ elapsedTime, formatTime, showModernModal }) => {
         
         <button
           onClick={handleShareToKakao}
-          className="bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/50 text-yellow-200 px-4 py-2 rounded-xl flex items-center gap-2 transform hover:scale-105 transition-all duration-200 backdrop-blur text-sm"
+          className="bg-yellow-400/20 hover:bg-yellow-400/30 border border-yellow-400/50 text-yellow-200 px-4 py-2 rounded-xl flex items-center gap-2 transform hover:scale-105 transition-all duration-200 backdrop-blur text-sm"
         >
-          <MessageCircle className="w-4 h-4" />
+          {/* 카카오톡 로고 SVG - 최신 디자인 */}
+          <div className="w-4 h-4 flex items-center justify-center">
+            <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current" aria-hidden="true">
+              <path d="M12 3C6.477 3 2 6.477 2 11.5c0 3.518 2.196 6.612 5.5 8.5v3l3.5-3c.5.1 1 .1 1.5 0l3.5 3v-3c3.304-1.888 5.5-4.982 5.5-8.5C22 6.477 17.523 3 12 3z"/>
+            </svg>
+          </div>
           <span>카카오톡</span>
         </button>
         
