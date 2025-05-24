@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 // 컴포넌트 imports
 import StatsBar from './components/StatsBar.jsx';
@@ -55,6 +55,11 @@ function App() {
   
   // 축하 시스템 초기화
   const { showCelebration, currentCelebration, handleCelebrationComplete } = useCelebrationSystem(elapsedTime);
+
+  // handleCelebrationComplete를 useCallback으로 안정화
+  const stableHandleCelebrationComplete = useCallback(() => {
+    handleCelebrationComplete();
+  }, [handleCelebrationComplete]);
 
   // CSS 애니메이션 스타일 주입
   useEffect(() => {
@@ -252,12 +257,6 @@ function App() {
           analytics.trackExtremeMode();
         }
         
-        // 광고 메시지 업데이트 (30초마다)
-        if (elapsed >= 60) {
-          const adIndex = Math.min(Math.floor((elapsed - 60) / 30), AD_MESSAGES.length - 1);
-          setAdMessage(AD_MESSAGES[adIndex]);
-        }
-        
         // 자동 메시지 변경 (45초마다)
         if (elapsed > 0 && elapsed % 45 === 0) {
           refreshMessage();
@@ -267,6 +266,14 @@ function App() {
 
     return () => clearInterval(interval);
   }, [startTime, isPageVisible, showAd, extremeMode]);
+
+  // 광고 메시지 업데이트 (별도 useEffect로 분리)
+  useEffect(() => {
+    if (elapsedTime >= 60) {
+      const adIndex = Math.min(Math.floor((elapsedTime - 60) / 30), AD_MESSAGES.length - 1);
+      setAdMessage(AD_MESSAGES[adIndex]);
+    }
+  }, [Math.floor((elapsedTime - 60) / 30)]); // 30초마다만 실행되도록 최적화
 
   // 페이지 가시성 감지
   useEffect(() => {
@@ -469,7 +476,7 @@ function App() {
       <CelebrationEffect 
         isActive={showCelebration}
         celebration={currentCelebration}
-        onComplete={handleCelebrationComplete}
+        onComplete={stableHandleCelebrationComplete}
       />
 
       {/* 세련된 모달 */}

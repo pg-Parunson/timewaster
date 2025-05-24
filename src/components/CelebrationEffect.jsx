@@ -1,9 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 // 축하 애니메이션 컴포넌트
 const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
   const [particles, setParticles] = useState([]);
   const [showMessage, setShowMessage] = useState(false);
+  
+  // onComplete를 useCallback으로 안정화
+  const stableOnComplete = useCallback(() => {
+    if (onComplete) {
+      onComplete();
+    }
+  }, [onComplete]);
   
   useEffect(() => {
     if (isActive && celebration) {
@@ -25,12 +32,21 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
       const timer = setTimeout(() => {
         setShowMessage(false);
         setParticles([]);
-        onComplete();
+        stableOnComplete();
       }, 3000);
       
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+        // cleanup 시에도 상태 초기화
+        setShowMessage(false);
+        setParticles([]);
+      };
+    } else {
+      // isActive가 false가 되면 즉시 정리
+      setShowMessage(false);
+      setParticles([]);
     }
-  }, [isActive, celebration, onComplete]);
+  }, [isActive, celebration, stableOnComplete]);
   
   if (!isActive || !celebration) return null;
   
