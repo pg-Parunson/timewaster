@@ -103,7 +103,24 @@ const BUTTON_TEXTS = [
 ];
 
 // 세련된 모달 컴포넌트
-const ModernModal = ({ isOpen, onClose, title, message, type = 'info' }) => {
+const ModernModal = ({ isOpen, onClose, onConfirm, title, message, type = 'info', showCancel = false }) => {
+  // ESC 키 이벤트 처리
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.keyCode === 27) {
+        onClose();
+      }
+    };
+    
+    if (isOpen) {
+      document.addEventListener('keydown', handleEsc, false);
+    }
+    
+    return () => {
+      document.removeEventListener('keydown', handleEsc, false);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const iconMap = {
@@ -121,8 +138,14 @@ const ModernModal = ({ isOpen, onClose, title, message, type = 'info' }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl max-w-md w-full p-6 shadow-2xl animate-fade-in">
+    <div 
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={onClose} // 바깥 클릭시 닫기
+    >
+      <div 
+        className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl max-w-md w-full p-6 shadow-2xl animate-fade-in"
+        onClick={(e) => e.stopPropagation()} // 모달 내부 클릭시 이벤트 전파 중단
+      >
         {/* 헤더 */}
         <div className="text-center mb-6">
           <div className="text-4xl mb-3">{iconMap[type]}</div>
@@ -135,12 +158,20 @@ const ModernModal = ({ isOpen, onClose, title, message, type = 'info' }) => {
         </div>
         
         {/* 버튼 */}
-        <div className="flex justify-center">
+        <div className={`flex justify-center gap-3 ${showCancel ? 'flex-row' : ''}`}>
+          {showCancel && (
+            <button
+              onClick={onClose}
+              className="px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white font-semibold rounded-xl transform hover:scale-105 transition-all duration-200 shadow-lg"
+            >
+              취소
+            </button>
+          )}
           <button
-            onClick={onClose}
+            onClick={onConfirm || onClose}
             className={`px-6 py-3 bg-gradient-to-r ${colorMap[type]} text-white font-semibold rounded-xl transform hover:scale-105 transition-all duration-200 shadow-lg`}
           >
-            확인
+            {showCancel ? '확인' : '확인'}
           </button>
         </div>
       </div>
@@ -195,8 +226,8 @@ function App() {
   }, []);
 
   // 세련된 모달 표시 함수
-  const showModernModal = (title, message, type = 'info') => {
-    setModalConfig({ title, message, type });
+  const showModernModal = (title, message, type = 'info', showCancel = false) => {
+    setModalConfig({ title, message, type, showCancel });
     setShowModal(true);
   };
 
@@ -462,13 +493,28 @@ function App() {
     showModernModal(
       "현실로 돌아가시겠습니까?",
       "정말로 이 환상적인 시간낭비를 끝내시겠습니까? 지금까지의 모든 노력이 물거품이 될 수 있어요!",
-      'exit'
+      'exit',
+      true // showCancel = true
     );
   };
 
   const confirmExit = () => {
+    // Google Analytics 종료 이벤트 추적
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'exit_confirmed', {
+        event_category: 'engagement',
+        time_wasted_seconds: elapsedTime,
+        exit_method: 'button'
+      });
+    }
+    
     setShowModal(false);
-    window.close();
+    // 브라우저 창 닫기 시도
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.close();
+    }
   };
 
   return (
@@ -762,10 +808,12 @@ function App() {
       {/* 세련된 모달 */}
       <ModernModal
         isOpen={showModal}
-        onClose={modalConfig.type === 'exit' ? confirmExit : () => setShowModal(false)}
+        onClose={() => setShowModal(false)}
+        onConfirm={modalConfig.type === 'exit' ? confirmExit : () => setShowModal(false)}
         title={modalConfig.title}
         message={modalConfig.message}
         type={modalConfig.type}
+        showCancel={modalConfig.showCancel}
       />
     </div>
   );
