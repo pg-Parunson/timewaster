@@ -245,6 +245,16 @@ function App() {
     setAdClicks(storedAdClicks);
     
     localStorage.setItem('timewaster_visits', storedVisits.toString());
+    
+    // Google Analytics 세션 시작 이벤트
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'session_start', {
+        event_category: 'engagement',
+        visits_count: storedVisits,
+        total_time_wasted: storedTotalTime,
+        returning_visitor: storedVisits > 1
+      });
+    }
   }, []);
 
   // 초기 메시지 타이핑
@@ -268,6 +278,14 @@ function App() {
         // 5분 후 극한 모드
         if (elapsed >= 300 && !extremeMode) {
           setExtremeMode(true);
+          // Google Analytics 극한 모드 진입 이벤트
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'extreme_mode_entered', {
+              event_category: 'engagement',
+              event_label: 'time_milestone',
+              value: 300
+            });
+          }
         }
         
         // 광고 메시지 업데이트 (30초마다)
@@ -366,6 +384,16 @@ function App() {
 
   // 광고 클릭
   const handleAdClick = () => {
+    // Google Analytics 이벤트 추적
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'ad_click', {
+        event_category: 'engagement',
+        event_label: 'ad_button',
+        value: adClicks + 1,
+        time_wasted_seconds: elapsedTime
+      });
+    }
+    
     const responses = [
       "우와! 정말 눌러주셨네요! 고마워요! 🎉",
       "훌륭한 선택입니다! 시간낭비의 달인이시네요!",
@@ -384,6 +412,15 @@ function App() {
 
   // 공유 기능들
   const shareToTwitter = () => {
+    // Google Analytics 이벤트 추적
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'share', {
+        method: 'twitter',
+        content_type: 'time_wasted',
+        time_wasted_seconds: elapsedTime
+      });
+    }
+    
     const text = `나는 이 시간낭비 사이트에서 ${formatTime(elapsedTime)}를 날렸습니다. 너도 똑같이 당해보시겠어요?`;
     const url = encodeURIComponent(window.location.href);
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${url}`, '_blank');
