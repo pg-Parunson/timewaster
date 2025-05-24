@@ -193,6 +193,7 @@ body {
 .message-box-hover {
   transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
   backdrop-filter: blur(20px);
+  border-radius: 1.5rem !important;
 }
 
 .message-box-hover:hover {
@@ -202,10 +203,12 @@ body {
     0 0 80px rgba(139, 92, 246, 0.15),
     inset 0 0 40px rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(30px);
+  border-radius: 1.5rem !important;
 }
 
 .message-box-hover:active {
   transform: translateY(-4px) scale(1.01);
+  border-radius: 1.5rem !important;
 }
 
 /* 현대적 쉐이크 애니메이션 */
@@ -460,17 +463,8 @@ body {
 
 /* 메시지 컨테이너 고급 효과 */
 .message-container {
-  background: linear-gradient(
-    135deg, 
-    rgba(255, 255, 255, 0.15) 0%, 
-    rgba(255, 255, 255, 0.05) 50%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 
-    0 8px 32px rgba(31, 38, 135, 0.37),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  /* 배경과 테두리는 컴포넌트에서 처리 */
+  /* border-radius는 inline style로 적용 */
 }
 
 /* 향상된 그림자 효과 */
@@ -525,6 +519,7 @@ body {
   );
   backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1.5rem;
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.2),

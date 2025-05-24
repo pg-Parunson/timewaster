@@ -5,6 +5,53 @@ export const formatTime = (seconds) => {
   return `${mins.toString().padStart(2, '0')}분 ${secs.toString().padStart(2, '0')}초`;
 };
 
+// 한국어 조사 처리 유틸리티
+export const getParticle = (word, type) => {
+  if (!word || typeof word !== 'string') return '';
+  
+  // 마지막 글자의 유니코드
+  const lastChar = word[word.length - 1];
+  const lastCharCode = lastChar.charCodeAt(0);
+  
+  // 한글 범위 확인 (가-힣)
+  if (lastCharCode >= 0xAC00 && lastCharCode <= 0xD7A3) {
+    // 받침 있는지 확인 (한글 완성형 공식)
+    const hasBatchim = (lastCharCode - 0xAC00) % 28 !== 0;
+    
+    switch (type) {
+      case '을를':
+        return hasBatchim ? '을' : '를';
+      case '이가':
+        return hasBatchim ? '이' : '가';
+      case '은는':
+        return hasBatchim ? '은' : '는';
+      case '과와':
+        return hasBatchim ? '과' : '와';
+      case '아으로':
+        return hasBatchim ? '으로' : '로';
+      default:
+        return '';
+    }
+  } else {
+    // 한글이 아닌 경우 (영어, 숫자 등)
+    // 영어나 숫자는 대부분 받침 없음으로 처리
+    switch (type) {
+      case '을를':
+        return '를';
+      case '이가':
+        return '가';
+      case '은는':
+        return '는';
+      case '과와':
+        return '와';
+      case '아으로':
+        return '로';
+      default:
+        return '';
+    }
+  }
+};
+
 // 동시 접속자 시뮬레이션 로직
 export const calculateConcurrentUsers = () => {
   const hour = new Date().getHours();

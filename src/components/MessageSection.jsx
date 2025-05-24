@@ -18,7 +18,7 @@ const MessageSection = ({
       onClick={onRefreshMessage}
     >
       {/* 카드 배경 - transform 제거로 위치 버그 해결 */}
-      <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-6 lg:p-8 min-h-[120px] flex items-center justify-center relative overflow-hidden">
+      <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-xl border border-white/20 p-6 lg:p-8 min-h-[120px] flex items-center justify-center relative overflow-hidden" style={{ borderRadius: '1.5rem' }}>
         {/* 배경 패턴 */}
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-4 left-4 w-2 h-2 bg-white rounded-full animate-ping"></div>
