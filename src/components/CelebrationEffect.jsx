@@ -61,12 +61,24 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
   }
   
   return (
-    <div className="fixed inset-0 pointer-events-none z-[60] overflow-hidden">
+    <div 
+      className="fixed top-0 left-0 w-screen h-screen pointer-events-none z-[9999] overflow-hidden"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        margin: 0,
+        padding: 0,
+        zIndex: 9999
+      }}
+    >
       {/* 강화된 배경 효과 - 반짝거리는 화면 */}
       <div 
         className={`absolute inset-0 bg-gradient-to-br ${celebration.color} pointer-events-none animate-pulse`}
         style={{ 
-          opacity: 0.15, // 0.01 → 0.15로 강화
+          opacity: 0.15,
           zIndex: 1,
           animation: 'celebration-flash 3s ease-in-out'
         }}
@@ -74,14 +86,15 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
       
       {/* 중앙 축하 메시지 - 브라우저 전체 화면 기준 완전 중앙 정렬 */}
       <div 
-        className="fixed inset-0 flex items-center justify-center"
+        className="absolute flex items-center justify-center"
         style={{ 
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
           zIndex: 2,
-          left: 0,
-          right: 0,
-          top: 0,
-          bottom: 0,
-          position: 'fixed'
+          width: 'auto',
+          height: 'auto'
         }}
       >
         <div className={`animate-${celebration.animation || 'bounce'}`}>
@@ -90,10 +103,11 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
             px-8 py-6 rounded-3xl shadow-2xl
             backdrop-blur-lg border-2 border-white/30
             transform-gpu
+            whitespace-nowrap
           `}>
             <div className="text-2xl lg:text-3xl font-bold text-center flex items-center gap-3">
               <span className="text-3xl lg:text-4xl">{celebration.effects[0]}</span>
-              <span className="whitespace-nowrap">{celebration.message}</span>
+              <span>{celebration.message}</span>
               <span className="text-3xl lg:text-4xl">{celebration.effects[1] || celebration.effects[0]}</span>
             </div>
           </div>

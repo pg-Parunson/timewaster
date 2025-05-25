@@ -751,13 +751,7 @@ function App() {
 
           {/* 메시지 영역이 상단으로 이동됨 */}
 
-          {/* 메인 액션 버튼 */}
-          <MainActionButton 
-            buttonText={buttonText}
-            isTyping={isTyping}
-            extremeMode={extremeMode}
-            onClick={refreshMessage}
-          />
+          {/* 메인 액션 버튼 제거됨 - 비난 메시지 박스로 이동 */}
 
           {/* 공유 섹션 */}
           <ShareSection 

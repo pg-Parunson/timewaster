@@ -134,7 +134,7 @@ const MessageSection = ({
             <button
               onClick={handleRefreshClick}
               disabled={isRefreshing}
-              className="flex flex-col items-center justify-center gap-1 px-2 py-2 bg-gradient-to-r from-red-500/20 to-pink-500/20 hover:from-red-500/30 hover:to-pink-500/30 rounded-lg border border-red-300/30 text-red-300 text-xs font-medium transition-all duration-200 hover:scale-105 disabled:opacity-50 min-w-[80px]"
+              className="flex flex-col items-center justify-center gap-1 px-2 py-2 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 rounded-lg border-2 border-red-400/50 shadow-lg text-white text-xs font-bold transition-all duration-200 hover:scale-105 disabled:opacity-50 min-w-[80px]"
             >
               {isRefreshing ? (
                 <>
