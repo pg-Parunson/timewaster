@@ -184,38 +184,12 @@ const MessageSection = ({
                   <span className="text-center">메시지<br/>생성중...</span>
                 </>
               ) : (
-                <>
-                  <Sparkles className="w-3 h-3" />
-                  <span className="text-center leading-tight">{refreshButtonText}</span>
-                </>
+                <span className="text-center leading-tight">{refreshButtonText}</span>
               )}
             </button>
           </div>
           
-          {/* 레트로 극한 모드 표시 - 위치 고정 */}
-          {extremeMode && (
-            <div className="absolute top-2 right-2 z-20">
-              <div 
-                className="text-white px-2 py-1 text-xs font-bold transform-none retro-warning"
-                style={{
-                  background: 'linear-gradient(135deg, #dc2626, #fbbf24)',
-                  border: '2px solid #000',
-                  borderRadius: '0px',
-                  boxShadow: `
-                    inset 1px 1px 0px rgba(255,255,255,0.3),
-                    inset -1px -1px 0px rgba(0,0,0,0.3),
-                    0 0 10px rgba(220, 38, 38, 0.8)
-                  `,
-                  fontFamily: 'monospace, "Courier New", monospace',
-                  textShadow: '1px 1px 0px #000',
-                  letterSpacing: '1px',
-                  animation: 'retro-blink 1s infinite'
-                }}
-              >
-                ⚠️ DANGER
-              </div>
-            </div>
-          )}
+          {/* 레트로 극한 모드 표시 - 사용자 피드백으로 제거 */}
         </div>
       </div>
       

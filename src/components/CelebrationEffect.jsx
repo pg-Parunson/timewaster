@@ -62,7 +62,7 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
   
   return (
     <div 
-      className="fixed top-0 left-0 w-screen h-screen pointer-events-none z-[9999] overflow-hidden"
+      className="fixed inset-0 pointer-events-none overflow-hidden"
       style={{
         position: 'fixed',
         top: 0,
@@ -71,50 +71,54 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
         height: '100vh',
         margin: 0,
         padding: 0,
-        zIndex: 9999
+        zIndex: 45,
+        contain: 'layout size style'
       }}
     >
-      {/* 강화된 배경 효과 - 반짝거리는 화면 */}
+      {/* 강화된 배경 효과 - 반짝거리는 화면 복원 */}
       <div 
-        className={`absolute inset-0 bg-gradient-to-br ${celebration.color} pointer-events-none animate-pulse`}
+        className={`absolute inset-0 bg-gradient-to-br ${celebration.color} pointer-events-none`}
         style={{ 
-          opacity: 0.15,
+          opacity: 0.2,
           zIndex: 1,
-          animation: 'celebration-flash 3s ease-in-out'
+          animation: 'celebration-flash 3s ease-in-out infinite'
         }}
       />
       
-      {/* 중앙 축하 메시지 - 브라우저 전체 화면 기준 완전 중앙 정렬 */}
+      {/* 중앙 축하 메시지 - 완전 중앙 정렬 고정 */}
       <div 
-        className="absolute flex items-center justify-center"
+        className="absolute inset-0 flex items-center justify-center"
         style={{ 
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
           zIndex: 2,
-          width: 'auto',
-          height: 'auto'
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
         }}
       >
         <div className={`animate-${celebration.animation || 'bounce'}`}>
           <div className={`
             bg-gradient-to-r ${celebration.color} text-white 
-            px-8 py-6 rounded-3xl shadow-2xl
+            px-6 py-4 rounded-2xl shadow-2xl
             backdrop-blur-lg border-2 border-white/30
             transform-gpu
             whitespace-nowrap
+            max-w-md
           `}>
-            <div className="text-2xl lg:text-3xl font-bold text-center flex items-center gap-3">
-              <span className="text-3xl lg:text-4xl">{celebration.effects[0]}</span>
+            <div className="text-lg font-bold text-center flex items-center gap-2">
+              <span className="text-xl">{celebration.effects[0]}</span>
               <span>{celebration.message}</span>
-              <span className="text-3xl lg:text-4xl">{celebration.effects[1] || celebration.effects[0]}</span>
+              <span className="text-xl">{celebration.effects[1] || celebration.effects[0]}</span>
             </div>
           </div>
         </div>
       </div>
       
-      {/* 파티클 효과 복원 */}
+      {/* 파티클 효과 복원 - 크기 조정 */}
       {celebration.effects.map((effect, index) => (
         <div
           key={index}
@@ -124,7 +128,7 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
             top: `${20 + (index * 10) % 60}%`,
             animationDelay: `${index * 0.2}s`,
             animationDuration: '3s',
-            fontSize: '2rem',
+            fontSize: '1.5rem',
             zIndex: 3
           }}
         >

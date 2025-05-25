@@ -34,15 +34,15 @@ const ActivityRecommendationCard = ({
 
   const getDifficultyBadge = (difficulty) => {
     const colors = {
-      '매우 쉬움': 'bg-green-100 text-green-800',
-      '쉬움': 'bg-blue-100 text-blue-800',
-      '보통': 'bg-yellow-100 text-yellow-800',
-      '어려움': 'bg-orange-100 text-orange-800',
-      '매우 어려움': 'bg-red-100 text-red-800',
-      '전문가': 'bg-purple-100 text-purple-800',
-      '레전드': 'bg-pink-100 text-pink-800'
+      '매우 쉬움': 'bg-green-500/80 text-green-100 border border-green-400/50',
+      '쉬움': 'bg-blue-500/80 text-blue-100 border border-blue-400/50',
+      '보통': 'bg-yellow-500/80 text-yellow-100 border border-yellow-400/50',
+      '어려움': 'bg-orange-500/80 text-orange-100 border border-orange-400/50',
+      '매우 어려움': 'bg-red-500/80 text-red-100 border border-red-400/50',
+      '전문가': 'bg-purple-500/80 text-purple-100 border border-purple-400/50',
+      '레전드': 'bg-pink-500/80 text-pink-100 border border-pink-400/50'
     };
-    return colors[difficulty] || 'bg-gray-100 text-gray-800';
+    return colors[difficulty] || 'bg-gray-500/80 text-gray-100 border border-gray-400/50';
   };
 
   return (
@@ -122,7 +122,7 @@ const ActivityRecommendationCard = ({
         </div>
       </div>
 
-      {/* 최적 활동 (현재 시간대 기준) */}
+      {/* 최적 활동 (현재 시간대 기준) - 더 밝고 선명한 색상 */}
       {optimalActivities && optimalActivities.length > 0 && (
         <div className="mt-4 pt-4 border-t border-white/10">
           <h5 className="text-white font-medium text-sm mb-2">🌟 지금 시간대 최적 활동</h5>
@@ -130,7 +130,10 @@ const ActivityRecommendationCard = ({
             {optimalActivities.slice(0, 4).map((activity, index) => (
               <span
                 key={index}
-                className="px-2 py-1 bg-gradient-to-r from-yellow-400/20 to-orange-400/20 text-yellow-300 text-xs rounded-full border border-yellow-400/30"
+                className="px-3 py-1.5 bg-gradient-to-r from-yellow-500/90 to-orange-500/90 text-white text-xs font-semibold rounded-full border border-yellow-400/70 shadow-lg"
+                style={{
+                  textShadow: '1px 1px 1px rgba(0,0,0,0.5)'
+                }}
               >
                 {activity}
               </span>

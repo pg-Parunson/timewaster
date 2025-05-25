@@ -89,35 +89,35 @@ function App() {
     const celebrationStyles = `
       @keyframes celebration-float {
         0% {
-          transform: translateY(50px) rotate(0deg);
+          transform: translateY(30px) rotate(0deg);
           opacity: 0;
-          scale: 0.5;
+          scale: 0.8;
         }
-        10% {
+        20% {
           opacity: 1;
           scale: 1;
         }
-        50% {
-          transform: translateY(-30px) rotate(180deg);
+        80% {
+          transform: translateY(-20px) rotate(180deg);
           opacity: 1;
-          scale: 1.1;
+          scale: 1;
         }
         100% {
-          transform: translateY(-80px) rotate(360deg);
+          transform: translateY(-50px) rotate(360deg);
           opacity: 0;
-          scale: 0.3;
+          scale: 0.5;
         }
       }
       
       @keyframes bounce {
         0%, 20%, 50%, 80%, 100% {
-          transform: translateX(-50%) translateY(-50%);
+          transform: scale(1);
         }
         40% {
-          transform: translateX(-50%) translateY(-50%) translateY(-30px);
+          transform: scale(1.1) translateY(-10px);
         }
         60% {
-          transform: translateX(-50%) translateY(-50%) translateY(-15px);
+          transform: scale(1.05) translateY(-5px);
         }
       }
       
@@ -201,10 +201,10 @@ function App() {
         position: relative;
         width: 100%;
         max-width: 100%;
-        overflow: visible; /* hidden → visible로 변경 */
-        border-radius: 1.5rem !important;
-        transform: none !important; /* transform 완전 차단 */
-        contain: layout style;
+        overflow: hidden;
+        border-radius: 0 !important; /* 레트로 스타일 */
+        transform: none !important;
+        contain: layout style size;
       }
       
       /* 메시지 애니메이션 완전 안정화 */
@@ -225,6 +225,7 @@ function App() {
         margin: 0 auto !important;
         overflow: hidden;
         text-overflow: ellipsis;
+        width: 100% !important;
       }
       
       /* 실시간 알림 애니메이션 */
@@ -286,6 +287,20 @@ function App() {
       
       .animate-fadeIn {
         animation: fadeIn 0.3s ease-out;
+      }
+      
+      /* 레트로 스타일 애니메이션 */
+      @keyframes retro-blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0.3; }
+      }
+      
+      /* 축하 이펙트 배경 반짝임 복원 */
+      @keyframes celebration-flash {
+        0%, 100% { opacity: 0.05; }
+        20% { opacity: 0.3; }
+        50% { opacity: 0.2; }
+        80% { opacity: 0.25; }
       }
     `;
     
@@ -718,17 +733,17 @@ function App() {
             />
           </div>
 
-          {/* 메인 콘텐츠 영역 - 새로운 2단 레이아웃: 타이머+활동제안+광고 | 랭킹 */}
-          <div className="grid grid-cols-1 lg:grid-cols-7 gap-4 mb-4">
-            {/* 왼쪽: 타이머 + 활동 제안 + 광고 (2칸 차지) */}
-            <div className="lg:col-span-3 space-y-4">
+          {/* 메인 콘텐츠 영역 - 수정된 레이아웃: 왼쪽 축소, 랭킹 확장 */}
+          <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 mb-4">
+            {/* 왼쪽: 타이머 + 광고 (2칸 차지) */}
+            <div className="xl:col-span-2 space-y-4">
               {/* 타이머 섹션 */}
               <TimerSection 
                 elapsedTime={elapsedTime}
                 extremeMode={extremeMode}
               />
               
-              {/* 광고 섹션 - 활동 제안 아래로 이동 */}
+              {/* 광고 섹션 */}
               <AdSection 
                 showAd={showAd}
                 adMessage={adMessage}
@@ -738,9 +753,9 @@ function App() {
               />
             </div>
 
-            {/* 오른쪽: 랭킹 영역 (확장) */}
-            <div className="lg:col-span-4">
-              <div className="w-full h-[480px] overflow-y-auto ranking-scrollbar bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.2) rgba(255,255,255,0.05)' }}>
+            {/* 오른쪽: 랭킹 영역 (3칸 차지, 높이 제한) */}
+            <div className="xl:col-span-3">
+              <div className="w-full h-[400px] overflow-y-auto ranking-scrollbar bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.2) rgba(255,255,255,0.05)' }}>
                 <RankingSection 
                   isVisible={true}
                   currentUser={currentUser}
@@ -760,11 +775,7 @@ function App() {
             showModernModal={showModernModal}
           />
 
-          {/* 극한 모드 추가 경고 */}
-          <ExtremeMode 
-            extremeMode={extremeMode}
-            elapsedTime={elapsedTime}
-          />
+          {/* 극한 모드 추가 경고 - 제거됨 (사용자 피드백) */}
 
           {/* 이스터에그 - 업그레이드된 버전 */}
           <EasterEgg elapsedTime={elapsedTime} />
