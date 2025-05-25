@@ -94,20 +94,20 @@ const MessageSection = ({
             </div>
             
             {/* 활동 추천 버튼 - 축소 모드에서는 숨김 */}
-          {hasRecommendation && !compact && (
-            <div className="mt-4">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowRecommendation(!showRecommendation);
-                }}
-                className="flex items-center justify-center gap-2 mx-auto px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 hover:from-cyan-500/30 hover:to-blue-500/30 rounded-lg border border-cyan-300/30 text-cyan-300 text-sm font-medium transition-all duration-200 hover:scale-105"
-              >
-                <span>🎯 대안 활동 추천</span>
-                {showRecommendation ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-              </button>
-            </div>
-          )}
+            {hasRecommendation && !compact && (
+              <div className="mt-4">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowRecommendation(!showRecommendation);
+                  }}
+                  className="flex items-center justify-center gap-2 mx-auto px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 hover:from-cyan-500/30 hover:to-blue-500/30 rounded-lg border border-cyan-300/30 text-cyan-300 text-sm font-medium transition-all duration-200 hover:scale-105"
+                >
+                  <span>🎯 대안 활동 추천</span>
+                  {showRecommendation ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
+              </div>
+            )}
           </div>
           
           {/* 극한 모드 효과 - 위치 고정 */}
@@ -118,6 +118,8 @@ const MessageSection = ({
               </div>
             </div>
           )}
+        </div>
+      </div>
       
       {/* 활동 추천 카드 - 축소 모드에서는 숨김 */}
       {hasRecommendation && showRecommendation && !compact && (
