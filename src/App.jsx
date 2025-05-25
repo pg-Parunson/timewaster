@@ -5,6 +5,7 @@ import StatsBar from './components/StatsBar.jsx';
 import TimerSection from './components/TimerSection.jsx';
 import AdSection from './components/AdSection.jsx';
 import ModernModal from './components/ModernModal.jsx';
+import RankingRegistrationModal from './components/RankingRegistrationModal.jsx';
 import CelebrationEffect from './components/CelebrationEffect.jsx';
 import ShareSection from './components/ShareSection.jsx';
 import ExtremeMode from './components/ExtremeMode.jsx';
@@ -60,6 +61,7 @@ function App() {
   const [modalConfig, setModalConfig] = useState({});
   const [currentUser, setCurrentUser] = useState(null);
   const [isRankingInitialized, setIsRankingInitialized] = useState(false);
+  const [showRankingModal, setShowRankingModal] = useState(false);
   
   const timerRef = useRef(null);
   const typingRef = useRef(null);
@@ -202,6 +204,22 @@ function App() {
       
       .scrollbar-hide::-webkit-scrollbar {
         display: none;
+      }
+      
+      /* 모달 애니메이션 */
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+          transform: scale(0.9) translateY(20px);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+      
+      .animate-fadeIn {
+        animation: fadeIn 0.3s ease-out;
       }
     `;
     
@@ -488,6 +506,13 @@ function App() {
 
   // 종료 확인
   const handleExit = () => {
+    // 랭킹 등록 모달을 먼저 표시
+    setShowRankingModal(true);
+  };
+
+  const handleRankingModalClose = () => {
+    setShowRankingModal(false);
+    // 랭킹 모달을 닫으면 다시 기본 종료 확인 모달 표시
     showModernModal(
       "현실로 돌아가시겠습니까?",
       "정말로 이 환상적인 시간낭비를 끝내시겠습니까? 지금까지의 모든 노력이 물거품이 될 수 있어요!",
@@ -503,7 +528,14 @@ function App() {
     // 시간 저장
     storage.updateTotalTimeWasted(elapsedTime);
     
+    // 모든 모달 닫기
     setShowModal(false);
+    setShowRankingModal(false);
+    
+    // Firebase 세션 종료
+    if (isRankingInitialized) {
+      rankingService.endSession();
+    }
     
     // beforeunload 이벤트 비활성화 (더블 모달 방지)
     window.removeEventListener('beforeunload', handleBeforeUnload);
@@ -620,6 +652,18 @@ function App() {
       
       {/* 개발 도구 (개발 모드에서만 표시) */}
       <DevTools isVisible={import.meta.env.DEV} />
+
+      {/* 랭킹 등록 모달 */}
+      <RankingRegistrationModal
+        isOpen={showRankingModal}
+        onClose={handleRankingModalClose}
+        onConfirm={confirmExit}
+        elapsedTime={elapsedTime}
+        currentUser={currentUser}
+        totalTimeWasted={totalTimeWasted}
+        visits={visits}
+        adClicks={adClicks}
+      />
 
       {/* 세련된 모달 */}
       <ModernModal

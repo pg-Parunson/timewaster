@@ -395,13 +395,23 @@ class RankingService {
           clearInterval(this.heartbeatInterval);
         }
 
-        // 세션 비활성화
-        const sessionRef = ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}`);
-        await set(sessionRef.child('isActive'), false);
-        await set(sessionRef.child('endTime'), serverTimestamp());
-
-        // 라이브 피드에 이탈 알림
-        await this.addLiveFeedEvent('leave', `${this.anonymousName}님이 현실로 돌아갔습니다`);
+        // Firebase 모드에서만 세션 비활성화
+        if (this.isFirebaseConnected) {
+          await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/isActive`), false);
+          await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/endTime`), serverTimestamp());
+          
+          // 라이브 피드에 이탈 알림
+          await this.addLiveFeedEvent('leave', `${this.anonymousName}님이 현실로 돌아갔습니다`);
+        } else {
+          // 로컬 모드에서 세션 비활성화
+          const stored = JSON.parse(localStorage.getItem('timewaster_local_ranking') || '[]');
+          const sessionIndex = stored.findIndex(s => s.sessionId === this.sessionId);
+          if (sessionIndex >= 0) {
+            stored[sessionIndex].isActive = false;
+            stored[sessionIndex].endTime = Date.now();
+            localStorage.setItem('timewaster_local_ranking', JSON.stringify(stored));
+          }
+        }
 
         // 모든 리스너 제거
         this.removeAllListeners();
@@ -418,6 +428,98 @@ class RankingService {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}분 ${remainingSeconds.toString().padStart(2, '0')}초`;
+  }
+
+  // 예상 랭킹 순위 확인
+  async getExpectedRank(timeInSeconds) {
+    try {
+      if (this.isFirebaseConnected) {
+        // Firebase 모드
+        const sessionsRef = ref(database, DB_PATHS.SESSIONS);
+        const sessionsSnapshot = await get(query(
+          sessionsRef,
+          orderByChild('isActive'),
+          limitToLast(100)
+        ));
+
+        if (!sessionsSnapshot.exists()) {
+          return 1; // 첫 번째 기록
+        }
+
+        const sessions = Object.values(sessionsSnapshot.val())
+          .filter(session => session.isActive && session.currentTime > 0)
+          .filter(session => this.isSessionInPeriod(session, RANKING_PERIODS.DAILY))
+          .sort((a, b) => b.currentTime - a.currentTime);
+
+        // 현재 시간보다 높은 기록의 개수 + 1
+        const higherScores = sessions.filter(session => session.currentTime > timeInSeconds).length;
+        return higherScores + 1;
+      } else {
+        // 로컬 모드
+        const stored = JSON.parse(localStorage.getItem('timewaster_local_ranking') || '[]');
+        const sessions = stored
+          .filter(session => session.isActive && session.currentTime > 0)
+          .filter(session => this.isSessionInPeriod(session, RANKING_PERIODS.DAILY))
+          .sort((a, b) => b.currentTime - a.currentTime);
+
+        const higherScores = sessions.filter(session => session.currentTime > timeInSeconds).length;
+        return higherScores + 1;
+      }
+    } catch (error) {
+      console.error('예상 순위 확인 실패:', error);
+      return null;
+    }
+  }
+
+  // 랭킹에 점수 제출 (종료 시)
+  async submitScore(timeInSeconds, customNickname = null) {
+    try {
+      if (!this.sessionId) {
+        throw new Error('활성 세션이 없습니다');
+      }
+
+      const finalNickname = customNickname || this.anonymousName;
+      
+      if (this.isFirebaseConnected) {
+        // Firebase 모드
+        const sessionRef = ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}`);
+        
+        // 세션 정보 업데이트
+        await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/finalTime`), timeInSeconds);
+        await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/finalNickname`), finalNickname);
+        await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/submittedToRanking`), true);
+        await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/endTime`), serverTimestamp());
+        
+        // 라이브 피드에 랭킹 등록 알림
+        const rank = await this.getExpectedRank(timeInSeconds);
+        await this.addLiveFeedEvent('ranking', 
+          `${finalNickname}님이 ${this.formatTime(timeInSeconds)}로 ${rank}위 달성! 🏆`
+        );
+        
+        console.log(`랭킹 제출 완료: ${finalNickname} - ${this.formatTime(timeInSeconds)} (${rank}위 예상)`);
+        return true;
+      } else {
+        // 로컬 모드
+        const stored = JSON.parse(localStorage.getItem('timewaster_local_ranking') || '[]');
+        const sessionIndex = stored.findIndex(s => s.sessionId === this.sessionId);
+        
+        if (sessionIndex >= 0) {
+          stored[sessionIndex].finalTime = timeInSeconds;
+          stored[sessionIndex].finalNickname = finalNickname;
+          stored[sessionIndex].submittedToRanking = true;
+          stored[sessionIndex].endTime = Date.now();
+          
+          localStorage.setItem('timewaster_local_ranking', JSON.stringify(stored));
+          console.log(`로컬 랭킹 제출 완료: ${finalNickname} - ${this.formatTime(timeInSeconds)}`);
+          return true;
+        }
+        
+        throw new Error('세션을 찾을 수 없습니다');
+      }
+    } catch (error) {
+      console.error('랭킹 제출 실패:', error);
+      throw error;
+    }
   }
 
   // 현재 사용자 정보 반환
