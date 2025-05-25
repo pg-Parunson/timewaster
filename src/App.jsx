@@ -253,6 +253,25 @@ function App() {
         display: none;
       }
       
+      /* 랭킹 보드 스크롤바 스타일 */
+      .ranking-scrollbar::-webkit-scrollbar {
+        width: 8px;
+      }
+      
+      .ranking-scrollbar::-webkit-scrollbar-track {
+        background: #1e293b;
+        border-radius: 4px;
+      }
+      
+      .ranking-scrollbar::-webkit-scrollbar-thumb {
+        background: #64748b;
+        border-radius: 4px;
+      }
+      
+      .ranking-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+      
       /* 모달 애니메이션 */
       @keyframes fadeIn {
         0% {
@@ -721,7 +740,7 @@ function App() {
 
             {/* 오른쪽: 랭킹 영역 (확장) */}
             <div className="lg:col-span-4">
-              <div className="w-full max-h-80 overflow-y-auto scrollbar-hide">
+              <div className="w-full max-h-96 overflow-y-auto ranking-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: '#64748b #1e293b' }}>
                 <RankingSection 
                   isVisible={true}
                   currentUser={currentUser}

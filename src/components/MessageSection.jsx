@@ -108,6 +108,20 @@ const MessageSection = ({
                 </button>
               </div>
             )}
+            
+            {/* 비난 메시지 갱신 버튼 - 메시지 박스 내부에 배치 */}
+            <div className="mt-3">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRefreshMessage();
+                }}
+                className="flex items-center justify-center gap-2 mx-auto px-3 py-1.5 bg-gradient-to-r from-red-500/20 to-pink-500/20 hover:from-red-500/30 hover:to-pink-500/30 rounded-md border border-red-300/30 text-red-300 text-xs font-medium transition-all duration-200 hover:scale-105"
+              >
+                <Sparkles className="w-3 h-3" />
+                <span>새 메시지</span>
+              </button>
+            </div>
           </div>
           
           {/* 극한 모드 효과 - 위치 고정 */}
@@ -132,15 +146,7 @@ const MessageSection = ({
         </div>
       )}
       
-      {/* 호버 효과 표시 - 축소 모드에서는 숨김 */}
-      {!compact && (
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 mt-2 text-center">
-          <div className="flex items-center justify-center gap-2 text-white/50 text-xs sm:text-sm">
-            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span>클릭해서 새로운 메시지 보기</span>
-          </div>
-        </div>
-      )}
+      {/* 호버 효과 표시 - 축소 모드에서는 숨김 (비난 메시지 갱신 버튼이 내부로 이동했으므로 삭제) */}
     </div>
   );
 };
