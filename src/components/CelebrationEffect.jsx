@@ -22,7 +22,7 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
             onComplete();
           }
         }, 200);
-      }, 3000);
+      }, 4000); // 4초로 연장
     }
     
     return () => {
@@ -38,39 +38,55 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
     const style = document.createElement('style');
     style.textContent = `
       .celebration-flash {
-        animation: celebration-flash 3s ease-in-out;
+        animation: celebration-flash 4s ease-in-out;
       }
       
       .celebration-bounce {
-        animation: celebration-bounce 1s ease-in-out infinite;
+        animation: celebration-bounce 0.8s ease-in-out infinite;
       }
       
       @keyframes celebration-flash {
-        0%, 100% { opacity: 0; }
-        50% { opacity: 1; }
+        0% { opacity: 0; }
+        10% { opacity: 0.3; }
+        20% { opacity: 0.2; }
+        30% { opacity: 0.4; }
+        90% { opacity: 0.2; }
+        100% { opacity: 0; }
       }
       
       @keyframes celebration-bounce {
-        0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
-        50% { transform: translate(-50%, -50%) translateY(-10px); }
+        0%, 100% { transform: translate(-50%, -50%) translateY(0px) scale(1); }
+        50% { transform: translate(-50%, -50%) translateY(-15px) scale(1.05); }
       }
       
-      @keyframes celebration-float-0 {
-        0% { transform: translateY(0px) rotate(0deg); opacity: 0; }
-        20% { opacity: 1; }
-        100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+      @keyframes particle-float-0 {
+        0% { transform: translateY(0px) translateX(0px) rotate(0deg) scale(0.5); opacity: 0; }
+        15% { opacity: 1; scale: 1; }
+        100% { transform: translateY(-150px) translateX(-30px) rotate(360deg) scale(1.2); opacity: 0; }
       }
       
-      @keyframes celebration-float-1 {
-        0% { transform: translateY(0px) rotate(0deg); opacity: 0; }
-        25% { opacity: 1; }
-        100% { transform: translateY(-120px) rotate(-360deg); opacity: 0; }
+      @keyframes particle-float-1 {
+        0% { transform: translateY(0px) translateX(0px) rotate(0deg) scale(0.5); opacity: 0; }
+        20% { opacity: 1; scale: 1.1; }
+        100% { transform: translateY(-180px) translateX(40px) rotate(-270deg) scale(0.8); opacity: 0; }
       }
       
-      @keyframes celebration-float-2 {
-        0% { transform: translateY(0px) scale(0.5); opacity: 0; }
-        30% { opacity: 1; }
-        100% { transform: translateY(-80px) scale(1.5); opacity: 0; }
+      @keyframes particle-float-2 {
+        0% { transform: translateY(0px) translateX(0px) scale(0.3); opacity: 0; }
+        25% { opacity: 1; scale: 1.3; }
+        100% { transform: translateY(-120px) translateX(-50px) scale(1.5); opacity: 0; }
+      }
+      
+      @keyframes particle-float-3 {
+        0% { transform: translateY(0px) translateX(0px) rotate(0deg) scale(0.7); opacity: 0; }
+        30% { opacity: 1; scale: 1; }
+        100% { transform: translateY(-200px) translateX(60px) rotate(450deg) scale(0.5); opacity: 0; }
+      }
+      
+      @keyframes particle-float-4 {
+        0% { transform: translateY(0px) translateX(0px) scale(0.4); opacity: 0; }
+        35% { opacity: 1; scale: 1.4; }
+        100% { transform: translateY(-160px) translateX(-70px) scale(0.3); opacity: 0; }
       }
     `;
     document.head.appendChild(style);
@@ -84,9 +100,26 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
     return null;
   }
   
+  // 색상 매핑
+  const getBackgroundColor = () => {
+    if (celebration.color.includes('blue')) return 'rgba(59, 130, 246, 0.25)';
+    if (celebration.color.includes('green')) return 'rgba(16, 185, 129, 0.25)';
+    if (celebration.color.includes('yellow')) return 'rgba(245, 158, 11, 0.25)';
+    if (celebration.color.includes('purple')) return 'rgba(147, 51, 234, 0.25)';
+    return 'rgba(236, 72, 153, 0.25)';
+  };
+  
+  const getGradientColors = () => {
+    if (celebration.color.includes('blue')) return '#3b82f6, #06b6d4';
+    if (celebration.color.includes('green')) return '#10b981, #059669';  
+    if (celebration.color.includes('yellow')) return '#f59e0b, #f97316';
+    if (celebration.color.includes('purple')) return '#9333ea, #ec4899';
+    return '#9333ea, #ec4899';
+  };
+  
   return (
     <>
-      {/* 배경 플래시 */}
+      {/* 배경 플래시 - 즉시 시작 */}
       <div 
         className="celebration-flash"
         style={{
@@ -95,13 +128,13 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
           left: 0,
           width: '100vw',
           height: '100vh',
-          backgroundColor: 'rgba(147, 51, 234, 0.15)',
+          backgroundColor: getBackgroundColor(),
           zIndex: 998,
           pointerEvents: 'none'
         }}
       />
       
-      {/* 중앙 메시지 */}
+      {/* 중앙 메시지 - 즉시 시작 */}
       <div 
         className="celebration-bounce"
         style={{
@@ -115,37 +148,38 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
       >
         <div 
           style={{
-            background: `linear-gradient(to right, ${celebration.color.includes('blue') ? '#3b82f6, #06b6d4' : celebration.color.includes('green') ? '#10b981, #059669' : '#9333ea, #ec4899'})`,
+            background: `linear-gradient(to right, ${getGradientColors()})`,
             color: 'white',
-            padding: '1.5rem 2rem',
-            borderRadius: '0.75rem',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            fontSize: '1.125rem',
+            padding: '1.5rem 2.5rem',
+            borderRadius: '1rem',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)',
+            border: '2px solid rgba(255, 255, 255, 0.4)',
+            fontSize: '1.25rem',
             fontWeight: 'bold',
             textAlign: 'center',
             whiteSpace: 'nowrap'
           }}
         >
-          {celebration.effects[0]} {celebration.message} {celebration.effects[1] || celebration.effects[0]}
+          {celebration.effects?.[0] || '🎉'} {celebration.message} {celebration.effects?.[1] || celebration.effects?.[0] || '🎉'}
         </div>
       </div>
       
-      {/* 파티클 이펙트 추가 */}
-      {celebration.effects.map((effect, index) => (
+      {/* 파티클 이펙트 - 더 많고 크게 */}
+      {[...Array(8)].map((_, index) => (
         <div
           key={index}
           style={{
             position: 'fixed',
-            left: `${20 + (index * 20) % 60}%`,
-            top: `${25 + (index * 15) % 50}%`,
-            fontSize: '2rem',
+            left: `${15 + (index * 12) % 70}%`,
+            top: `${20 + (index * 8) % 60}%`,
+            fontSize: '2.5rem',
             zIndex: 997,
             pointerEvents: 'none',
-            animation: `celebration-float-${index} 3s ease-out forwards`
+            animation: `particle-float-${index % 5} 4s ease-out forwards`,
+            animationDelay: `${index * 0.2}s`
           }}
         >
-          {effect}
+          {celebration.effects?.[index % celebration.effects.length] || '✨'}
         </div>
       ))}
     </>

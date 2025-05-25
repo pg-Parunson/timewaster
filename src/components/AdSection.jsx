@@ -7,11 +7,22 @@ const AdSection = React.memo(({ showAd, adMessage, extremeMode, elapsedTime, onP
   const product = getRecommendedProduct(elapsedTime);
 
   return (
-    <div className="w-full" style={{ position: 'relative', zIndex: 1, contain: 'layout' }}>
+    <div className="w-full" style={{ 
+      position: 'relative', 
+      zIndex: 10, 
+      transform: 'translateZ(0)', // GPU 가속으로 고정
+      willChange: 'auto',
+      isolation: 'isolate' // 완전 격리
+    }}>
       {showAd ? (
         <div className={`bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur border border-yellow-500/30 rounded-2xl p-4 h-full flex flex-col justify-center ${
           extremeMode ? 'animate-pulse' : ''
-        }`} style={{ position: 'relative', overflow: 'hidden' }}>
+        }`} style={{ 
+          position: 'relative', 
+          overflow: 'hidden',
+          transform: 'translateZ(0)',
+          backfaceVisibility: 'hidden' // 렌더링 최적화
+        }}>
           <div className="flex items-center justify-center gap-2 mb-4">
             <Zap className="w-4 h-4 text-yellow-400 animate-bounce" />
             <span className="text-yellow-200 font-medium text-center text-sm leading-tight">{adMessage}</span>
@@ -32,7 +43,10 @@ const AdSection = React.memo(({ showAd, adMessage, extremeMode, elapsedTime, onP
           </div>
         </div>
       ) : (
-        <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-4 h-full flex items-center justify-center" style={{ position: 'relative' }}>
+        <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-4 h-full flex items-center justify-center" style={{ 
+          position: 'relative',
+          transform: 'translateZ(0)'
+        }}>
           <div className="text-center text-white/50">
             <Clock className="w-8 h-8 mx-auto mb-2 animate-spin-slow" />
             <p className="text-sm">1분 후 광고가 나타납니다</p>
