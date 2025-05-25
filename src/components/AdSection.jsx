@@ -7,11 +7,11 @@ const AdSection = React.memo(({ showAd, adMessage, extremeMode, elapsedTime, onP
   const product = getRecommendedProduct(elapsedTime);
 
   return (
-    <div className="lg:col-span-1">
+    <div className="w-full" style={{ position: 'relative', zIndex: 1, contain: 'layout' }}>
       {showAd ? (
         <div className={`bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur border border-yellow-500/30 rounded-2xl p-4 h-full flex flex-col justify-center ${
           extremeMode ? 'animate-pulse' : ''
-        }`}>
+        }`} style={{ position: 'relative', overflow: 'hidden' }}>
           <div className="flex items-center justify-center gap-2 mb-4">
             <Zap className="w-4 h-4 text-yellow-400 animate-bounce" />
             <span className="text-yellow-200 font-medium text-center text-sm leading-tight">{adMessage}</span>
@@ -32,7 +32,7 @@ const AdSection = React.memo(({ showAd, adMessage, extremeMode, elapsedTime, onP
           </div>
         </div>
       ) : (
-        <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-4 h-full flex items-center justify-center">
+        <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-4 h-full flex items-center justify-center" style={{ position: 'relative' }}>
           <div className="text-center text-white/50">
             <Clock className="w-8 h-8 mx-auto mb-2 animate-spin-slow" />
             <p className="text-sm">1분 후 광고가 나타납니다</p>

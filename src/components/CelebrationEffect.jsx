@@ -54,6 +54,24 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
         0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
         50% { transform: translate(-50%, -50%) translateY(-10px); }
       }
+      
+      @keyframes celebration-float-0 {
+        0% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+        20% { opacity: 1; }
+        100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+      }
+      
+      @keyframes celebration-float-1 {
+        0% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+        25% { opacity: 1; }
+        100% { transform: translateY(-120px) rotate(-360deg); opacity: 0; }
+      }
+      
+      @keyframes celebration-float-2 {
+        0% { transform: translateY(0px) scale(0.5); opacity: 0; }
+        30% { opacity: 1; }
+        100% { transform: translateY(-80px) scale(1.5); opacity: 0; }
+      }
     `;
     document.head.appendChild(style);
     
@@ -97,7 +115,7 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
       >
         <div 
           style={{
-            background: 'linear-gradient(to right, #9333ea, #ec4899)',
+            background: `linear-gradient(to right, ${celebration.color.includes('blue') ? '#3b82f6, #06b6d4' : celebration.color.includes('green') ? '#10b981, #059669' : '#9333ea, #ec4899'})`,
             color: 'white',
             padding: '1.5rem 2rem',
             borderRadius: '0.75rem',
@@ -109,9 +127,27 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
             whiteSpace: 'nowrap'
           }}
         >
-          🎉 {celebration.message} 🎉
+          {celebration.effects[0]} {celebration.message} {celebration.effects[1] || celebration.effects[0]}
         </div>
       </div>
+      
+      {/* 파티클 이펙트 추가 */}
+      {celebration.effects.map((effect, index) => (
+        <div
+          key={index}
+          style={{
+            position: 'fixed',
+            left: `${20 + (index * 20) % 60}%`,
+            top: `${25 + (index * 15) % 50}%`,
+            fontSize: '2rem',
+            zIndex: 997,
+            pointerEvents: 'none',
+            animation: `celebration-float-${index} 3s ease-out forwards`
+          }}
+        >
+          {effect}
+        </div>
+      ))}
     </>
   );
 };
