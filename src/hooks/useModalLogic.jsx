@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { storage } from '../utils/storage';
 import { analytics } from '../utils/analytics';
 import { getRecommendedProduct } from '../data/coupangProducts';
-import { rankingService } from '../services/rankingService';
+import { rankingService } from '../services/rankingService.jsx';
 
 // 모달 및 사용자 액션 관리 훅
 export const useModalLogic = ({

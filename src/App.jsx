@@ -18,9 +18,9 @@ import DevTools from './components/DevTools.jsx';
 import TimerSection from './components/TimerSection.jsx';
 
 // 훅스 imports
-import { useCelebrationSystem } from './hooks/useCelebrationSystem';
-import { useTimerLogic } from './hooks/useTimerLogic';
-import { useModalLogic } from './hooks/useModalLogic';
+import { useCelebrationSystem } from './hooks/useCelebrationSystem.jsx';
+import { useTimerLogic } from './hooks/useTimerLogic.jsx';
+import { useModalLogic } from './hooks/useModalLogic.jsx';
 
 // 유틸리티 imports
 import { formatTime } from './utils/helpers';

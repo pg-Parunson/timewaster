@@ -1,7 +1,7 @@
 // 실시간 랭킹 표시 컴포넌트
 import React, { useState, useEffect } from 'react';
 import { Trophy, Crown, Medal, Users } from 'lucide-react';
-import { rankingService } from '../services/rankingService.js';
+import { rankingService } from '../services/rankingService.jsx';
 import { RANKING_PERIODS, RANKING_LABELS } from '../config/firebase.js';
 
 const RankingSection = ({ isVisible = true }) => {

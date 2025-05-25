@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { formatTime } from '../utils/helpers';
-import { rankingService } from '../services/rankingService';
+import { rankingService } from '../services/rankingService.jsx';
 
 const RankingRegistrationModal = ({ 
   isOpen, 
