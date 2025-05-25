@@ -12,7 +12,7 @@ import {
   limitToLast,
   remove
 } from 'firebase/database';
-import { database, ANONYMOUS_NAMES, DB_PATHS, RANKING_PERIODS } from '../config/firebase.js';
+import { database, ANONYMOUS_NAMES, DB_PATHS, RANKING_PERIODS, isFirebaseConnected } from '../config/firebase.js';
 
 class RankingService {
   constructor() {
@@ -20,7 +20,7 @@ class RankingService {
     this.anonymousName = null;
     this.heartbeatInterval = null;
     this.listeners = new Map();
-    this.isFirebaseConnected = !!database;
+    this.isFirebaseConnected = isFirebaseConnected;
     this.localRanking = []; // Firebase 연결 실패 시 로컬 랭킹
     
     console.log('🏆 랭킹 서비스 초기화:', this.isFirebaseConnected ? 'Firebase 모드' : '로컬 모드');

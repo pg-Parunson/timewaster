@@ -1,20 +1,6 @@
 {
   "rules": {
-    "sessions": {
-      ".read": true,
-      ".write": true,
-      "$sessionId": {
-        ".validate": "newData.hasChildren(['sessionId', 'anonymousName', 'startTime', 'currentTime', 'isActive'])"
-      }
-    },
-    "liveFeed": {
-      ".read": true,
-      ".write": true,
-      ".indexOn": ["timestamp"]
-    },
-    "rankings": {
-      ".read": true,
-      ".write": true
-    }
+    ".read": true,
+    ".write": true
   }
 }

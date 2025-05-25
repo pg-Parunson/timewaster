@@ -1,6 +1,6 @@
 // Firebase 설정 및 초기화
 import { initializeApp } from 'firebase/app';
-import { getDatabase } from 'firebase/database';
+import { getDatabase, connectDatabaseEmulator } from 'firebase/database';
 
 // 실제 Firebase 프로젝트 설정
 const firebaseConfig = {
@@ -14,20 +14,24 @@ const firebaseConfig = {
   measurementId: "G-6850FF04H6"
 };
 
-// Firebase 앱 초기화
+// Firebase 앱 초기화 (안전한 방식)
 let app = null;
 let database = null;
+let isFirebaseConnected = false;
 
 try {
+  console.log('🔥 Firebase 연결 시도 중...');
   app = initializeApp(firebaseConfig);
   database = getDatabase(app);
-  console.log('🔥 Firebase 연결 성공! 실시간 랭킹 시스템 활성화!');
+  isFirebaseConnected = true;
+  console.log('✅ Firebase 연결 성공! 실시간 랭킹 시스템 활성화!');
 } catch (error) {
-  console.error('❌ Firebase 연결 실패:', error.message);
-  console.log('💻 로컬 모드로 전환합니다.');
+  console.warn('⚠️ Firebase 연결 실패:', error.message);
+  console.log('💻 로컬 모드로 전환합니다. 기본 기능은 정상 작동합니다.');
+  isFirebaseConnected = false;
 }
 
-export { database };
+export { database, isFirebaseConnected };
 
 // 익명 닉네임 풀 (30개)
 export const ANONYMOUS_NAMES = [
