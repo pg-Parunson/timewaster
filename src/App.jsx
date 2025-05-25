@@ -15,6 +15,8 @@ import SiteHeader from './components/SiteHeader.jsx';
 import MainActionButton from './components/MainActionButton.jsx';
 import BackgroundEffects from './components/BackgroundEffects.jsx';
 import RankingSection from './components/RankingSection.jsx';
+import LiveFeedNotifications from './components/LiveFeedNotifications.jsx';
+import DevTools from './components/DevTools.jsx';
 
 // 훅스 imports
 import { useCelebrationSystem } from './hooks/useCelebrationSystem';
@@ -33,6 +35,9 @@ import { formatTime, getParticle } from './utils/helpers';
 
 // Firebase 랭킹 서비스
 import { rankingService } from './services/rankingService.js';
+
+// 실시간 피드 서비스
+import { addMilestoneNotification, addRankingNotification, addActivityNotification } from './services/liveFeedService.js';
 
 function App() {
   // 기본 상태들
@@ -172,6 +177,32 @@ function App() {
         max-width: 100%;
         border-radius: 1.5rem !important;
       }
+      
+      /* 실시간 알림 애니메이션 */
+      @keyframes slideInRight {
+        0% {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        100% {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      
+      .animate-slideInRight {
+        animation: slideInRight 0.5s ease-out;
+      }
+      
+      /* 스크롤바 숨기기 */
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
     `;
     
     const styleElement = document.createElement('style');
@@ -305,6 +336,18 @@ function App() {
         // Firebase 랭킹 시스템에 시간 업데이트
         if (isRankingInitialized && elapsed > 0) {
           rankingService.updateTime(elapsed);
+          
+          // 마일스톤 달성 시 알림 추가 (1분, 3분, 5분, 10분, 15분, 30분...)
+          if (elapsed === 60 || elapsed === 180 || elapsed === 300 || elapsed === 600 || elapsed === 900 || elapsed === 1800 || elapsed === 3600) {
+            const minutes = Math.floor(elapsed / 60);
+            addMilestoneNotification(minutes, currentUser?.anonymousName);
+          }
+          
+          // 활동 알림 (30초마다 랜덤하게)
+          if (elapsed > 30 && elapsed % 30 === 0 && Math.random() < 0.3) {
+            const currentActivity = getTimeBasedActivity(elapsed);
+            addActivityNotification(`${elapsed}초 동안 "${currentActivity.activity}" 생각 중...`, currentUser?.anonymousName);
+          }
         }
         
         // 1분 후 광고 표시
@@ -571,6 +614,12 @@ function App() {
         celebration={currentCelebration}
         onComplete={stableHandleCelebrationComplete}
       />
+
+      {/* 실시간 피드 알림 */}
+      <LiveFeedNotifications />
+      
+      {/* 개발 도구 (개발 모드에서만 표시) */}
+      <DevTools isVisible={import.meta.env.DEV} />
 
       {/* 세련된 모달 */}
       <ModernModal
