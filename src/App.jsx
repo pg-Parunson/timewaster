@@ -116,6 +116,17 @@ function App() {
         }
       }
       
+      @keyframes pulse {
+        0%, 100% {
+          transform: translateX(-50%) translateY(-50%) scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: translateX(-50%) translateY(-50%) scale(1.05);
+          opacity: 0.9;
+        }
+      }
+      
       @keyframes float {
         0%, 100% {
           transform: translateY(0px) translateX(-50%) translateY(-50%);

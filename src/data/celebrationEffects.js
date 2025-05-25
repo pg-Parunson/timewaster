@@ -12,7 +12,7 @@ export const CELEBRATION_EFFECTS = [
     message: "5분 돌파! 🎉 집중력 대단해요! 🎉",
     effects: ["🎉", "🎊", "✨", "🌟"],
     color: "from-green-400 to-emerald-400",
-    animation: "spin"
+    animation: "pulse"
   },
   {
     minSeconds: 600, // 10분
