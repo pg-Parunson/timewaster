@@ -1,1 +1,124 @@
-import { useState } from 'react';\nimport { storage } from '../utils/storage';\nimport { analytics } from '../utils/analytics';\nimport { getRecommendedProduct } from '../data/coupangProducts';\nimport { rankingService } from '../services/rankingService';\n\n// 모달 및 사용자 액션 관리 훅\nexport const useModalLogic = ({\n  elapsedTime,\n  adClicks,\n  setAdClicks,\n  totalTimeWasted,\n  visits,\n  isRankingInitialized,\n  currentUser\n}) => {\n  const [showModal, setShowModal] = useState(false);\n  const [modalConfig, setModalConfig] = useState({});\n  const [showRankingModal, setShowRankingModal] = useState(false);\n\n  // 세련된 모달 표시 함수\n  const showModernModal = (title, message, type = 'info', showCancel = false) => {\n    setModalConfig({ title, message, type, showCancel });\n    setShowModal(true);\n  };\n\n  // 활동 선택 핸들러\n  const handleActivitySelect = (activity) => {\n    console.log('🎯 사용자가 활동을 선택했습니다:', activity);\n    \n    if (activity === 'start_activity') {\n      showModernModal(\n        '🚀 대단해요!',\n        '드디어 생산적인 일을 시작하시는군요! 이 의지를 계속 유지해보세요. 아니면... 조금 더 여기 있어도 괜찮아요 😏',\n        'success'\n      );\n    } else {\n      showModernModal(\n        '✨ 훌륭한 선택!',\n        `\"${activity}\" 정말 좋은 아이디어네요! 지금 당장 시작해보세요. 더 늦기 전에 말이에요...`,\n        'info'\n      );\n      \n      analytics.trackActivitySelect(activity, elapsedTime);\n    }\n  };\n\n  // 쿠팡 상품 클릭\n  const handleProductClick = () => {\n    const product = getRecommendedProduct(elapsedTime);\n    \n    analytics.trackCoupangClick(product.name, product.category, elapsedTime, adClicks + 1);\n    \n    window.open(product.url, '_blank');\n    \n    const responses = [\n      `${product.icon} ${product.name} 좋은 선택이에요! 🎉`,\n      `훌륭해요! ${product.category} 분야 투자는 언제나 옳습니다!`,\n      `${product.name}로 시간낭비를 생산적으로 만드셨네요!`,\n      `감사합니다! ${product.category} 상품 클릭으로 사이트를 후원해주셨어요!`,\n      `완벽한 선택! ${product.name}은 정말 추천하는 아이템이에요!`\n    ];\n    \n    const randomResponse = responses[Math.floor(Math.random() * responses.length)];\n    showModernModal(\"쿠팡 파트너스 클릭!\", randomResponse, 'success');\n    \n    const newAdClicks = storage.incrementAdClicks();\n    setAdClicks(newAdClicks);\n  };\n\n  // 종료 확인\n  const handleExit = () => {\n    setShowRankingModal(true);\n  };\n\n  const handleRankingModalClose = () => {\n    setShowRankingModal(false);\n    showModernModal(\n      \"현실로 돌아가시겠습니까?\",\n      \"정말로 이 환상적인 시간낭비를 끝내시겠습니까? 지금까지의 모든 노력이 물거품이 될 수 있어요!\",\n      'exit',\n      true\n    );\n  };\n\n  const confirmExit = () => {\n    analytics.trackExit(elapsedTime);\n    storage.updateTotalTimeWasted(elapsedTime);\n    \n    setShowModal(false);\n    setShowRankingModal(false);\n    \n    if (isRankingInitialized) {\n      rankingService.endSession();\n    }\n    \n    window.removeEventListener('beforeunload', handleBeforeUnload);\n    \n    setTimeout(() => {\n      if (window.history.length > 1) {\n        window.history.back();\n      } else {\n        window.location.reload();\n      }\n    }, 100);\n  };\n\n  return {\n    // 상태들\n    showModal,\n    modalConfig,\n    showRankingModal,\n    \n    // 함수들\n    showModernModal,\n    handleActivitySelect,\n    handleProductClick,\n    handleExit,\n    handleRankingModalClose,\n    confirmExit,\n    \n    // 세터들\n    setShowModal,\n    setShowRankingModal\n  };\n};\n
+import { useState } from 'react';
+import { storage } from '../utils/storage';
+import { analytics } from '../utils/analytics';
+import { getRecommendedProduct } from '../data/coupangProducts';
+import { rankingService } from '../services/rankingService';
+
+// 모달 및 사용자 액션 관리 훅
+export const useModalLogic = ({
+  elapsedTime,
+  adClicks,
+  setAdClicks,
+  totalTimeWasted,
+  visits,
+  isRankingInitialized,
+  currentUser
+}) => {
+  const [showModal, setShowModal] = useState(false);
+  const [modalConfig, setModalConfig] = useState({});
+  const [showRankingModal, setShowRankingModal] = useState(false);
+
+  // 세련된 모달 표시 함수
+  const showModernModal = (title, message, type = 'info', showCancel = false) => {
+    setModalConfig({ title, message, type, showCancel });
+    setShowModal(true);
+  };
+
+  // 활동 선택 핸들러
+  const handleActivitySelect = (activity) => {
+    console.log('🎯 사용자가 활동을 선택했습니다:', activity);
+    
+    if (activity === 'start_activity') {
+      showModernModal(
+        '🚀 대단해요!',
+        '드디어 생산적인 일을 시작하시는군요! 이 의지를 계속 유지해보세요. 아니면... 조금 더 여기 있어도 괜찮아요 😏',
+        'success'
+      );
+    } else {
+      showModernModal(
+        '✨ 훌륭한 선택!',
+        `"${activity}" 정말 좋은 아이디어네요! 지금 당장 시작해보세요. 더 늦기 전에 말이에요...`,
+        'info'
+      );
+      
+      analytics.trackActivitySelect(activity, elapsedTime);
+    }
+  };
+
+  // 쿠팡 상품 클릭
+  const handleProductClick = () => {
+    const product = getRecommendedProduct(elapsedTime);
+    
+    analytics.trackCoupangClick(product.name, product.category, elapsedTime, adClicks + 1);
+    
+    window.open(product.url, '_blank');
+    
+    const responses = [
+      `${product.icon} ${product.name} 좋은 선택이에요! 🎉`,
+      `훌륭해요! ${product.category} 분야 투자는 언제나 옳습니다!`,
+      `${product.name}로 시간낭비를 생산적으로 만드셨네요!`,
+      `감사합니다! ${product.category} 상품 클릭으로 사이트를 후원해주셨어요!`,
+      `완벽한 선택! ${product.name}은 정말 추천하는 아이템이에요!`
+    ];
+    
+    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+    showModernModal("쿠팡 파트너스 클릭!", randomResponse, 'success');
+    
+    const newAdClicks = storage.incrementAdClicks();
+    setAdClicks(newAdClicks);
+  };
+
+  // 종료 확인
+  const handleExit = () => {
+    setShowRankingModal(true);
+  };
+
+  const handleRankingModalClose = () => {
+    setShowRankingModal(false);
+    showModernModal(
+      "현실로 돌아가시겠습니까?",
+      "정말로 이 환상적인 시간낭비를 끝내시겠습니까? 지금까지의 모든 노력이 물거품이 될 수 있어요!",
+      'exit',
+      true
+    );
+  };
+
+  const confirmExit = () => {
+    analytics.trackExit(elapsedTime);
+    storage.updateTotalTimeWasted(elapsedTime);
+    
+    setShowModal(false);
+    setShowRankingModal(false);
+    
+    if (isRankingInitialized) {
+      rankingService.endSession();
+    }
+    
+    setTimeout(() => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.reload();
+      }
+    }, 100);
+  };
+
+  return {
+    // 상태들
+    showModal,
+    modalConfig,
+    showRankingModal,
+    
+    // 함수들
+    showModernModal,
+    handleActivitySelect,
+    handleProductClick,
+    handleExit,
+    handleRankingModalClose,
+    confirmExit,
+    
+    // 세터들
+    setShowModal,
+    setShowRankingModal
+  };
+};

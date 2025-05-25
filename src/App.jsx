@@ -1,1 +1,404 @@
-import React, { useEffect } from 'react';\n\n// 컴포넌트 imports\nimport StatsBar from './components/StatsBar.jsx';\nimport AdSection from './components/AdSection.jsx';\nimport ModernModal from './components/ModernModal.jsx';\nimport RankingRegistrationModal from './components/RankingRegistrationModal.jsx';\nimport CelebrationEffect from './components/CelebrationEffect.jsx';\nimport ShareSection from './components/ShareSection.jsx';\nimport EasterEgg from './components/EasterEgg.jsx';\nimport FloatingExitButton from './components/FloatingExitButton.jsx';\nimport MessageSection from './components/MessageSection.jsx';\nimport SiteHeader from './components/SiteHeader.jsx';\nimport BackgroundEffects from './components/BackgroundEffects.jsx';\nimport RankingSection from './components/RankingSection.jsx';\nimport LiveFeedNotifications from './components/LiveFeedNotifications.jsx';\nimport DevTools from './components/DevTools.jsx';\nimport TimerSection from './components/TimerSection.jsx';\n\n// 훅스 imports\nimport { useCelebrationSystem } from './hooks/useCelebrationSystem';\nimport { useTimerLogic } from './hooks/useTimerLogic';\nimport { useModalLogic } from './hooks/useModalLogic';\n\n// 유틸리티 imports\nimport { formatTime } from './utils/helpers';\n\nfunction App() {\n  // 타이머 로직 훅\n  const {\n    elapsedTime,\n    currentMessage,\n    currentMessageData,\n    displayMessage,\n    buttonText,\n    showAd,\n    adMessage,\n    visits,\n    totalTimeWasted,\n    adClicks,\n    messageShake,\n    extremeMode,\n    isTyping,\n    concurrentUsers,\n    currentUser,\n    isRankingInitialized,\n    refreshMessage,\n    setAdClicks\n  } = useTimerLogic();\n\n  // 모달 로직 훅\n  const {\n    showModal,\n    modalConfig,\n    showRankingModal,\n    showModernModal,\n    handleActivitySelect,\n    handleProductClick,\n    handleExit,\n    handleRankingModalClose,\n    confirmExit,\n    setShowModal\n  } = useModalLogic({\n    elapsedTime,\n    adClicks,\n    setAdClicks,\n    totalTimeWasted,\n    visits,\n    isRankingInitialized,\n    currentUser\n  });\n  \n  // 축하 시스템 초기화\n  const { showCelebration, currentCelebration, handleCelebrationComplete } = useCelebrationSystem(elapsedTime);\n\n  // CSS 애니메이션 스타일 주입\n  useEffect(() => {\n    const celebrationStyles = `\n      @keyframes celebration-float {\n        0% {\n          transform: translateY(30px) rotate(0deg);\n          opacity: 0;\n          scale: 0.8;\n        }\n        20% {\n          opacity: 1;\n          scale: 1;\n        }\n        80% {\n          transform: translateY(-20px) rotate(180deg);\n          opacity: 1;\n          scale: 1;\n        }\n        100% {\n          transform: translateY(-50px) rotate(360deg);\n          opacity: 0;\n          scale: 0.5;\n        }\n      }\n      \n      @keyframes bounce {\n        0%, 20%, 50%, 80%, 100% {\n          transform: scale(1);\n        }\n        40% {\n          transform: scale(1.1) translateY(-10px);\n        }\n        60% {\n          transform: scale(1.05) translateY(-5px);\n        }\n      }\n      \n      @keyframes spin {\n        from {\n          transform: rotate(0deg) translateX(-50%) translateY(-50%);\n        }\n        to {\n          transform: rotate(360deg) translateX(-50%) translateY(-50%);\n        }\n      }\n      \n      @keyframes pulse {\n        0%, 100% {\n          transform: translateX(-50%) translateY(-50%) scale(1);\n          opacity: 1;\n        }\n        50% {\n          transform: translateX(-50%) translateY(-50%) scale(1.05);\n          opacity: 0.9;\n        }\n      }\n      \n      @keyframes float {\n        0%, 100% {\n          transform: translateY(0px) translateX(-50%) translateY(-50%);\n        }\n        50% {\n          transform: translateY(-20px) translateX(-50%) translateY(-50%);\n        }\n      }\n      \n      @keyframes rainbow {\n        0% { opacity: 1; }\n        50% { opacity: 0.8; }\n        100% { opacity: 1; }\n      }\n      \n      @keyframes shake {\n        0%, 100% { transform: translateX(-50%) translateY(-50%); }\n        25% { transform: translateX(-50%) translateY(-50%) translateX(5px); }\n        75% { transform: translateX(-50%) translateY(-50%) translateX(-5px); }\n      }\n      \n      @keyframes mega {\n        0% { transform: scale(1) translateX(-50%) translateY(-50%); }\n        50% { transform: scale(1.3) translateX(-50%) translateY(-50%); }\n        100% { transform: scale(1) translateX(-50%) translateY(-50%); }\n      }\n      \n      @keyframes unicorn {\n        0% { \n          transform: translateX(-50%) translateY(-50%) rotate(0deg);\n        }\n        50% { \n          transform: translateX(-50%) translateY(-50%) rotate(5deg);\n        }\n        100% { \n          transform: translateX(-50%) translateY(-50%) rotate(0deg);\n        }\n      }\n      \n      @keyframes dragon {\n        0% { \n          transform: translateX(-50%) translateY(-50%) scale(1);\n        }\n        50% { \n          transform: translateX(-50%) translateY(-50%) scale(1.2);\n        }\n        100% { \n          transform: translateX(-50%) translateY(-50%) scale(1);\n        }\n      }\n      \n      .animate-celebration-float {\n        animation: celebration-float linear forwards;\n      }\n      \n      /* 메시지 박스 완전 안정화 */\n      .message-container {\n        position: relative;\n        width: 100%;\n        max-width: 100%;\n        overflow: hidden;\n        border-radius: 0 !important; /* 레트로 스타일 */\n        transform: none !important;\n        contain: layout style size;\n      }\n      \n      /* 메시지 애니메이션 완전 안정화 */\n      .message-container * {\n        max-width: 100%;\n        word-wrap: break-word;\n        overflow-wrap: break-word;\n        box-sizing: border-box;\n        transform: none !important;\n      }\n      \n      /* 메시지 텍스트 영역 안정화 */\n      .message-container p {\n        transform: none !important;\n        position: relative !important;\n        left: auto !important;\n        right: auto !important;\n        margin: 0 auto !important;\n        overflow: hidden;\n        text-overflow: ellipsis;\n        width: 100% !important;\n      }\n      \n      /* 실시간 알림 애니메이션 */\n      @keyframes slideInRight {\n        0% {\n          transform: translateX(100%);\n          opacity: 0;\n        }\n        100% {\n          transform: translateX(0);\n          opacity: 1;\n        }\n      }\n      \n      .animate-slideInRight {\n        animation: slideInRight 0.5s ease-out;\n      }\n      \n      /* 스크롤바 숨기기 */\n      .scrollbar-hide {\n        -ms-overflow-style: none;\n        scrollbar-width: none;\n      }\n      \n      .scrollbar-hide::-webkit-scrollbar {\n        display: none;\n      }\n      \n      /* 랭킹 보드 스크롤바 스타일 */\n      .ranking-scrollbar::-webkit-scrollbar {\n        width: 6px;\n      }\n      \n      .ranking-scrollbar::-webkit-scrollbar-track {\n        background: rgba(255, 255, 255, 0.05);\n        border-radius: 3px;\n      }\n      \n      .ranking-scrollbar::-webkit-scrollbar-thumb {\n        background: rgba(255, 255, 255, 0.2);\n        border-radius: 3px;\n      }\n      \n      .ranking-scrollbar::-webkit-scrollbar-thumb:hover {\n        background: rgba(255, 255, 255, 0.3);\n      }\n      \n      /* 모달 애니메이션 */\n      @keyframes fadeIn {\n        0% {\n          opacity: 0;\n          transform: scale(0.9) translateY(20px);\n        }\n        100% {\n          opacity: 1;\n          transform: scale(1) translateY(0);\n        }\n      }\n      \n      .animate-fadeIn {\n        animation: fadeIn 0.3s ease-out;\n      }\n      \n      /* 레트로 스타일 애니메이션 */\n      @keyframes retro-blink {\n        0%, 50% { opacity: 1; }\n        51%, 100% { opacity: 0.3; }\n      }\n      \n      /* 축하 이펙트 배경 반짝임 복원 */\n      @keyframes celebration-flash {\n        0%, 100% { opacity: 0.05; }\n        20% { opacity: 0.3; }\n        50% { opacity: 0.2; }\n        80% { opacity: 0.25; }\n      }\n    `;\n    \n    const styleElement = document.createElement('style');\n    styleElement.textContent = celebrationStyles;\n    document.head.appendChild(styleElement);\n    \n    return () => {\n      document.head.removeChild(styleElement);\n    };\n  }, []);\n\n  return (\n    <div className=\"min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden\">\n      {/* 현대적 배경 효과 */}\n      <BackgroundEffects />\n\n      {/* 메인 컨테이너 */}\n      <div className=\"relative z-10 min-h-screen flex items-center justify-center p-4\">\n        <div className=\"bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-6 lg:p-8 w-full max-w-7xl\">\n          {/* 상단 통계 바 */}\n          <StatsBar \n            visits={visits}\n            adClicks={adClicks}\n            totalTimeWasted={totalTimeWasted}\n            concurrentUsers={concurrentUsers}\n            extremeMode={extremeMode}\n            currentElapsedTime={elapsedTime}\n          />\n\n          {/* 사이트 제목 헤더 - 시간 표시 통합 */}\n          <SiteHeader \n            elapsedTime={elapsedTime}\n            extremeMode={extremeMode}\n          />\n\n          {/* 비난 메시지 영역 - 상단 배치 및 축소 */}\n          <div className=\"mb-4\">\n            <MessageSection \n              displayMessage={displayMessage}\n              messageData={currentMessageData}\n              isTyping={isTyping}\n              messageShake={messageShake}\n              extremeMode={extremeMode}\n              onRefreshMessage={refreshMessage}\n              onActivitySelect={handleActivitySelect}\n              compact={true}\n            />\n          </div>\n\n          {/* 메인 콘텐츠 영역 - 수정된 레이아웃: 왼쪽 축소, 랭킹 확장 */}\n          <div className=\"grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4\">\n            {/* 왼쪽: 활동 추천 + 광고 (1칸 차지) */}\n            <div className=\"lg:col-span-1 space-y-4\">\n              {/* 활동 추천 섹션 */}\n              <TimerSection \n                elapsedTime={elapsedTime}\n                extremeMode={extremeMode}\n              />\n              \n              {/* 광고 섹션 */}\n              <AdSection \n                showAd={showAd}\n                adMessage={adMessage}\n                extremeMode={extremeMode}\n                elapsedTime={elapsedTime}\n                onProductClick={handleProductClick}\n              />\n            </div>\n\n            {/* 오른쪽: 랭킹 영역 (2칸 차지, 더 확장) */}\n            <div className=\"lg:col-span-2\">\n              <div className=\"w-full h-[500px] overflow-y-auto ranking-scrollbar bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl\" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.2) rgba(255,255,255,0.05)' }}>\n                <RankingSection \n                  isVisible={true}\n                  currentUser={currentUser}\n                />\n              </div>\n            </div>\n          </div>\n\n          {/* 공유 섹션 */}\n          <ShareSection \n            elapsedTime={elapsedTime}\n            formatTime={formatTime}\n            showModernModal={showModernModal}\n          />\n\n          {/* 이스터에그 - 업그레이드된 버전 */}\n          <EasterEgg elapsedTime={elapsedTime} />\n        </div>\n      </div>\n\n      {/* 플로팅 액션 버튼 (개선된 디자인) */}\n      <FloatingExitButton \n        elapsedTime={elapsedTime}\n        onExit={handleExit}\n      />\n\n      {/* 축하 이팩트 컴포넌트 */}\n      <CelebrationEffect \n        isActive={showCelebration}\n        celebration={currentCelebration}\n        onComplete={handleCelebrationComplete}\n      />\n\n      {/* 실시간 피드 알림 */}\n      <LiveFeedNotifications />\n      \n      {/* 개발 도구 (개발 모드에서만 표시) */}\n      <DevTools isVisible={import.meta.env.DEV} />\n\n      {/* 랭킹 등록 모달 */}\n      <RankingRegistrationModal\n        isOpen={showRankingModal}\n        onClose={handleRankingModalClose}\n        onConfirm={confirmExit}\n        elapsedTime={elapsedTime}\n        currentUser={currentUser}\n        totalTimeWasted={totalTimeWasted}\n        visits={visits}\n        adClicks={adClicks}\n      />\n\n      {/* 세련된 모달 */}\n      <ModernModal\n        isOpen={showModal}\n        onClose={() => setShowModal(false)}\n        onConfirm={modalConfig.type === 'exit' ? confirmExit : () => setShowModal(false)}\n        title={modalConfig.title}\n        message={modalConfig.message}\n        type={modalConfig.type}\n        showCancel={modalConfig.showCancel}\n      />\n    </div>\n  );\n}\n\nexport default App;\n
+import React, { useEffect } from 'react';
+
+// 컴포넌트 imports
+import StatsBar from './components/StatsBar.jsx';
+import AdSection from './components/AdSection.jsx';
+import ModernModal from './components/ModernModal.jsx';
+import RankingRegistrationModal from './components/RankingRegistrationModal.jsx';
+import CelebrationEffect from './components/CelebrationEffect.jsx';
+import ShareSection from './components/ShareSection.jsx';
+import EasterEgg from './components/EasterEgg.jsx';
+import FloatingExitButton from './components/FloatingExitButton.jsx';
+import MessageSection from './components/MessageSection.jsx';
+import SiteHeader from './components/SiteHeader.jsx';
+import BackgroundEffects from './components/BackgroundEffects.jsx';
+import RankingSection from './components/RankingSection.jsx';
+import LiveFeedNotifications from './components/LiveFeedNotifications.jsx';
+import DevTools from './components/DevTools.jsx';
+import TimerSection from './components/TimerSection.jsx';
+
+// 훅스 imports
+import { useCelebrationSystem } from './hooks/useCelebrationSystem';
+import { useTimerLogic } from './hooks/useTimerLogic';
+import { useModalLogic } from './hooks/useModalLogic';
+
+// 유틸리티 imports
+import { formatTime } from './utils/helpers';
+
+function App() {
+  // 타이머 로직 훅
+  const {
+    elapsedTime,
+    currentMessage,
+    currentMessageData,
+    displayMessage,
+    buttonText,
+    showAd,
+    adMessage,
+    visits,
+    totalTimeWasted,
+    adClicks,
+    messageShake,
+    extremeMode,
+    isTyping,
+    concurrentUsers,
+    currentUser,
+    isRankingInitialized,
+    refreshMessage,
+    setAdClicks
+  } = useTimerLogic();
+
+  // 모달 로직 훅
+  const {
+    showModal,
+    modalConfig,
+    showRankingModal,
+    showModernModal,
+    handleActivitySelect,
+    handleProductClick,
+    handleExit,
+    handleRankingModalClose,
+    confirmExit,
+    setShowModal
+  } = useModalLogic({
+    elapsedTime,
+    adClicks,
+    setAdClicks,
+    totalTimeWasted,
+    visits,
+    isRankingInitialized,
+    currentUser
+  });
+  
+  // 축하 시스템 초기화
+  const { showCelebration, currentCelebration, handleCelebrationComplete } = useCelebrationSystem(elapsedTime);
+
+  // CSS 애니메이션 스타일 주입
+  useEffect(() => {
+    const celebrationStyles = `
+      @keyframes celebration-float {
+        0% {
+          transform: translateY(30px) rotate(0deg);
+          opacity: 0;
+          scale: 0.8;
+        }
+        20% {
+          opacity: 1;
+          scale: 1;
+        }
+        80% {
+          transform: translateY(-20px) rotate(180deg);
+          opacity: 1;
+          scale: 1;
+        }
+        100% {
+          transform: translateY(-50px) rotate(360deg);
+          opacity: 0;
+          scale: 0.5;
+        }
+      }
+      
+      @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+          transform: scale(1);
+        }
+        40% {
+          transform: scale(1.1) translateY(-10px);
+        }
+        60% {
+          transform: scale(1.05) translateY(-5px);
+        }
+      }
+      
+      @keyframes spin {
+        from {
+          transform: rotate(0deg) translateX(-50%) translateY(-50%);
+        }
+        to {
+          transform: rotate(360deg) translateX(-50%) translateY(-50%);
+        }
+      }
+      
+      @keyframes pulse {
+        0%, 100% {
+          transform: translateX(-50%) translateY(-50%) scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: translateX(-50%) translateY(-50%) scale(1.05);
+          opacity: 0.9;
+        }
+      }
+      
+      @keyframes float {
+        0%, 100% {
+          transform: translateY(0px) translateX(-50%) translateY(-50%);
+        }
+        50% {
+          transform: translateY(-20px) translateX(-50%) translateY(-50%);
+        }
+      }
+      
+      @keyframes rainbow {
+        0% { opacity: 1; }
+        50% { opacity: 0.8; }
+        100% { opacity: 1; }
+      }
+      
+      @keyframes shake {
+        0%, 100% { transform: translateX(-50%) translateY(-50%); }
+        25% { transform: translateX(-50%) translateY(-50%) translateX(5px); }
+        75% { transform: translateX(-50%) translateY(-50%) translateX(-5px); }
+      }
+      
+      @keyframes mega {
+        0% { transform: scale(1) translateX(-50%) translateY(-50%); }
+        50% { transform: scale(1.3) translateX(-50%) translateY(-50%); }
+        100% { transform: scale(1) translateX(-50%) translateY(-50%); }
+      }
+      
+      @keyframes unicorn {
+        0% { 
+          transform: translateX(-50%) translateY(-50%) rotate(0deg);
+        }
+        50% { 
+          transform: translateX(-50%) translateY(-50%) rotate(5deg);
+        }
+        100% { 
+          transform: translateX(-50%) translateY(-50%) rotate(0deg);
+        }
+      }
+      
+      @keyframes dragon {
+        0% { 
+          transform: translateX(-50%) translateY(-50%) scale(1);
+        }
+        50% { 
+          transform: translateX(-50%) translateY(-50%) scale(1.2);
+        }
+        100% { 
+          transform: translateX(-50%) translateY(-50%) scale(1);
+        }
+      }
+      
+      .animate-celebration-float {
+        animation: celebration-float linear forwards;
+      }
+      
+      .message-container {
+        position: relative;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+        border-radius: 0 !important;
+        transform: none !important;
+        contain: layout style size;
+      }
+      
+      .message-container * {
+        max-width: 100%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        box-sizing: border-box;
+        transform: none !important;
+      }
+      
+      .message-container p {
+        transform: none !important;
+        position: relative !important;
+        left: auto !important;
+        right: auto !important;
+        margin: 0 auto !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100% !important;
+      }
+      
+      @keyframes slideInRight {
+        0% {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        100% {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      
+      .animate-slideInRight {
+        animation: slideInRight 0.5s ease-out;
+      }
+      
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      
+      .ranking-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      
+      .ranking-scrollbar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 3px;
+      }
+      
+      .ranking-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 3px;
+      }
+      
+      .ranking-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+          transform: scale(0.9) translateY(20px);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+      
+      .animate-fadeIn {
+        animation: fadeIn 0.3s ease-out;
+      }
+      
+      @keyframes retro-blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0.3; }
+      }
+      
+      @keyframes celebration-flash {
+        0%, 100% { opacity: 0.05; }
+        20% { opacity: 0.3; }
+        50% { opacity: 0.2; }
+        80% { opacity: 0.25; }
+      }
+    `;
+    
+    const styleElement = document.createElement('style');
+    styleElement.textContent = celebrationStyles;
+    document.head.appendChild(styleElement);
+    
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+      <BackgroundEffects />
+
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-6 lg:p-8 w-full max-w-7xl">
+          <StatsBar 
+            visits={visits}
+            adClicks={adClicks}
+            totalTimeWasted={totalTimeWasted}
+            concurrentUsers={concurrentUsers}
+            extremeMode={extremeMode}
+            currentElapsedTime={elapsedTime}
+          />
+
+          <SiteHeader 
+            elapsedTime={elapsedTime}
+            extremeMode={extremeMode}
+          />
+
+          <div className="mb-4">
+            <MessageSection 
+              displayMessage={displayMessage}
+              messageData={currentMessageData}
+              isTyping={isTyping}
+              messageShake={messageShake}
+              extremeMode={extremeMode}
+              onRefreshMessage={refreshMessage}
+              onActivitySelect={handleActivitySelect}
+              compact={true}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+            <div className="lg:col-span-1 space-y-4">
+              <TimerSection 
+                elapsedTime={elapsedTime}
+                extremeMode={extremeMode}
+              />
+              
+              <AdSection 
+                showAd={showAd}
+                adMessage={adMessage}
+                extremeMode={extremeMode}
+                elapsedTime={elapsedTime}
+                onProductClick={handleProductClick}
+              />
+            </div>
+
+            <div className="lg:col-span-2">
+              <div className="w-full h-[500px] overflow-y-auto ranking-scrollbar bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.2) rgba(255,255,255,0.05)' }}>
+                <RankingSection 
+                  isVisible={true}
+                  currentUser={currentUser}
+                />
+              </div>
+            </div>
+          </div>
+
+          <ShareSection 
+            elapsedTime={elapsedTime}
+            formatTime={formatTime}
+            showModernModal={showModernModal}
+          />
+
+          <EasterEgg elapsedTime={elapsedTime} />
+        </div>
+      </div>
+
+      <FloatingExitButton 
+        elapsedTime={elapsedTime}
+        onExit={handleExit}
+      />
+
+      <CelebrationEffect 
+        isActive={showCelebration}
+        celebration={currentCelebration}
+        onComplete={handleCelebrationComplete}
+      />
+
+      <LiveFeedNotifications />
+      
+      <DevTools isVisible={import.meta.env.DEV} />
+
+      <RankingRegistrationModal
+        isOpen={showRankingModal}
+        onClose={handleRankingModalClose}
+        onConfirm={confirmExit}
+        elapsedTime={elapsedTime}
+        currentUser={currentUser}
+        totalTimeWasted={totalTimeWasted}
+        visits={visits}
+        adClicks={adClicks}
+      />
+
+      <ModernModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onConfirm={modalConfig.type === 'exit' ? confirmExit : () => setShowModal(false)}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
+        showCancel={modalConfig.showCancel}
+      />
+    </div>
+  );
+}
+
+export default App;
