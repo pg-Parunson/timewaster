@@ -53,25 +53,44 @@ const MessageSection = ({
         }`}
         onClick={onRefreshMessage}
       >
-        {/* 카드 배경 - 완전 안정화된 컨테이너 */}
+        {/* 레트로 게임 스타일 메시지 박스 */}
         <div className="
-          bg-gradient-to-r from-white/10 to-white/5 
-          backdrop-blur-xl border border-white/20 
+          bg-gradient-to-r from-slate-900/95 to-slate-800/95
+          backdrop-blur-xl
           p-2 sm:p-3 lg:p-4 
           min-h-[60px] sm:min-h-[80px] lg:min-h-[100px]
           w-full
-          rounded-lg lg:rounded-xl
           flex items-center justify-between
           relative 
           overflow-hidden
           contain-layout contain-style
-        ">
+          retro-message-box
+        "
+        style={{
+          border: '3px solid',
+          borderImage: 'linear-gradient(45deg, #8b5cf6, #ec4899, #06b6d4) 1',
+          borderRadius: '0px',
+          boxShadow: `
+            0 0 0 2px #1e293b,
+            inset 0 0 0 2px #334155,
+            0 4px 8px rgba(0,0,0,0.3),
+            0 0 20px rgba(139, 92, 246, 0.3)
+          `
+        }}>
           
-          {/* 배경 패턴 */}
-          <div className="absolute inset-0 opacity-5">
-            <div className="absolute top-4 left-4 w-2 h-2 bg-white rounded-full animate-ping"></div>
-            <div className="absolute top-8 right-8 w-1 h-1 bg-white rounded-full animate-ping delay-1000"></div>
-            <div className="absolute bottom-6 left-8 w-1.5 h-1.5 bg-white rounded-full animate-ping delay-2000"></div>
+          {/* 레트로 게임 배경 패턴 - 픽셀 아트 스타일 */}
+          <div className="absolute inset-0 opacity-20">
+            {/* 픽셀 코너 */}
+            <div className="absolute top-2 left-2 w-1 h-1 bg-cyan-400 pixel-corner"></div>
+            <div className="absolute top-2 right-2 w-1 h-1 bg-pink-400 pixel-corner"></div>
+            <div className="absolute bottom-2 left-2 w-1 h-1 bg-purple-400 pixel-corner"></div>
+            <div className="absolute bottom-2 right-2 w-1 h-1 bg-yellow-400 pixel-corner"></div>
+            
+            {/* 스캔라인 효과 */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent animate-pulse"></div>
+              <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-pink-400/50 to-transparent animate-pulse delay-1000"></div>
+            </div>
           </div>
           
           {/* 메인 텍스트 - 완전 안정화된 텍스트 영역 */}
@@ -84,17 +103,25 @@ const MessageSection = ({
             ">
               <p className={`
                 text-xs sm:text-sm lg:text-base xl:text-lg 
-                leading-relaxed font-medium text-white 
+                leading-relaxed font-bold text-white 
                 transition-all duration-300 
                 break-words 
                 text-center
                 w-full
                 block
+                retro-text
                 ${
                   isTyping ? 'animate-pulse' : ''
                 }
               `}
-              style={{ 
+              style={{
+                fontFamily: 'monospace, "Courier New", monospace',
+                textShadow: `
+                  1px 1px 0px #000,
+                  0 0 10px rgba(139, 92, 246, 0.8),
+                  0 0 20px rgba(236, 72, 153, 0.6)
+                `,
+                letterSpacing: '0.5px',
                 wordBreak: 'keep-all',
                 overflowWrap: 'break-word',
                 hyphens: 'auto',
@@ -107,7 +134,7 @@ const MessageSection = ({
               }}>
                 {displayMessage}
                 {isTyping && (
-                  <span className="animate-ping text-red-400 ml-1 inline-block">|</span>
+                  <span className="animate-ping text-cyan-400 ml-1 inline-block font-bold">█</span>
                 )}
               </p>
             </div>
@@ -129,12 +156,27 @@ const MessageSection = ({
             )}
           </div>
           
-          {/* 비난 메시지 갱신 버튼 - 우측 배치 */}
+          {/* 레트로 게임 스타일 갱신 버튼 - 우측 배치 */}
           <div className="relative z-10 ml-3">
             <button
               onClick={handleRefreshClick}
               disabled={isRefreshing}
-              className="flex flex-col items-center justify-center gap-1 px-2 py-2 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 rounded-lg border-2 border-red-400/50 shadow-lg text-white text-xs font-bold transition-all duration-200 hover:scale-105 disabled:opacity-50 min-w-[80px]"
+              className="flex flex-col items-center justify-center gap-1 px-2 py-2 text-white text-xs font-bold transition-all duration-200 hover:scale-105 disabled:opacity-50 min-w-[80px] retro-button"
+              style={{
+                background: 'linear-gradient(135deg, #dc2626, #ec4899)',
+                border: '2px solid #1e293b',
+                borderRadius: '0px',
+                boxShadow: `
+                  inset 2px 2px 0px rgba(255,255,255,0.2),
+                  inset -2px -2px 0px rgba(0,0,0,0.2),
+                  0 4px 0px #7f1d1d,
+                  0 6px 8px rgba(0,0,0,0.3),
+                  0 0 20px rgba(220, 38, 38, 0.5)
+                `,
+                fontFamily: 'monospace, "Courier New", monospace',
+                textShadow: '1px 1px 0px #000',
+                letterSpacing: '0.5px'
+              }}
             >
               {isRefreshing ? (
                 <>
@@ -150,11 +192,27 @@ const MessageSection = ({
             </button>
           </div>
           
-          {/* 극한 모드 효과 - 위치 고정 */}
+          {/* 레트로 극한 모드 표시 - 위치 고정 */}
           {extremeMode && (
-            <div className="absolute top-3 sm:top-4 right-3 sm:right-4 z-20">
-              <div className="bg-red-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-bold transform-none">
-                🚨 극한!
+            <div className="absolute top-2 right-2 z-20">
+              <div 
+                className="text-white px-2 py-1 text-xs font-bold transform-none retro-warning"
+                style={{
+                  background: 'linear-gradient(135deg, #dc2626, #fbbf24)',
+                  border: '2px solid #000',
+                  borderRadius: '0px',
+                  boxShadow: `
+                    inset 1px 1px 0px rgba(255,255,255,0.3),
+                    inset -1px -1px 0px rgba(0,0,0,0.3),
+                    0 0 10px rgba(220, 38, 38, 0.8)
+                  `,
+                  fontFamily: 'monospace, "Courier New", monospace',
+                  textShadow: '1px 1px 0px #000',
+                  letterSpacing: '1px',
+                  animation: 'retro-blink 1s infinite'
+                }}
+              >
+                ⚠️ DANGER
               </div>
             </div>
           )}

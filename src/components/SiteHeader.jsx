@@ -6,12 +6,12 @@ const SiteHeader = () => {
     <div className="text-center mb-8">
       <div className="flex items-center justify-center gap-3 mb-2">
         <div className="text-4xl title-icon">🕒</div>
-        <h1 className="text-3xl lg:text-4xl xl:text-5xl font-bold bg-gradient-to-r from-red-400 via-pink-400 to-purple-400 bg-clip-text text-transparent site-title">
+        <h1 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-cyan-400 site-title retro-neon pixel-font">
           시간낭비 계산기
         </h1>
         <div className="text-4xl title-icon delay-150">⏰</div>
       </div>
-      <p className="text-white/70 text-base lg:text-lg animate-fade-in">
+      <p className="text-white/70 text-base lg:text-lg animate-fade-in pixel-font" style={{ textShadow: '1px 1px 0px #000', letterSpacing: '1px' }}>
         당신이 이 사이트에서 낭비한 시간을 실시간으로 계산해드립니다 ✨
       </p>
     </div>
