@@ -1,15 +1,28 @@
-import React, { useRef } from 'react';
-import { Sparkles } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
+import ActivityRecommendationCard from './ActivityRecommendationCard';
 
-// 메시지 섹션 컴포넌트 - 프레임 밖 튀어나가기 문제 해결
+// 메시지 섹션 컴포넌트 - 스마트 메시지 시스템 통합
 const MessageSection = ({ 
   displayMessage, 
+  messageData, // 새로운 prop: 스마트 메시지 데이터
   isTyping, 
   messageShake, 
   extremeMode, 
-  onRefreshMessage 
+  onRefreshMessage,
+  onActivitySelect = () => {} // 새로운 prop: 활동 선택 콜백
 }) => {
   const messageRef = useRef(null);
+  const [showRecommendation, setShowRecommendation] = useState(false);
+
+  // 스마트 메시지인지 확인
+  const hasRecommendation = messageData && messageData.type === 'smart' && messageData.recommendation;
+
+  const handleActivitySelect = (activity) => {
+    onActivitySelect(activity);
+    // 활동 선택 시 자동으로 추천 카드 닫기
+    setShowRecommendation(false);
+  };
 
   return (
     <div className="relative mb-6 w-full">
@@ -79,13 +92,21 @@ const MessageSection = ({
               </p>
             </div>
             
-            {/* 호버 효과 표시 - 위치 안정화 */}
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 mt-3 sm:mt-4">
-              <div className="flex items-center justify-center gap-2 text-white/50 text-xs sm:text-sm">
-                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>클릭해서 새로운 메시지 보기</span>
-              </div>
+            {/* 활동 추천 버튼 - 스마트 메시지인 경우에만 표시 */}
+          {hasRecommendation && (
+            <div className="mt-4">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowRecommendation(!showRecommendation);
+                }}
+                className="flex items-center justify-center gap-2 mx-auto px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 hover:from-cyan-500/30 hover:to-blue-500/30 rounded-lg border border-cyan-300/30 text-cyan-300 text-sm font-medium transition-all duration-200 hover:scale-105"
+              >
+                <span>🎯 대안 활동 추천</span>
+                {showRecommendation ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
             </div>
+          )}
           </div>
           
           {/* 극한 모드 효과 - 위치 고정 */}
@@ -96,6 +117,23 @@ const MessageSection = ({
               </div>
             </div>
           )}
+      
+      {/* 활동 추천 카드 - 스마트 메시지일 때만 표시 */}
+      {hasRecommendation && showRecommendation && (
+        <div className="mt-4 animate-in slide-in-from-top-2 duration-300">
+          <ActivityRecommendationCard
+            recommendation={messageData.recommendation}
+            theme={messageData.theme}
+            onActivitySelect={handleActivitySelect}
+          />
+        </div>
+      )}
+      
+      {/* 호버 효과 표시 - 하단에 별도 배치 */}
+      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 mt-2 text-center">
+        <div className="flex items-center justify-center gap-2 text-white/50 text-xs sm:text-sm">
+          <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
+          <span>클릭해서 새로운 메시지 보기</span>
         </div>
       </div>
     </div>

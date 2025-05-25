@@ -67,5 +67,29 @@ export const analytics = {
         exit_method: 'button'
       });
     }
+  },
+
+  // 활동 선택 이벤트 - 새로운 기능
+  trackActivitySelect: (activity, elapsedTime) => {
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'activity_selected', {
+        event_category: 'productivity',
+        event_label: activity,
+        time_wasted_seconds: elapsedTime,
+        custom_parameter_1: 'smart_recommendation'
+      });
+    }
+  },
+
+  // 스마트 메시지 표시 이벤트
+  trackSmartMessage: (messageType, category, elapsedTime) => {
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'smart_message_shown', {
+        event_category: 'engagement',
+        message_type: messageType,
+        message_category: category,
+        time_wasted_seconds: elapsedTime
+      });
+    }
   }
 };

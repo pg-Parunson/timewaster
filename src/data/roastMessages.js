@@ -1,4 +1,6 @@
-// 비난 멘트 데이터베이스 - 50개로 대폭 확장된 버전
+// 비난 멘트 데이터베이스 - 50개로 대폭 확장된 버전 + 시간대별 활동 매칭 시스템
+import { getTimeBasedActivityRecommendation, ACTIVITY_THEMES } from './timeBasedActivities.js';
+
 export const ROAST_MESSAGES = [
   // 기본 비난 멘트 (1-20)
   "정말 대단한 시간 활용 능력이네요.",
@@ -192,4 +194,72 @@ export const getTimeBasedMessage = () => {
 // 랜덤 일반 메시지 가져오기
 export const getRandomRoastMessage = () => {
   return ROAST_MESSAGES[Math.floor(Math.random() * ROAST_MESSAGES.length)];
+};
+
+// 🎯 새로운 기능: 시간 기반 스마트 메시지 생성
+export const getSmartTimeBasedMessage = (seconds, userHistory = {}) => {
+  const activityRec = getTimeBasedActivityRecommendation(seconds, userHistory);
+  const minutes = Math.floor(seconds / 60);
+  
+  // 시간대별 맞춤 메시지 생성
+  const baseMessages = [
+    `${activityRec.timeSpent} 동안 시간을 보내셨네요.`,
+    `이 시간이면 "${activityRec.activities[0]}"도 할 수 있었는데요.`,
+    `${activityRec.message} - 지금이라도 시작해보세요!`,
+    `현재 ${activityRec.brainState} 상태예요. ${activityRec.timeOptimization}`,
+    `${activityRec.difficulty} 난이도의 활동들이 기다리고 있어요.`
+  ];
+  
+  // 개인화된 팁이 있으면 추가
+  if (activityRec.personalizedTip) {
+    baseMessages.push(activityRec.personalizedTip);
+  }
+  
+  return {
+    message: baseMessages[Math.floor(Math.random() * baseMessages.length)],
+    activityRecommendation: activityRec,
+    theme: ACTIVITY_THEMES[activityRec.category]
+  };
+};
+
+// 통합 메시지 시스템 - 확률 기반 선택
+export const getIntegratedMessage = (seconds, userRank = null, userHistory = {}) => {
+  const random = Math.random();
+  
+  // 랭킹 메시지 20% 확률
+  if (userRank && random < 0.2) {
+    return {
+      type: 'ranking',
+      message: getRankingMessage(userRank, seconds),
+      category: 'ranking'
+    };
+  }
+  
+  // 시간 기반 스마트 메시지 40% 확률
+  if (random < 0.6) {
+    const smartMessage = getSmartTimeBasedMessage(seconds, userHistory);
+    return {
+      type: 'smart',
+      message: smartMessage.message,
+      category: 'activity',
+      recommendation: smartMessage.activityRecommendation,
+      theme: smartMessage.theme
+    };
+  }
+  
+  // 시간대별 메시지 20% 확률
+  if (random < 0.8) {
+    return {
+      type: 'timeBased',
+      message: getTimeBasedMessage(),
+      category: 'timeOfDay'
+    };
+  }
+  
+  // 일반 비난 메시지 20% 확률
+  return {
+    type: 'roast',
+    message: getRandomRoastMessage(),
+    category: 'general'
+  };
 };

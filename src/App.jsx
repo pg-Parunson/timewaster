@@ -27,7 +27,8 @@ import {
   ROAST_MESSAGES, 
   getRankingMessage, 
   getTimeBasedMessage, 
-  getRandomRoastMessage 
+  getRandomRoastMessage,
+  getIntegratedMessage // 새로운 통합 메시지 시스템
 } from './data/roastMessages';
 import { AD_MESSAGES } from './data/adMessages';
 import { BUTTON_TEXTS } from './data/buttonTexts';
@@ -50,7 +51,9 @@ function App() {
   const [startTime] = useState(Date.now());
   const [elapsedTime, setElapsedTime] = useState(0);
   const [currentMessage, setCurrentMessage] = useState("당신의 소중한 시간이 흘러가고 있습니다...");
+  const [currentMessageData, setCurrentMessageData] = useState(null); // 새로운 상태: 스마트 메시지 데이터
   const [displayMessage, setDisplayMessage] = useState(""); // 타이핑 애니메이션용
+  const [userHistory, setUserHistory] = useState({ visits: 1, patterns: {} }); // 사용자 히스토리
   const [buttonText, setButtonText] = useState(BUTTON_TEXTS[0]);
   const [showAd, setShowAd] = useState(false);
   const [adMessage, setAdMessage] = useState(AD_MESSAGES[0]);
@@ -511,50 +514,37 @@ function App() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [elapsedTime, totalTimeWasted]);
 
-  // 메시지 새로고침 - 50개 메시지 + 랭킹/시간대 기반 시스템
+  // 메시지 새로고침 - 새로운 통합 스마트 메시지 시스템
   const refreshMessage = () => {
     if (elapsedTime < 10) {
       const newMessage = "시간 낭비의 여정이 시작되었습니다.";
       setCurrentMessage(newMessage);
+      setCurrentMessageData(null);
       typeMessage(newMessage);
       return;
     }
 
-    let selectedMessage = "";
-    const random = Math.random();
+    // 사용자 히스토리 업데이트
+    const history = {
+      visits,
+      timeSpent: elapsedTime,
+      adClicks,
+      patterns: {
+        frequentVisitor: visits >= 3,
+        longTimeUser: elapsedTime >= 1800, // 30분 이상
+        extremeUser: extremeMode
+      }
+    };
+    setUserHistory(history);
+
+    // 통합 메시지 시스템 사용
+    const messageResult = getIntegratedMessage(elapsedTime, currentRank, history);
     
-    // 20% 확률로 랭킹 기반 메시지 (랭킹이 10위 안이고 1분 이상)
-    if (random < 0.2 && currentRank && currentRank <= 10 && elapsedTime >= 60) {
-      selectedMessage = getRankingMessage(currentRank, elapsedTime);
-    }
-    // 15% 확률로 시간대 기반 메시지
-    else if (random < 0.35) {
-      selectedMessage = getTimeBasedMessage();
-    }
-    // 65% 확률로 일반 메시지 (기존 + 새로운 50개)
-    else {
-      // 강화된 시간 매칭 시스템
-      const currentActivity = getTimeBasedActivity(elapsedTime);
-      const randomRoast = getRandomRoastMessage();
-      
-      // 조사 처리를 위한 변수
-      const activityWithParticle = currentActivity.activity + getParticle(currentActivity.activity, '을를');
-      const categoryWithParticle = currentActivity.category + getParticle(currentActivity.category, '아으로');
-      
-      // 다양한 메시지 패턴 - 긴 메시지 방지
-      const messagePatterns = [
-        `이 시간에 "${currentActivity.activity}" 할 수 있었는데... ${randomRoast}`,
-        `${currentActivity.icon} ${activityWithParticle} 위한 소중한 시간이었어요. ${randomRoast}`,
-        `⏰ ${formatTime(elapsedTime)} 동안 "${currentActivity.activity}" 같은 ${currentActivity.category} 활동을 할 수 있었어요... ${randomRoast}`,
-        `${randomRoast}`, // 순수 비난 메시지
-        `${currentActivity.icon} 지금 이 순간에도 "${currentActivity.activity}"로 더 나은 자신이 될 수 있었는데... ${randomRoast}`
-      ];
-      
-      selectedMessage = messagePatterns[Math.floor(Math.random() * messagePatterns.length)];
-    }
+    setCurrentMessage(messageResult.message);
+    setCurrentMessageData(messageResult);
+    typeMessage(messageResult.message);
     
-    setCurrentMessage(selectedMessage);
-    typeMessage(selectedMessage);
+    console.log('🎯 새로운 메시지 시스템:', messageResult.type, messageResult.category);
     
     // 버튼 텍스트도 가끔 변경
     if (Math.random() < 0.4) {
@@ -565,6 +555,35 @@ function App() {
     // 메시지 흔들기 효과
     setMessageShake(true);
     setTimeout(() => setMessageShake(false), 500);
+  };
+
+  // 활동 선택 핸들러 - 새로운 기능
+  const handleActivitySelect = (activity) => {
+    console.log('🎯 사용자가 활동을 선택했습니다:', activity);
+    
+    if (activity === 'start_activity') {
+      // "지금 바로 시작하기" 버튼 클릭
+      showModernModal(
+        '🚀 대단해요!',
+        '드디어 생산적인 일을 시작하시는군요! 이 의지를 계속 유지해보세요. 아니면... 조금 더 여기 있어도 괜찮아요 😏',
+        'success'
+      );
+      
+      // 새로운 동기부여 메시지 표시
+      const motivationalMessage = '정말 시작하실 건가요? 아니면 조금 더...?';
+      setCurrentMessage(motivationalMessage);
+      typeMessage(motivationalMessage);
+    } else {
+      // 특정 활동 선택
+      showModernModal(
+        '✨ 훌륭한 선택!',
+        `"${activity}" 정말 좋은 아이디어네요! 지금 당장 시작해보세요. 더 늦기 전에 말이에요...`,
+        'info'
+      );
+      
+      // Google Analytics 이벤트 추적
+      analytics.trackActivitySelect(activity, elapsedTime);
+    }
   };
 
   // 쿠팡 상품 클릭 (실제 파트너스 연동)
@@ -692,13 +711,15 @@ function App() {
             </div>
           </div>
 
-          {/* 메시지 영역 */}
+          {/* 메시지 영역 - 스마트 메시지 시스템 적용 */}
           <MessageSection 
             displayMessage={displayMessage}
+            messageData={currentMessageData}
             isTyping={isTyping}
             messageShake={messageShake}
             extremeMode={extremeMode}
             onRefreshMessage={refreshMessage}
+            onActivitySelect={handleActivitySelect}
           />
 
           {/* 메인 액션 버튼 */}
