@@ -10,14 +10,14 @@ export const CELEBRATION_EFFECTS = [
   {
     minSeconds: 300, // 5분
     message: "5분 돌파! 🎉 집중력 대단해요! 🎉",
-    effects: ["🎉", "🎊", "✨", "🌟"],
+    effects: ["🎉", "✨"], // effects 수 줄임
     color: "from-green-400 to-emerald-400",
     animation: "pulse"
   },
   {
     minSeconds: 600, // 10분
     message: "10분 완주! 🏆 진정한 챔피언! 🏆",
-    effects: ["🏆", "👑", "⭐", "✨", "🎆"],
+    effects: ["🏆", "✨"], // effects 수 줄임
     color: "from-yellow-400 to-orange-400",
     animation: "pulse"
   },

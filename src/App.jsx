@@ -716,8 +716,11 @@ function App() {
             currentElapsedTime={elapsedTime}
           />
 
-          {/* 사이트 제목 헤더 */}
-          <SiteHeader />
+          {/* 사이트 제목 헤더 - 시간 표시 통합 */}
+          <SiteHeader 
+            elapsedTime={elapsedTime}
+            extremeMode={extremeMode}
+          />
 
           {/* 비난 메시지 영역 - 상단 배치 및 축소 */}
           <div className="mb-4">
@@ -734,10 +737,10 @@ function App() {
           </div>
 
           {/* 메인 콘텐츠 영역 - 수정된 레이아웃: 왼쪽 축소, 랭킹 확장 */}
-          <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 mb-4">
-            {/* 왼쪽: 타이머 + 광고 (2칸 차지) */}
-            <div className="xl:col-span-2 space-y-4">
-              {/* 타이머 섹션 */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+            {/* 왼쪽: 활동 추천 + 광고 (1칸 차지) */}
+            <div className="lg:col-span-1 space-y-4">
+              {/* 활동 추천 섹션 */}
               <TimerSection 
                 elapsedTime={elapsedTime}
                 extremeMode={extremeMode}
@@ -753,9 +756,9 @@ function App() {
               />
             </div>
 
-            {/* 오른쪽: 랭킹 영역 (3칸 차지, 높이 제한) */}
-            <div className="xl:col-span-3">
-              <div className="w-full h-[400px] overflow-y-auto ranking-scrollbar bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.2) rgba(255,255,255,0.05)' }}>
+            {/* 오른쪽: 랭킹 영역 (2칸 차지, 더 확장) */}
+            <div className="lg:col-span-2">
+              <div className="w-full h-[500px] overflow-y-auto ranking-scrollbar bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.2) rgba(255,255,255,0.05)' }}>
                 <RankingSection 
                   isVisible={true}
                   currentUser={currentUser}

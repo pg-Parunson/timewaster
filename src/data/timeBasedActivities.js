@@ -258,18 +258,18 @@ export const getTimeBasedActivityRecommendation = (seconds, userHistory = {}) =>
   };
 };
 
-// 활동 카테고리별 색상 테마
+// 활동 카테고리별 색상 테마 - 더 밝고 선명한 색상으로 개선
 export const ACTIVITY_THEMES = {
-  instant: { color: "green", icon: "⚡", description: "즉시 실행" },
-  quick: { color: "blue", icon: "🚀", description: "빠른 실행" },
-  habit: { color: "purple", icon: "🔄", description: "습관 형성" },
-  learning: { color: "orange", icon: "🧠", description: "학습 중심" },
-  productive: { color: "red", icon: "⚡", description: "생산성 향상" },
-  skill: { color: "indigo", icon: "🎯", description: "스킬 개발" },
-  advanced: { color: "pink", icon: "📈", description: "심화 학습" },
+  instant: { color: "emerald", icon: "⚡", description: "즉시 실행" },
+  quick: { color: "cyan", icon: "🚀", description: "빠른 실행" },
+  habit: { color: "violet", icon: "🔄", description: "습관 형성" },
+  learning: { color: "amber", icon: "🧠", description: "학습 중심" },
+  productive: { color: "rose", icon: "⚡", description: "생산성 향상" },
+  skill: { color: "blue", icon: "🎯", description: "스킬 개발" },
+  advanced: { color: "fuchsia", icon: "📈", description: "심화 학습" },
   expert: { color: "yellow", icon: "👑", description: "전문성 구축" },
-  master: { color: "cyan", icon: "🏆", description: "마스터 레벨" },
-  legend: { color: "emerald", icon: "💎", description: "레전드 도전" }
+  master: { color: "teal", icon: "🏆", description: "마스터 레벨" },
+  legend: { color: "pink", icon: "💎", description: "레전드 도전" }
 };
 
 export default {
