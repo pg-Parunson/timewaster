@@ -313,21 +313,20 @@ function App() {
             extremeMode={extremeMode}
           />
 
-          <div className="mb-4">
-            <MessageSection 
-              displayMessage={displayMessage}
-              messageData={currentMessageData}
-              isTyping={isTyping}
-              messageShake={messageShake}
-              extremeMode={extremeMode}
-              onRefreshMessage={refreshMessage}
-              onActivitySelect={handleActivitySelect}
-              compact={true}
-            />
-          </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
             <div className="lg:col-span-1 space-y-4">
+              {/* 비난 메시지 섹션을 여기로 이동 */}
+              <MessageSection 
+                displayMessage={displayMessage}
+                messageData={currentMessageData}
+                isTyping={isTyping}
+                messageShake={messageShake}
+                extremeMode={extremeMode}
+                onRefreshMessage={refreshMessage}
+                onActivitySelect={handleActivitySelect}
+                compact={true}
+              />
+              
               <TimerSection 
                 elapsedTime={elapsedTime}
                 extremeMode={extremeMode}
