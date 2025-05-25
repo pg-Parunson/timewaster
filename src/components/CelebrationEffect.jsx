@@ -1,1 +1,119 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';\n\n// 축하 애니메이션 컴포넌트 - UI 깨짐 수정 버전\nconst CelebrationEffect = ({ isActive, celebration, onComplete }) => {\n  const [particles, setParticles] = useState([]);\n  const [showMessage, setShowMessage] = useState(false);\n  const timerRef = useRef(null);\n  \n  // onComplete를 useCallback으로 안정화\n  const stableOnComplete = useCallback(() => {\n    if (onComplete) {\n      onComplete();\n    }\n  }, [onComplete]);\n  \n  // 상태 초기화 함수\n  const clearStates = useCallback(() => {\n    setShowMessage(false);\n    setParticles([]);\n    if (timerRef.current) {\n      clearTimeout(timerRef.current);\n      timerRef.current = null;\n    }\n  }, []);\n  \n  useEffect(() => {\n    // 이전 타이머 정리\n    if (timerRef.current) {\n      clearTimeout(timerRef.current);\n      timerRef.current = null;\n    }\n    \n    if (isActive && celebration) {\n      // 파티클 생성 - 크기 및 위치 수정\n      const newParticles = Array.from({ length: 15 }, (_, i) => ({ // 20개 → 15개로 줄임\n        id: i,\n        emoji: celebration.effects[Math.floor(Math.random() * celebration.effects.length)],\n        x: 10 + Math.random() * 80, // 10% ~ 90% 범위로 제한\n        y: 10 + Math.random() * 80, // 10% ~ 90% 범위로 제한\n        delay: Math.random() * 500, // 1000ms → 500ms로 줄임\n        duration: 1500 + Math.random() * 500, // 더 짧게\n        size: 0.8 + Math.random() * 0.4 // 0.8 ~ 1.2 범위로 제한\n      }));\n      \n      setParticles(newParticles);\n      setShowMessage(true);\n      \n      // 3초 후 정리 (강제 정리)\n      timerRef.current = setTimeout(() => {\n        clearStates();\n        stableOnComplete();\n      }, 3000);\n      \n    } else {\n      // isActive가 false면 즉시 정리\n      clearStates();\n    }\n    \n    // cleanup\n    return () => {\n      clearStates();\n    };\n  }, [isActive, celebration, stableOnComplete, clearStates]);\n  \n  if (!isActive || !celebration) return null;\n  \n  return (\n    <div className=\"fixed inset-0 pointer-events-none z-40 overflow-hidden\"> {/* z-50 → z-40로 변경 */}\n      {/* 메인 축하 메시지 - 안정화된 위치 */}\n      {showMessage && (\n        <div className=\"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2\">\n          <div className={`\n            bg-gradient-to-r ${celebration.color} text-white \n            px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:py-4 \n            rounded-2xl sm:rounded-3xl shadow-2xl \n            backdrop-blur-xl border border-white/30\n            animate-bounce\n          `}> {/* 커스텀 애니메이션 대신 기본 animate-bounce 사용 */}\n            <div className=\"text-lg sm:text-xl lg:text-2xl font-bold text-center whitespace-nowrap\">\n              {celebration.message}\n            </div>\n          </div>\n        </div>\n      )}\n      \n      {/* 파티클 효과 - 크기 수정 */}\n      {particles.map((particle) => (\n        <div\n          key={particle.id}\n          className=\"absolute animate-celebration-float select-none\"\n          style={{\n            left: `${particle.x}%`,\n            top: `${particle.y}%`,\n            animationDelay: `${particle.delay}ms`,\n            animationDuration: `${particle.duration}ms`,\n            fontSize: `${particle.size * 1.5}rem`, // transform 제거하고 fontSize만 사용\n            zIndex: 35 // 개별 z-index 설정\n          }}\n        >\n          {particle.emoji}\n        </div>\n      ))}\n      \n      {/* 화면 전체 글로우 효과 - 약하게 수정 */}\n      {showMessage && (\n        <div \n          className={`absolute inset-0 bg-gradient-to-br ${celebration.color} animate-pulse`}\n          style={{ \n            opacity: 0.03, // 0.1 → 0.03으로 매우 약하게\n            mixBlendMode: 'overlay',\n            zIndex: 30\n          }}\n        />\n      )}\n    </div>\n  );\n};\n\nexport default CelebrationEffect;"
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+
+// 축하 애니메이션 컴포넌트 - UI 깨짐 수정 버전
+const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
+  const [particles, setParticles] = useState([]);
+  const [showMessage, setShowMessage] = useState(false);
+  const timerRef = useRef(null);
+  
+  // onComplete를 useCallback으로 안정화
+  const stableOnComplete = useCallback(() => {
+    if (onComplete) {
+      onComplete();
+    }
+  }, [onComplete]);
+  
+  // 상태 초기화 함수
+  const clearStates = useCallback(() => {
+    setShowMessage(false);
+    setParticles([]);
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+  
+  useEffect(() => {
+    // 이전 타이머 정리
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    
+    if (isActive && celebration) {
+      // 파티클 생성 - 크기 및 위치 수정
+      const newParticles = Array.from({ length: 15 }, (_, i) => ({ // 20개 → 15개로 줄임
+        id: i,
+        emoji: celebration.effects[Math.floor(Math.random() * celebration.effects.length)],
+        x: 10 + Math.random() * 80, // 10% ~ 90% 범위로 제한
+        y: 10 + Math.random() * 80, // 10% ~ 90% 범위로 제한
+        delay: Math.random() * 500, // 1000ms → 500ms로 줄임
+        duration: 1500 + Math.random() * 500, // 더 짧게
+        size: 0.8 + Math.random() * 0.4 // 0.8 ~ 1.2 범위로 제한
+      }));
+      
+      setParticles(newParticles);
+      setShowMessage(true);
+      
+      // 3초 후 정리 (강제 정리)
+      timerRef.current = setTimeout(() => {
+        clearStates();
+        stableOnComplete();
+      }, 3000);
+      
+    } else {
+      // isActive가 false면 즉시 정리
+      clearStates();
+    }
+    
+    // cleanup
+    return () => {
+      clearStates();
+    };
+  }, [isActive, celebration, stableOnComplete, clearStates]);
+  
+  if (!isActive || !celebration) return null;
+  
+  return (
+    <div className="fixed inset-0 pointer-events-none z-40 overflow-hidden">
+      {/* 메인 축하 메시지 - 안정화된 위치 */}
+      {showMessage && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <div className={`
+            bg-gradient-to-r ${celebration.color} text-white 
+            px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:py-4 
+            rounded-2xl sm:rounded-3xl shadow-2xl 
+            backdrop-blur-xl border border-white/30
+            animate-bounce
+          `}>
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-center whitespace-nowrap">
+              {celebration.message}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* 파티클 효과 - 크기 수정 */}
+      {particles.map((particle) => (
+        <div
+          key={particle.id}
+          className="absolute animate-celebration-float select-none"
+          style={{
+            left: `${particle.x}%`,
+            top: `${particle.y}%`,
+            animationDelay: `${particle.delay}ms`,
+            animationDuration: `${particle.duration}ms`,
+            fontSize: `${particle.size * 1.5}rem`,
+            zIndex: 35
+          }}
+        >
+          {particle.emoji}
+        </div>
+      ))}
+      
+      {/* 화면 전체 글로우 효과 - 약하게 수정 */}
+      {showMessage && (
+        <div 
+          className={`absolute inset-0 bg-gradient-to-br ${celebration.color} animate-pulse`}
+          style={{ 
+            opacity: 0.03,
+            mixBlendMode: 'overlay',
+            zIndex: 30
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+export default CelebrationEffect;
