@@ -1,10 +1,15 @@
 import React from 'react';
 import { Brain } from 'lucide-react';
-import { getTimeBasedActivity, CATEGORY_COLORS } from '../data/timeBasedActivities';
+import { getTimeBasedActivityRecommendation, ACTIVITY_THEMES } from '../data/timeBasedActivities';
 import { formatTime } from '../utils/helpers';
 
 const TimerSection = ({ elapsedTime = 0, extremeMode = false }) => {
-  const currentActivity = getTimeBasedActivity(elapsedTime);
+  const activityRecommendation = getTimeBasedActivityRecommendation(elapsedTime);
+  const currentActivity = {
+    activity: activityRecommendation.activities[0] || '생산적인 일',
+    icon: ACTIVITY_THEMES[activityRecommendation.category]?.icon || '🎨',
+    category: ACTIVITY_THEMES[activityRecommendation.category]?.description || '생산성'
+  };
 
   return (
     <div className="lg:col-span-2">
@@ -40,7 +45,7 @@ const TimerSection = ({ elapsedTime = 0, extremeMode = false }) => {
           </div>
           
           <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r ${
-            CATEGORY_COLORS[currentActivity.category] || CATEGORY_COLORS["기본"]
+            `from-${ACTIVITY_THEMES[activityRecommendation.category]?.color || 'blue'}-500/20 to-${ACTIVITY_THEMES[activityRecommendation.category]?.color || 'blue'}-600/20`
           } shadow-lg`}>
             <span className="font-medium text-sm">{currentActivity.category}</span>
           </div>

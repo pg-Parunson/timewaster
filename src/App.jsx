@@ -32,7 +32,7 @@ import {
 } from './data/roastMessages';
 import { AD_MESSAGES } from './data/adMessages';
 import { BUTTON_TEXTS } from './data/buttonTexts';
-import { getTimeBasedActivity } from './data/timeBasedActivities';
+import { getTimeBasedActivityRecommendation } from './data/timeBasedActivities';
 import { getRecommendedProduct } from './data/coupangProducts';
 
 // 유틸리티 imports
@@ -442,8 +442,9 @@ function App() {
           
           // 활동 알림 (30초마다 랜덤하게)
           if (elapsed > 30 && elapsed % 30 === 0 && Math.random() < 0.3) {
-            const currentActivity = getTimeBasedActivity(elapsed);
-            addActivityNotification(`${elapsed}초 동안 "${currentActivity.activity}" 생각 중...`, currentUser?.anonymousName);
+            const activityRecommendation = getTimeBasedActivityRecommendation(elapsed);
+            const activityName = activityRecommendation.activities[0] || '생산적인 일';
+            addActivityNotification(`${elapsed}초 동안 "${activityName}" 생각 중...`, currentUser?.anonymousName);
           }
         }
         
