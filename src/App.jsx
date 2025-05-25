@@ -14,6 +14,7 @@ import MessageSection from './components/MessageSection.jsx';
 import SiteHeader from './components/SiteHeader.jsx';
 import MainActionButton from './components/MainActionButton.jsx';
 import BackgroundEffects from './components/BackgroundEffects.jsx';
+import RankingSection from './components/RankingSection.jsx';
 
 // 훅스 imports
 import { useCelebrationSystem } from './hooks/useCelebrationSystem';
@@ -29,6 +30,9 @@ import { getRecommendedProduct } from './data/coupangProducts';
 import { storage } from './utils/storage';
 import { analytics } from './utils/analytics';
 import { formatTime, getParticle } from './utils/helpers';
+
+// Firebase 랭킹 서비스
+import { rankingService } from './services/rankingService.js';
 
 function App() {
   // 기본 상태들
@@ -49,6 +53,8 @@ function App() {
   const [concurrentUsers, setConcurrentUsers] = useState(3);
   const [showModal, setShowModal] = useState(false);
   const [modalConfig, setModalConfig] = useState({});
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isRankingInitialized, setIsRankingInitialized] = useState(false);
   
   const timerRef = useRef(null);
   const typingRef = useRef(null);
@@ -257,6 +263,32 @@ function App() {
     analytics.trackSessionStart(visits, storedData.totalTimeWasted);
   }, []);
 
+  // Firebase 랭킹 시스템 초기화
+  useEffect(() => {
+    const initializeRanking = async () => {
+      try {
+        console.log('🚀 Firebase 랭킹 시스템 초기화 시작...');
+        const user = await rankingService.initializeSession();
+        setCurrentUser(user);
+        setIsRankingInitialized(true);
+        console.log(`✅ 랭킹 시스템 초기화 완료: ${user.anonymousName}`);
+      } catch (error) {
+        console.error('❌ Firebase 랭킹 시스템 초기화 실패:', error);
+        // Firebase 연결 실패시도 기본 기능은 사용 가능
+        setIsRankingInitialized(false);
+      }
+    };
+
+    initializeRanking();
+
+    // 컴포넌트 언마운트 시 랭킹 세션 종료
+    return () => {
+      if (isRankingInitialized) {
+        rankingService.endSession();
+      }
+    };
+  }, []);
+
   // 초기 메시지 타이핑
   useEffect(() => {
     typeMessage(currentMessage);
@@ -269,6 +301,11 @@ function App() {
         const now = Date.now();
         const elapsed = Math.floor((now - startTime) / 1000);
         setElapsedTime(elapsed);
+        
+        // Firebase 랭킹 시스템에 시간 업데이트
+        if (isRankingInitialized && elapsed > 0) {
+          rankingService.updateTime(elapsed);
+        }
         
         // 1분 후 광고 표시
         if (elapsed >= 60 && !showAd) {
@@ -289,7 +326,7 @@ function App() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [startTime, isPageVisible, showAd, extremeMode]);
+  }, [startTime, isPageVisible, showAd, extremeMode, isRankingInitialized]);
 
   // 광고 메시지 업데이트 (버그 완전 해결 버전)
   useEffect(() => {
@@ -461,21 +498,29 @@ function App() {
           {/* 사이트 제목 헤더 */}
           <SiteHeader />
 
-          {/* 메인 콘텐츠 영역 - 2단 레이아웃 */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            {/* 왼쪽: 타이머 + 활동 제안 */}
-            <TimerSection 
-              elapsedTime={elapsedTime}
-              extremeMode={extremeMode}
-            />
+          {/* 메인 콘텐츠 영역 - 3단 레이아웃: 타이머 + 광고 + 랭킹 */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+            {/* 왼쪽: 타이머 + 활동 제안 (2칸 차지) */}
+            <div className="lg:col-span-2">
+              <TimerSection 
+                elapsedTime={elapsedTime}
+                extremeMode={extremeMode}
+              />
+            </div>
 
-            {/* 오른쪽: 광고 영역 (항상 표시) */}
+            {/* 가운데: 광고 영역 */}
             <AdSection 
               showAd={showAd}
               adMessage={adMessage}
               extremeMode={extremeMode}
               elapsedTime={elapsedTime}
               onProductClick={handleProductClick}
+            />
+
+            {/* 오른쪽: 랭킹 영역 */}
+            <RankingSection 
+              isVisible={true}
+              currentUser={currentUser}
             />
           </div>
 
