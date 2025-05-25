@@ -74,7 +74,7 @@ const RankingSection = ({ isVisible = true }) => {
   const currentLabel = RANKING_LABELS[activePeriod];
 
   return (
-    <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-2xl">
+    <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-2xl min-w-[500px] w-full max-w-[600px]">
       {/* 제목 */}
       <div className="flex items-center gap-3 mb-4">
         <Trophy className="w-6 h-6 text-yellow-400" />
@@ -153,7 +153,7 @@ const RankingSection = ({ isVisible = true }) => {
                   </div>
 
                   {/* 닉네임 */}
-                  <div className="flex-1 min-w-0 px-2">
+                  <div className="flex-1 min-w-[180px] px-3">
                     <div className={`
                       font-semibold text-sm
                       ${
@@ -178,7 +178,7 @@ const RankingSection = ({ isVisible = true }) => {
                   </div>
 
                   {/* 시간 */}
-                  <div className="text-right min-w-[70px]">
+                  <div className="text-right min-w-[100px]">
                     <div className={`
                       font-mono font-bold text-sm
                       ${user.rank === 1 ? 'text-yellow-400' : 
