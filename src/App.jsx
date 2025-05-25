@@ -193,20 +193,31 @@ function App() {
         animation: celebration-float linear forwards;
       }
       
-      /* 메시지 박스 안정화 */
+      /* 메시지 박스 완전 안정화 */
       .message-container {
         position: relative;
         width: 100%;
         max-width: 100%;
-        overflow: hidden;
+        overflow: visible; /* hidden → visible로 변경 */
         border-radius: 1.5rem !important;
+        transform: none !important; /* transform 완전 차단 */
       }
       
-      /* 메시지 애니메이션 안정화 */
+      /* 메시지 애니메이션 완전 안정화 */
       .message-container * {
         max-width: 100%;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        box-sizing: border-box;
+      }
+      
+      /* 메시지 텍스트 영역 안정화 */
+      .message-container p {
+        transform: none !important;
+        position: relative !important;
+        left: auto !important;
+        right: auto !important;
+        margin: 0 auto !important;
       }
       
       /* 실시간 알림 애니메이션 */
