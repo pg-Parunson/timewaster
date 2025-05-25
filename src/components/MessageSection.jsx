@@ -29,8 +29,9 @@ const MessageSection = ({
           w-full
           rounded-2xl lg:rounded-3xl
           flex items-center justify-center 
-          relative overflow-hidden
-          transform-none
+          relative 
+          overflow-hidden
+          contain-layout contain-style
         ">
           
           {/* 배경 패턴 */}
@@ -41,12 +42,12 @@ const MessageSection = ({
           </div>
           
           {/* 메인 텍스트 - 완전 안정화된 텍스트 영역 */}
-          <div className="relative z-10 text-center w-full max-w-full">
+          <div className="relative z-10 text-center w-full">
             <div className="
               px-2 sm:px-4 lg:px-6
               mx-auto
-              max-w-[90%] sm:max-w-[85%] lg:max-w-[80%]
-              overflow-hidden
+              w-full
+              box-border
             ">
               <p className={`
                 text-sm sm:text-base lg:text-xl xl:text-2xl 
@@ -55,7 +56,7 @@ const MessageSection = ({
                 break-words 
                 text-center
                 w-full
-                display-inline-block
+                block
                 ${
                   isTyping ? 'animate-pulse' : ''
                 }
@@ -66,7 +67,10 @@ const MessageSection = ({
                 hyphens: 'auto',
                 whiteSpace: 'pre-wrap',
                 minHeight: '1.5em',
-                lineHeight: '1.6'
+                lineHeight: '1.6',
+                maxWidth: '100%',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
               }}>
                 {displayMessage}
                 {isTyping && (

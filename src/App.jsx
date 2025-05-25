@@ -662,9 +662,9 @@ function App() {
           <SiteHeader />
 
           {/* 메인 콘텐츠 영역 - 새로운 2단 레이아웃: 타이머+활동제안+광고 | 랭킹 */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 mb-6">
             {/* 왼쪽: 타이머 + 활동 제안 + 광고 (2칸 차지) */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="xl:col-span-2 space-y-4">
               {/* 타이머 섹션 */}
               <TimerSection 
                 elapsedTime={elapsedTime}
@@ -682,11 +682,13 @@ function App() {
             </div>
 
             {/* 오른쪽: 랭킹 영역 (확장) */}
-            <div className="lg:col-span-1">
-              <RankingSection 
-                isVisible={true}
-                currentUser={currentUser}
-              />
+            <div className="xl:col-span-3">
+              <div className="w-full h-full">
+                <RankingSection 
+                  isVisible={true}
+                  currentUser={currentUser}
+                />
+              </div>
             </div>
           </div>
 
