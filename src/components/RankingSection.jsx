@@ -153,14 +153,24 @@ const RankingSection = ({ isVisible = true }) => {
                   </div>
 
                   {/* 닉네임 */}
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 px-2">
                     <div className={`
-                      font-semibold truncate
-                      ${user.isCurrentUser ? 'text-blue-300' : 'text-white'}
+                      font-semibold text-sm
+                      ${
+                        user.isCurrentUser 
+                          ? 'text-blue-300' 
+                          : user.rank === 1 
+                            ? 'text-yellow-300'
+                            : user.rank === 2
+                              ? 'text-gray-200'
+                              : user.rank === 3
+                                ? 'text-amber-300'
+                                : 'text-white'
+                      }
                     `}>
                       {user.anonymousName}
                       {user.isCurrentUser && (
-                        <span className="ml-2 text-xs bg-blue-500/30 px-2 py-1 rounded-full">
+                        <span className="ml-2 text-xs bg-blue-500/40 px-2 py-1 rounded-full font-bold">
                           나
                         </span>
                       )}
@@ -168,13 +178,13 @@ const RankingSection = ({ isVisible = true }) => {
                   </div>
 
                   {/* 시간 */}
-                  <div className="text-right">
+                  <div className="text-right min-w-[70px]">
                     <div className={`
-                      font-mono font-bold
+                      font-mono font-bold text-sm
                       ${user.rank === 1 ? 'text-yellow-400' : 
                         user.rank === 2 ? 'text-gray-300' :
                         user.rank === 3 ? 'text-amber-600' :
-                        user.isCurrentUser ? 'text-blue-300' : 'text-white/80'
+                        user.isCurrentUser ? 'text-blue-300' : 'text-white/90'
                       }
                     `}>
                       {user.timeDisplay}

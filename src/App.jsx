@@ -97,13 +97,13 @@ function App() {
       
       @keyframes bounce {
         0%, 20%, 50%, 80%, 100% {
-          transform: translateY(0) translateX(-50%);
+          transform: translateX(-50%) translateY(-50%);
         }
         40% {
-          transform: translateY(-30px) translateX(-50%);
+          transform: translateX(-50%) translateY(-50%) translateY(-30px);
         }
         60% {
-          transform: translateY(-15px) translateX(-50%);
+          transform: translateX(-50%) translateY(-50%) translateY(-15px);
         }
       }
       
@@ -184,11 +184,18 @@ function App() {
       
       /* 메시지 박스 안정화 */
       .message-container {
-        transform: none !important;
         position: relative;
         width: 100%;
         max-width: 100%;
+        overflow: hidden;
         border-radius: 1.5rem !important;
+      }
+      
+      /* 메시지 애니메이션 안정화 */
+      .message-container * {
+        max-width: 100%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
       }
       
       /* 실시간 알림 애니메이션 */
@@ -584,30 +591,33 @@ function App() {
           {/* 사이트 제목 헤더 */}
           <SiteHeader />
 
-          {/* 메인 콘텐츠 영역 - 3단 레이아웃: 타이머 + 광고 + 랭킹 */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
-            {/* 왼쪽: 타이머 + 활동 제안 (2칸 차지) */}
-            <div className="lg:col-span-2">
+          {/* 메인 콘텐츠 영역 - 새로운 2단 레이아웃: 타이머+활동제안+광고 | 랭킹 */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            {/* 왼쪽: 타이머 + 활동 제안 + 광고 (2칸 차지) */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* 타이머 섹션 */}
               <TimerSection 
                 elapsedTime={elapsedTime}
                 extremeMode={extremeMode}
               />
+              
+              {/* 광고 섹션 - 활동 제안 아래로 이동 */}
+              <AdSection 
+                showAd={showAd}
+                adMessage={adMessage}
+                extremeMode={extremeMode}
+                elapsedTime={elapsedTime}
+                onProductClick={handleProductClick}
+              />
             </div>
 
-            {/* 가운데: 광고 영역 */}
-            <AdSection 
-              showAd={showAd}
-              adMessage={adMessage}
-              extremeMode={extremeMode}
-              elapsedTime={elapsedTime}
-              onProductClick={handleProductClick}
-            />
-
-            {/* 오른쪽: 랭킹 영역 */}
-            <RankingSection 
-              isVisible={true}
-              currentUser={currentUser}
-            />
+            {/* 오른쪽: 랭킹 영역 (확장) */}
+            <div className="lg:col-span-1">
+              <RankingSection 
+                isVisible={true}
+                currentUser={currentUser}
+              />
+            </div>
           </div>
 
           {/* 메시지 영역 */}
