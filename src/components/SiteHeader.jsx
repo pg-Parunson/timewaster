@@ -29,21 +29,21 @@ const SiteHeader = ({ elapsedTime = 0, extremeMode = false }) => {
         
         {/* 우측: 타이머 */}
         <div className="flex justify-center lg:justify-end">
-          <div className="bg-slate-900/80 border-2 border-cyan-400/50 px-6 py-4 rounded-2xl shadow-xl">
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 bg-cyan-400 rounded-full animate-pulse"></div>
+          <div className="bg-slate-900/80 border-2 border-cyan-400/50 px-8 py-6 rounded-2xl shadow-xl min-w-[200px]">
+            <div className="flex items-center gap-4">
+              <div className="w-4 h-4 bg-cyan-400 rounded-full animate-pulse"></div>
               <div className="text-center">
-                <div className="text-xs text-white/60 uppercase tracking-wider mb-1">낭비한 시간</div>
+                <div className="text-xs text-white/60 uppercase tracking-wider mb-2">낭비한 시간</div>
                 <div 
-                  className={`text-2xl lg:text-3xl font-mono font-bold ${
+                  className={`text-4xl lg:text-5xl font-mono font-bold ${
                     extremeMode ? 'text-red-400' : 'text-cyan-400'
                   }`}
                   style={{
                     fontFamily: 'monospace, "Courier New", monospace',
                     textShadow: extremeMode 
-                      ? '0 0 10px #ef4444, 1px 1px 0px #000'
-                      : '0 0 10px #22d3ee, 1px 1px 0px #000',
-                    letterSpacing: '2px'
+                      ? '0 0 15px #ef4444, 2px 2px 0px #000'
+                      : '0 0 15px #22d3ee, 2px 2px 0px #000',
+                    letterSpacing: '3px'
                   }}
                 >
                   {formatTime(elapsedTime)}
