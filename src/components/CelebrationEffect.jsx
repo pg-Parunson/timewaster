@@ -1,6 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-// 축하 애니메이션 컴포넌트 - UI 간섭 완전 방지 버전
+// 축하 애니메이션 컴포넌트 - 완전 복원 및 강화 버전
+// 추가 CSS 애니메이션 정의
+const celebrationStyles = `
+  @keyframes celebration-flash {
+    0% { opacity: 0; }
+    20% { opacity: 0.2; }
+    50% { opacity: 0.15; }
+    80% { opacity: 0.25; }
+    100% { opacity: 0; }
+  }
+`;
+
+// 스타일 주입
+if (typeof document !== 'undefined') {
+  const styleElement = document.createElement('style');
+  styleElement.textContent = celebrationStyles;
+  if (!document.head.querySelector('[data-celebration-styles]')) {
+    styleElement.setAttribute('data-celebration-styles', 'true');
+    document.head.appendChild(styleElement);
+  }
+}
 const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
   const [isVisible, setIsVisible] = useState(false);
   const timeoutRef = useRef(null);
@@ -41,33 +61,55 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
   }
   
   return (
-    <div className="fixed inset-0 pointer-events-none z-[45] overflow-hidden">
-      {/* 중앙 축하 메시지 - 크기 정규화 */}
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        <div className="animate-bounce">
+    <div className="fixed inset-0 pointer-events-none z-[60] overflow-hidden">
+      {/* 강화된 배경 효과 - 반짝거리는 화면 */}
+      <div 
+        className={`absolute inset-0 bg-gradient-to-br ${celebration.color} pointer-events-none animate-pulse`}
+        style={{ 
+          opacity: 0.15, // 0.01 → 0.15로 강화
+          zIndex: 1,
+          animation: 'celebration-flash 3s ease-in-out'
+        }}
+      />
+      
+      {/* 중앙 축하 메시지 - 완전히 중앙 정렬 */}
+      <div 
+        className="absolute inset-0 flex items-center justify-center"
+        style={{ zIndex: 2 }}
+      >
+        <div className={`animate-${celebration.animation || 'bounce'}`}>
           <div className={`
             bg-gradient-to-r ${celebration.color} text-white 
-            px-6 py-3 rounded-2xl shadow-xl
-            backdrop-blur-md border border-white/20
-            max-w-md mx-auto
+            px-8 py-6 rounded-3xl shadow-2xl
+            backdrop-blur-lg border-2 border-white/30
+            transform-gpu
           `}>
-            <div className="text-lg font-bold text-center whitespace-nowrap flex items-center gap-2">
-              <span className="text-xl">{celebration.effects[0]}</span>
-              <span className="text-base">{celebration.message}</span>
-              <span className="text-xl">{celebration.effects[1] || celebration.effects[0]}</span>
+            <div className="text-2xl lg:text-3xl font-bold text-center flex items-center gap-3">
+              <span className="text-3xl lg:text-4xl">{celebration.effects[0]}</span>
+              <span className="whitespace-nowrap">{celebration.message}</span>
+              <span className="text-3xl lg:text-4xl">{celebration.effects[1] || celebration.effects[0]}</span>
             </div>
           </div>
         </div>
       </div>
       
-      {/* 극도로 미세한 배경 효과 */}
-      <div 
-        className={`absolute inset-0 bg-gradient-to-br ${celebration.color} pointer-events-none`}
-        style={{ 
-          opacity: 0.01,
-          zIndex: -1
-        }}
-      />
+      {/* 파티클 효과 복원 */}
+      {celebration.effects.map((effect, index) => (
+        <div
+          key={index}
+          className="absolute animate-celebration-float"
+          style={{
+            left: `${10 + (index * 15) % 80}%`,
+            top: `${20 + (index * 10) % 60}%`,
+            animationDelay: `${index * 0.2}s`,
+            animationDuration: '3s',
+            fontSize: '2rem',
+            zIndex: 3
+          }}
+        >
+          {effect}
+        </div>
+      ))}
     </div>
   );
 };

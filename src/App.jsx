@@ -204,6 +204,7 @@ function App() {
         overflow: visible; /* hidden → visible로 변경 */
         border-radius: 1.5rem !important;
         transform: none !important; /* transform 완전 차단 */
+        contain: layout style;
       }
       
       /* 메시지 애니메이션 완전 안정화 */
@@ -212,6 +213,7 @@ function App() {
         word-wrap: break-word;
         overflow-wrap: break-word;
         box-sizing: border-box;
+        transform: none !important;
       }
       
       /* 메시지 텍스트 영역 안정화 */
@@ -221,6 +223,8 @@ function App() {
         left: auto !important;
         right: auto !important;
         margin: 0 auto !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       
       /* 실시간 알림 애니메이션 */
@@ -680,10 +684,24 @@ function App() {
           {/* 사이트 제목 헤더 */}
           <SiteHeader />
 
+          {/* 비난 메시지 영역 - 상단 배치 및 축소 */}
+          <div className="mb-4">
+            <MessageSection 
+              displayMessage={displayMessage}
+              messageData={currentMessageData}
+              isTyping={isTyping}
+              messageShake={messageShake}
+              extremeMode={extremeMode}
+              onRefreshMessage={refreshMessage}
+              onActivitySelect={handleActivitySelect}
+              compact={true}
+            />
+          </div>
+
           {/* 메인 콘텐츠 영역 - 새로운 2단 레이아웃: 타이머+활동제안+광고 | 랭킹 */}
-          <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-7 gap-4 mb-4">
             {/* 왼쪽: 타이머 + 활동 제안 + 광고 (2칸 차지) */}
-            <div className="xl:col-span-2 space-y-4">
+            <div className="lg:col-span-3 space-y-4">
               {/* 타이머 섹션 */}
               <TimerSection 
                 elapsedTime={elapsedTime}
@@ -701,8 +719,8 @@ function App() {
             </div>
 
             {/* 오른쪽: 랭킹 영역 (확장) */}
-            <div className="xl:col-span-3">
-              <div className="w-full h-full">
+            <div className="lg:col-span-4">
+              <div className="w-full max-h-80 overflow-y-auto scrollbar-hide">
                 <RankingSection 
                   isVisible={true}
                   currentUser={currentUser}
@@ -711,16 +729,7 @@ function App() {
             </div>
           </div>
 
-          {/* 메시지 영역 - 스마트 메시지 시스템 적용 */}
-          <MessageSection 
-            displayMessage={displayMessage}
-            messageData={currentMessageData}
-            isTyping={isTyping}
-            messageShake={messageShake}
-            extremeMode={extremeMode}
-            onRefreshMessage={refreshMessage}
-            onActivitySelect={handleActivitySelect}
-          />
+          {/* 메시지 영역이 상단으로 이동됨 */}
 
           {/* 메인 액션 버튼 */}
           <MainActionButton 

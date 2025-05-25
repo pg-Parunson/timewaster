@@ -10,7 +10,8 @@ const MessageSection = ({
   messageShake, 
   extremeMode, 
   onRefreshMessage,
-  onActivitySelect = () => {} // 새로운 prop: 활동 선택 콜백
+  onActivitySelect = () => {}, // 새로운 prop: 활동 선택 콜백
+  compact = false // 새로운 prop: 축소 모드
 }) => {
   const messageRef = useRef(null);
   const [showRecommendation, setShowRecommendation] = useState(false);
@@ -25,7 +26,7 @@ const MessageSection = ({
   };
 
   return (
-    <div className="relative mb-6 w-full">
+    <div className={`relative ${compact ? 'mb-2' : 'mb-6'} w-full`}>
       <div 
         ref={messageRef}
         className={`message-container cursor-pointer group transition-all duration-300 w-full ${
@@ -37,10 +38,10 @@ const MessageSection = ({
         <div className="
           bg-gradient-to-r from-white/10 to-white/5 
           backdrop-blur-xl border border-white/20 
-          p-4 sm:p-6 lg:p-8 
-          min-h-[120px] sm:min-h-[140px] lg:min-h-[160px]
+          p-2 sm:p-3 lg:p-4 
+          min-h-[60px] sm:min-h-[80px] lg:min-h-[100px]
           w-full
-          rounded-2xl lg:rounded-3xl
+          rounded-lg lg:rounded-xl
           flex items-center justify-center 
           relative 
           overflow-hidden
@@ -63,7 +64,7 @@ const MessageSection = ({
               box-border
             ">
               <p className={`
-                text-sm sm:text-base lg:text-xl xl:text-2xl 
+                text-xs sm:text-sm lg:text-base xl:text-lg 
                 leading-relaxed font-medium text-white 
                 transition-all duration-300 
                 break-words 
@@ -92,8 +93,8 @@ const MessageSection = ({
               </p>
             </div>
             
-            {/* 활동 추천 버튼 - 스마트 메시지인 경우에만 표시 */}
-          {hasRecommendation && (
+            {/* 활동 추천 버튼 - 축소 모드에서는 숨김 */}
+          {hasRecommendation && !compact && (
             <div className="mt-4">
               <button
                 onClick={(e) => {
@@ -118,8 +119,8 @@ const MessageSection = ({
             </div>
           )}
       
-      {/* 활동 추천 카드 - 스마트 메시지일 때만 표시 */}
-      {hasRecommendation && showRecommendation && (
+      {/* 활동 추천 카드 - 축소 모드에서는 숨김 */}
+      {hasRecommendation && showRecommendation && !compact && (
         <div className="mt-4 animate-in slide-in-from-top-2 duration-300">
           <ActivityRecommendationCard
             recommendation={messageData.recommendation}
@@ -129,13 +130,15 @@ const MessageSection = ({
         </div>
       )}
       
-      {/* 호버 효과 표시 - 하단에 별도 배치 */}
-      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 mt-2 text-center">
-        <div className="flex items-center justify-center gap-2 text-white/50 text-xs sm:text-sm">
-          <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
-          <span>클릭해서 새로운 메시지 보기</span>
+      {/* 호버 효과 표시 - 축소 모드에서는 숨김 */}
+      {!compact && (
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 mt-2 text-center">
+          <div className="flex items-center justify-center gap-2 text-white/50 text-xs sm:text-sm">
+            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span>클릭해서 새로운 메시지 보기</span>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
