@@ -2,21 +2,17 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase } from 'firebase/database';
 
-// Firebase 설정 (실제 프로젝트에서는 환경변수로 관리)
+// 실제 Firebase 프로젝트 설정
 const firebaseConfig = {
-  // 데모용 설정 - 실제 Firebase 프로젝트 생성 후 교체 필요
-  apiKey: "AIzaSyDemo-timewaster-ranking-demo-key",
-  authDomain: "timewaster-ranking-demo.firebaseapp.com",
-  databaseURL: "https://timewaster-ranking-demo-default-rtdb.firebaseio.com",
-  projectId: "timewaster-ranking-demo",
-  storageBucket: "timewaster-ranking-demo.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:demo-app-id-for-timewaster"
+  apiKey: "AIzaSyBIiVYzJyoe5l_Sx9ctjXHSfWFa1iK4d2Q",
+  authDomain: "timewaster-ranking.firebaseapp.com",
+  databaseURL: "https://timewaster-ranking-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "timewaster-ranking",
+  storageBucket: "timewaster-ranking.firebasestorage.app",
+  messagingSenderId: "43389524361",
+  appId: "1:43389524361:web:2bb4cb052bc6e5a8e4e958",
+  measurementId: "G-6850FF04H6"
 };
-
-// 개발 환경에서 Firebase 연결 확인
-const isDevelopment = import.meta.env.DEV;
-console.log('🔥 Firebase 설정:', isDevelopment ? '개발 모드' : '프로덕션 모드');
 
 // Firebase 앱 초기화
 let app = null;
@@ -25,10 +21,10 @@ let database = null;
 try {
   app = initializeApp(firebaseConfig);
   database = getDatabase(app);
-  console.log('✅ Firebase 초기화 성공');
+  console.log('🔥 Firebase 연결 성공! 실시간 랭킹 시스템 활성화!');
 } catch (error) {
-  console.warn('⚠️ Firebase 초기화 실패:', error.message);
-  console.log('💻 로컬 개발 모드로 전환');
+  console.error('❌ Firebase 연결 실패:', error.message);
+  console.log('💻 로컬 모드로 전환합니다.');
 }
 
 export { database };
