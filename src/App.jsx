@@ -86,19 +86,23 @@ function App() {
     const celebrationStyles = `
       @keyframes celebration-float {
         0% {
-          transform: translateY(100vh) rotate(0deg) scale(0);
+          transform: translateY(50px) rotate(0deg);
           opacity: 0;
+          scale: 0.5;
         }
         10% {
           opacity: 1;
+          scale: 1;
         }
         50% {
-          transform: translateY(-20px) rotate(180deg) scale(1.2);
+          transform: translateY(-30px) rotate(180deg);
           opacity: 1;
+          scale: 1.1;
         }
         100% {
-          transform: translateY(-100vh) rotate(360deg) scale(0.5);
+          transform: translateY(-80px) rotate(360deg);
           opacity: 0;
+          scale: 0.3;
         }
       }
       
