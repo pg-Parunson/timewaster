@@ -11,9 +11,11 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
     }
     
     if (isActive && celebration) {
+      console.log('🎉 축하 이펙트 시작:', celebration.message);
       setIsVisible(true);
       
       timeoutRef.current = setTimeout(() => {
+        console.log('🎉 축하 이펙트 종료');
         setIsVisible(false);
         setTimeout(() => {
           if (onComplete) {
@@ -31,6 +33,35 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
     };
   }, [isActive, celebration, onComplete]);
   
+  // 축하 이펙트 CSS 스타일을 동적으로 추가
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .celebration-flash {
+        animation: celebration-flash 3s ease-in-out;
+      }
+      
+      .celebration-bounce {
+        animation: celebration-bounce 1s ease-in-out infinite;
+      }
+      
+      @keyframes celebration-flash {
+        0%, 100% { opacity: 0; }
+        50% { opacity: 1; }
+      }
+      
+      @keyframes celebration-bounce {
+        0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
+        50% { transform: translate(-50%, -50%) translateY(-10px); }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+  
   if (!isActive || !celebration || !isVisible) {
     return null;
   }
@@ -39,21 +70,22 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
     <>
       {/* 배경 플래시 */}
       <div 
+        className="celebration-flash"
         style={{
           position: 'fixed',
           top: 0,
           left: 0,
           width: '100vw',
           height: '100vh',
-          backgroundColor: `rgba(147, 51, 234, 0.1)`,
+          backgroundColor: 'rgba(147, 51, 234, 0.15)',
           zIndex: 998,
-          pointerEvents: 'none',
-          animation: 'flash 3s ease-in-out'
+          pointerEvents: 'none'
         }}
       />
       
       {/* 중앙 메시지 */}
       <div 
+        className="celebration-bounce"
         style={{
           position: 'fixed',
           top: '50%',
@@ -64,28 +96,22 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
         }}
       >
         <div 
-          className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-4 rounded-xl shadow-2xl border border-white/30"
           style={{
-            animation: 'bounce 1s ease-in-out infinite',
-            fontSize: '1rem',
+            background: 'linear-gradient(to right, #9333ea, #ec4899)',
+            color: 'white',
+            padding: '1.5rem 2rem',
+            borderRadius: '0.75rem',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            fontSize: '1.125rem',
             fontWeight: 'bold',
-            textAlign: 'center'
+            textAlign: 'center',
+            whiteSpace: 'nowrap'
           }}
         >
           🎉 {celebration.message} 🎉
         </div>
       </div>
-      
-      <style jsx>{`
-        @keyframes flash {
-          0%, 100% { opacity: 0; }
-          50% { opacity: 1; }
-        }
-        @keyframes bounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
-        }
-      `}</style>
     </>
   );
 };

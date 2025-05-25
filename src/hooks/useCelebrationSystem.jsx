@@ -21,8 +21,11 @@ export const useCelebrationSystem = (elapsedTime) => {
   };
   
   useEffect(() => {
+    console.log('현재 elapsedTime:', elapsedTime, '초');
+    
     // 이미 축하 이팩트가 표시 중이면 새로운 체크 생략
     if (isShowingRef.current) {
+      console.log('이미 축하 이팩트 표시 중...');
       return;
     }
     
@@ -31,8 +34,12 @@ export const useCelebrationSystem = (elapsedTime) => {
       (effect) => elapsedTime >= effect.minSeconds && !celebrationHistoryRef.current.has(effect.minSeconds)
     );
     
+    console.log('사용 가능한 축하 이팩트:', availableCelebrations.length, '개');
+    
     if (availableCelebrations.length > 0) {
       const celebration = availableCelebrations[availableCelebrations.length - 1];
+      
+      console.log('축하 이팩트 실행:', celebration.message);
       
       // 중복 방지 플래그 설정
       isShowingRef.current = true;
