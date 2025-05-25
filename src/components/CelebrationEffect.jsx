@@ -72,10 +72,17 @@ const CelebrationEffect = ({ isActive, celebration, onComplete }) => {
         }}
       />
       
-      {/* 중앙 축하 메시지 - 완전히 중앙 정렬 */}
+      {/* 중앙 축하 메시지 - 브라우저 전체 화면 기준 완전 중앙 정렬 */}
       <div 
-        className="absolute inset-0 flex items-center justify-center"
-        style={{ zIndex: 2 }}
+        className="fixed inset-0 flex items-center justify-center"
+        style={{ 
+          zIndex: 2,
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+          position: 'fixed'
+        }}
       >
         <div className={`animate-${celebration.animation || 'bounce'}`}>
           <div className={`

@@ -74,7 +74,7 @@ const RankingSection = ({ isVisible = true }) => {
   const currentLabel = RANKING_LABELS[activePeriod];
 
   return (
-    <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-2xl w-full">
+    <div className="p-6 w-full">
       {/* 제목 */}
       <div className="flex items-center gap-3 mb-4">
         <Trophy className="w-6 h-6 text-yellow-400" />

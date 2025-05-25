@@ -255,21 +255,21 @@ function App() {
       
       /* 랭킹 보드 스크롤바 스타일 */
       .ranking-scrollbar::-webkit-scrollbar {
-        width: 8px;
+        width: 6px;
       }
       
       .ranking-scrollbar::-webkit-scrollbar-track {
-        background: #1e293b;
-        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 3px;
       }
       
       .ranking-scrollbar::-webkit-scrollbar-thumb {
-        background: #64748b;
-        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 3px;
       }
       
       .ranking-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8;
+        background: rgba(255, 255, 255, 0.3);
       }
       
       /* 모달 애니메이션 */
@@ -740,7 +740,7 @@ function App() {
 
             {/* 오른쪽: 랭킹 영역 (확장) */}
             <div className="lg:col-span-4">
-              <div className="w-full max-h-96 overflow-y-auto ranking-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: '#64748b #1e293b' }}>
+              <div className="w-full h-[480px] overflow-y-auto ranking-scrollbar bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.2) rgba(255,255,255,0.05)' }}>
                 <RankingSection 
                   isVisible={true}
                   currentUser={currentUser}

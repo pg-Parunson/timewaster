@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
-import { Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
+import { Sparkles, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 import ActivityRecommendationCard from './ActivityRecommendationCard';
+import { BUTTON_TEXTS } from '../data/buttonTexts';
 
 // 메시지 섹션 컴포넌트 - 스마트 메시지 시스템 통합
 const MessageSection = ({ 
@@ -15,6 +16,8 @@ const MessageSection = ({
 }) => {
   const messageRef = useRef(null);
   const [showRecommendation, setShowRecommendation] = useState(false);
+  const [refreshButtonText, setRefreshButtonText] = useState(BUTTON_TEXTS[0]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // 스마트 메시지인지 확인
   const hasRecommendation = messageData && messageData.type === 'smart' && messageData.recommendation;
@@ -23,6 +26,22 @@ const MessageSection = ({
     onActivitySelect(activity);
     // 활동 선택 시 자동으로 추천 카드 닫기
     setShowRecommendation(false);
+  };
+
+  // 갱신 버튼 클릭 핸들러
+  const handleRefreshClick = async (e) => {
+    e.stopPropagation();
+    setIsRefreshing(true);
+    
+    // 버튼 텍스트 바로 바꿀기
+    const newButtonText = BUTTON_TEXTS[Math.floor(Math.random() * BUTTON_TEXTS.length)];
+    setRefreshButtonText(newButtonText);
+    
+    // 잘짠 메시지 표시
+    setTimeout(() => {
+      onRefreshMessage();
+      setIsRefreshing(false);
+    }, 800);
   };
 
   return (
@@ -42,7 +61,7 @@ const MessageSection = ({
           min-h-[60px] sm:min-h-[80px] lg:min-h-[100px]
           w-full
           rounded-lg lg:rounded-xl
-          flex items-center justify-center 
+          flex items-center justify-between
           relative 
           overflow-hidden
           contain-layout contain-style
@@ -56,7 +75,7 @@ const MessageSection = ({
           </div>
           
           {/* 메인 텍스트 - 완전 안정화된 텍스트 영역 */}
-          <div className="relative z-10 text-center w-full">
+          <div className="relative z-10 text-center flex-1">
             <div className="
               px-2 sm:px-4 lg:px-6
               mx-auto
@@ -108,20 +127,27 @@ const MessageSection = ({
                 </button>
               </div>
             )}
-            
-            {/* 비난 메시지 갱신 버튼 - 메시지 박스 내부에 배치 */}
-            <div className="mt-3">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRefreshMessage();
-                }}
-                className="flex items-center justify-center gap-2 mx-auto px-3 py-1.5 bg-gradient-to-r from-red-500/20 to-pink-500/20 hover:from-red-500/30 hover:to-pink-500/30 rounded-md border border-red-300/30 text-red-300 text-xs font-medium transition-all duration-200 hover:scale-105"
-              >
-                <Sparkles className="w-3 h-3" />
-                <span>새 메시지</span>
-              </button>
-            </div>
+          </div>
+          
+          {/* 비난 메시지 갱신 버튼 - 우측 배치 */}
+          <div className="relative z-10 ml-3">
+            <button
+              onClick={handleRefreshClick}
+              disabled={isRefreshing}
+              className="flex flex-col items-center justify-center gap-1 px-2 py-2 bg-gradient-to-r from-red-500/20 to-pink-500/20 hover:from-red-500/30 hover:to-pink-500/30 rounded-lg border border-red-300/30 text-red-300 text-xs font-medium transition-all duration-200 hover:scale-105 disabled:opacity-50 min-w-[80px]"
+            >
+              {isRefreshing ? (
+                <>
+                  <RefreshCw className="w-3 h-3 animate-spin" />
+                  <span className="text-center">메시지<br/>생성중...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-3 h-3" />
+                  <span className="text-center leading-tight">{refreshButtonText}</span>
+                </>
+              )}
+            </button>
           </div>
           
           {/* 극한 모드 효과 - 위치 고정 */}
