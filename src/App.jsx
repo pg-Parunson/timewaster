@@ -301,9 +301,7 @@ function App() {
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-6 lg:p-8 w-full max-w-7xl">
           <StatsBar 
             visits={visits}
-            adClicks={adClicks}
             totalTimeWasted={totalTimeWasted}
-            concurrentUsers={concurrentUsers}
             extremeMode={extremeMode}
             currentElapsedTime={elapsedTime}
           />
