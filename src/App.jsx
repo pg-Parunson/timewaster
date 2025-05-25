@@ -23,7 +23,12 @@ import DevTools from './components/DevTools.jsx';
 import { useCelebrationSystem } from './hooks/useCelebrationSystem';
 
 // 데이터 imports
-import { ROAST_MESSAGES } from './data/roastMessages';
+import { 
+  ROAST_MESSAGES, 
+  getRankingMessage, 
+  getTimeBasedMessage, 
+  getRandomRoastMessage 
+} from './data/roastMessages';
 import { AD_MESSAGES } from './data/adMessages';
 import { BUTTON_TEXTS } from './data/buttonTexts';
 import { getTimeBasedActivity } from './data/timeBasedActivities';
@@ -62,6 +67,8 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [isRankingInitialized, setIsRankingInitialized] = useState(false);
   const [showRankingModal, setShowRankingModal] = useState(false);
+  const [currentRank, setCurrentRank] = useState(null);
+  const [lastRankCheckTime, setLastRankCheckTime] = useState(0);
   
   const timerRef = useRef(null);
   const typingRef = useRef(null);
@@ -279,6 +286,32 @@ function App() {
     setShowModal(true);
   };
 
+  // 현재 랭킹 확인 함수
+  const checkCurrentRanking = async (timeInSeconds) => {
+    if (!isRankingInitialized) return;
+    
+    try {
+      const rank = await rankingService.getExpectedRank(timeInSeconds);
+      const previousRank = currentRank;
+      setCurrentRank(rank);
+      
+      // 랭킹 상승 시 특별 알림
+      if (previousRank && rank < previousRank && rank <= 10) {
+        const minutes = Math.floor(timeInSeconds / 60);
+        addRankingNotification(rank, minutes, currentUser?.anonymousName);
+        
+        // 랭킹 기반 특별 메시지 표시 (낮은 확률로)
+        if (Math.random() < 0.3) {
+          const rankingMessage = getRankingMessage(rank, timeInSeconds);
+          setCurrentMessage(rankingMessage);
+          typeMessage(rankingMessage);
+        }
+      }
+    } catch (error) {
+      console.error('랭킹 확인 실패:', error);
+    }
+  };
+
   // 타이핑 애니메이션 함수 - 중복 문자 버그 수정
   const typeMessage = (message) => {
     // 이전 타이머 완전 정리
@@ -379,6 +412,12 @@ function App() {
             addMilestoneNotification(minutes, currentUser?.anonymousName);
           }
           
+          // 랭킹 확인 (30초마다)
+          if (elapsed > 60 && elapsed % 30 === 0 && elapsed !== lastRankCheckTime) {
+            setLastRankCheckTime(elapsed);
+            checkCurrentRanking(elapsed);
+          }
+          
           // 활동 알림 (30초마다 랜덤하게)
           if (elapsed > 30 && elapsed % 30 === 0 && Math.random() < 0.3) {
             const currentActivity = getTimeBasedActivity(elapsed);
@@ -457,7 +496,7 @@ function App() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [elapsedTime, totalTimeWasted]);
 
-  // 메시지 새로고침 - 강화된 활동 매칭 시스템
+  // 메시지 새로고침 - 50개 메시지 + 랭킹/시간대 기반 시스템
   const refreshMessage = () => {
     if (elapsedTime < 10) {
       const newMessage = "시간 낭비의 여정이 시작되었습니다.";
@@ -466,25 +505,41 @@ function App() {
       return;
     }
 
-    // 강화된 시간 매칭 시스템
-    const currentActivity = getTimeBasedActivity(elapsedTime);
-    const randomRoast = ROAST_MESSAGES[Math.floor(Math.random() * ROAST_MESSAGES.length)];
+    let selectedMessage = "";
+    const random = Math.random();
     
-    // 조사 처리를 위한 변수
-    const activityWithParticle = currentActivity.activity + getParticle(currentActivity.activity, '을를');
-    const categoryWithParticle = currentActivity.category + getParticle(currentActivity.category, '아으로');
+    // 20% 확률로 랭킹 기반 메시지 (랭킹이 10위 안이고 1분 이상)
+    if (random < 0.2 && currentRank && currentRank <= 10 && elapsedTime >= 60) {
+      selectedMessage = getRankingMessage(currentRank, elapsedTime);
+    }
+    // 15% 확률로 시간대 기반 메시지
+    else if (random < 0.35) {
+      selectedMessage = getTimeBasedMessage();
+    }
+    // 65% 확률로 일반 메시지 (기존 + 새로운 50개)
+    else {
+      // 강화된 시간 매칭 시스템
+      const currentActivity = getTimeBasedActivity(elapsedTime);
+      const randomRoast = getRandomRoastMessage();
+      
+      // 조사 처리를 위한 변수
+      const activityWithParticle = currentActivity.activity + getParticle(currentActivity.activity, '을를');
+      const categoryWithParticle = currentActivity.category + getParticle(currentActivity.category, '아으로');
+      
+      // 다양한 메시지 패턴 - 긴 메시지 방지
+      const messagePatterns = [
+        `이 시간에 "${currentActivity.activity}" 할 수 있었는데... ${randomRoast}`,
+        `${currentActivity.icon} ${activityWithParticle} 위한 소중한 시간이었어요. ${randomRoast}`,
+        `⏰ ${formatTime(elapsedTime)} 동안 "${currentActivity.activity}" 같은 ${currentActivity.category} 활동을 할 수 있었어요... ${randomRoast}`,
+        `${randomRoast}`, // 순수 비난 메시지
+        `${currentActivity.icon} 지금 이 순간에도 "${currentActivity.activity}"로 더 나은 자신이 될 수 있었는데... ${randomRoast}`
+      ];
+      
+      selectedMessage = messagePatterns[Math.floor(Math.random() * messagePatterns.length)];
+    }
     
-    // 다양한 메시지 패턴 - 긴 메시지 방지
-    const messagePatterns = [
-      `이 시간에 "${currentActivity.activity}" 할 수 있었는데... ${randomRoast}`,
-      `${currentActivity.icon} ${activityWithParticle} 위한 소중한 시간이었어요. ${randomRoast}`,
-      `⏰ ${formatTime(elapsedTime)} 동안 "${currentActivity.activity}" 같은 ${currentActivity.category} 활동을 할 수 있었어요... ${randomRoast}`,
-      `${currentActivity.icon} 지금 이 순간에도 "${currentActivity.activity}"로 더 나은 자신이 될 수 있었는데... ${randomRoast}`
-    ];
-    
-    const randomPattern = messagePatterns[Math.floor(Math.random() * messagePatterns.length)];
-    setCurrentMessage(randomPattern);
-    typeMessage(randomPattern);
+    setCurrentMessage(selectedMessage);
+    typeMessage(selectedMessage);
     
     // 버튼 텍스트도 가끔 변경
     if (Math.random() < 0.4) {
