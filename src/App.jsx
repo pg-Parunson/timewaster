@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import "galmuri/dist/galmuri.css";
 
 // 컴포넌트 imports
 import StatsBar from './components/StatsBar.jsx';
@@ -73,161 +74,343 @@ function App() {
   // 축하 시스템 초기화 (범위 제한)
   const { showCelebration, currentCelebration, handleCelebrationComplete } = useCelebrationSystem(elapsedTime);
 
-  // 기본 UI 스타일 주입 (축하 이펙트는 별도 컴포넌트에서 처리)
+  // 포켓몬 골드 버전 스타일 주입
   useEffect(() => {
-    const safeUIStyles = `
-      .scrollbar-hide {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
+    const pokemonStyles = `
+      /* Galmuri 폰트가 이미 import 되어 있음 */
+      
+      /* 포켓몬 골드 진짜 컬러 팔레트 - 더 선명하게! */
+      :root {
+        --pokemon-gold: #FFD700;
+        --pokemon-orange: #FF6B35;
+        --pokemon-navy: #003366;
+        --pokemon-black: #000000;
+        --pokemon-white: #FFFFFF;
+        --pokemon-bg: #E8F4FD;
+        --pokemon-shadow: #2C5AA0;
+        --pokemon-border: #1E3A8A;
+        --pokemon-text: #1A1A1A;
+        --pokemon-light-blue: #B3D9FF;
       }
       
-      .scrollbar-hide::-webkit-scrollbar {
-        display: none;
+      /* 레트로 픽셀 폰트 - Galmuri (깔끔하게 수정) */
+      .pokemon-font {
+        font-family: 'Galmuri11', 'Galmuri9', monospace;
+        font-weight: normal;
+        /* 그림자 제거 - 깔끔하게 */
       }
       
-      .ranking-scrollbar::-webkit-scrollbar {
-        width: 6px;
+      .pokemon-title {
+        font-family: 'Galmuri14', 'Galmuri11', monospace;
+        font-weight: bold;
+        font-size: 2.5rem;
+        color: var(--pokemon-orange);
+        text-shadow: 
+          3px 3px 0px var(--pokemon-navy),
+          -1px -1px 0px var(--pokemon-white);
+        letter-spacing: 2px;
       }
       
-      .ranking-scrollbar::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 3px;
+      /* 포켓몬 대화창 스타일 - 깔끔하게 단순화! */
+      .pokemon-dialog {
+        background: var(--pokemon-white);
+        color: var(--pokemon-text);
+        border: 3px solid var(--pokemon-black);
+        border-radius: 8px;
+        padding: 20px;
+        /* 복잡한 그림자 제거 - 깔끔하게 */
+        box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
       }
       
-      .ranking-scrollbar::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 3px;
+      /* 포켓몬 버튼 스타일 - 깔끔하게 단순화! */
+      .pokemon-button {
+        background: linear-gradient(135deg, var(--pokemon-gold) 0%, var(--pokemon-orange) 100%);
+        color: var(--pokemon-black);
+        border: 3px solid var(--pokemon-black);
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-family: 'Galmuri11', 'Galmuri9', monospace;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+        /* 복잡한 그림자 제거 - 깔끔하게 */
+        box-shadow: 3px 3px 0px rgba(0,0,0,0.4);
+        transition: all 0.1s ease;
       }
       
-      .ranking-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.3);
+      .pokemon-button:hover {
+        transform: translateY(-2px);
+        /* 간단한 호버 효과만 */
+        box-shadow: 5px 5px 0px rgba(0,0,0,0.4);
       }
       
-      @keyframes fadeIn {
-        0% {
-          opacity: 0;
-          transform: scale(0.9) translateY(20px);
+      .pokemon-button:active {
+        transform: translateY(0px);
+        box-shadow: 2px 2px 0px rgba(0,0,0,0.4);
+      }
+      
+      /* 위기 번쩍거림 효과 */
+      @keyframes pokemon-danger-blink {
+        0%, 50% { 
+          background-color: rgba(220, 38, 38, 0.3);
+          border-color: #DC2626;
         }
-        100% {
-          opacity: 1;
-          transform: scale(1) translateY(0);
+        51%, 100% { 
+          background-color: transparent;
+          border-color: var(--pokemon-black);
         }
       }
       
-      .animate-fadeIn {
-        animation: fadeIn 0.3s ease-out;
+      .pokemon-danger {
+        animation: pokemon-danger-blink 1s infinite;
       }
       
-      @keyframes slideInRight {
-        0% {
-          transform: translateX(100%);
-          opacity: 0;
-        }
-        100% {
-          transform: translateX(0);
-          opacity: 1;
-        }
-      }
-      
-      .animate-slideInRight {
-        animation: slideInRight 0.5s ease-out;
-      }
-      
-      @keyframes retro-blink {
+      /* 레트로 타이핑 효과 */
+      @keyframes pokemon-typing {
         0%, 50% { opacity: 1; }
-        51%, 100% { opacity: 0.3; }
+        51%, 100% { opacity: 0; }
       }
       
-      /* 안전한 레이아웃 보장 */
-      .safe-layout {
+      .pokemon-typing::after {
+        content: "▋";
+        animation: pokemon-typing 0.8s infinite;
+        color: var(--pokemon-black);
+      }
+      
+      /* 포켓몬 게임 화면 배경 - 더 밝고 선명하게! */
+      .pokemon-screen {
+        background: 
+          linear-gradient(135deg, var(--pokemon-bg) 0%, #F0F8FF 50%, var(--pokemon-light-blue) 100%),
+          radial-gradient(circle at 25% 25%, rgba(255, 215, 0, 0.1) 0%, transparent 50%);
+        min-height: 100vh;
         position: relative;
-        isolation: isolate;
-        transform: none !important;
       }
       
-      .safe-ad-section {
-        position: relative !important;
-        transform: none !important;
-        z-index: 1 !important;
-        contain: layout style;
+      /* 포켓몬 게임 메인 윈도우 */
+      .pokemon-window {
+        background: var(--pokemon-white);
+        border: 6px solid var(--pokemon-black);
+        border-radius: 12px;
+        box-shadow: 
+          inset 4px 4px 0px rgba(255,255,255,0.5),
+          inset -4px -4px 0px rgba(0,0,0,0.3),
+          8px 8px 16px rgba(0,0,0,0.4);
       }
       
-      .safe-timer {
-        position: relative;
-        z-index: 2;
-        isolation: isolate;
+      /* PC 친화적 가로형 그리드 */
+      .pokemon-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 24px;
+        padding: 24px;
       }
       
-      .safe-message {
-        position: relative;
-        z-index: 2;
-        isolation: isolate;
+      @media (max-width: 1024px) {
+        .pokemon-grid {
+          grid-template-columns: 1fr;
+          gap: 16px;
+          padding: 16px;
+        }
+      }
+      
+      /* 통계 바 포켓몬 스타일 - 깔끔하게 단순화! */
+      .pokemon-stats {
+        background: linear-gradient(90deg, var(--pokemon-navy) 0%, var(--pokemon-border) 100%);
+        color: var(--pokemon-white);
+        border: 3px solid var(--pokemon-black);
+        border-radius: 8px;
+        padding: 16px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        /* 간단한 그림자만 */
+        box-shadow: 3px 3px 0px rgba(0,0,0,0.3);
+      }
+      
+      /* 타이머 대형 디스플레이 - 깔끔하게 유지! */
+      .pokemon-timer {
+        font-family: 'Galmuri14', 'Galmuri11', monospace;
+        font-weight: bold;
+        font-size: 4rem;
+        color: var(--pokemon-orange);
+        text-shadow: 
+          4px 4px 0px var(--pokemon-navy),
+          -2px -2px 0px var(--pokemon-white);
+        text-align: center;
+        padding: 24px;
+        background: var(--pokemon-white);
+        border: 4px solid var(--pokemon-black);
+        border-radius: 12px;
+        /* 타이머만 예외적으로 그림자 유지 */
+        box-shadow: 4px 4px 0px rgba(0,0,0,0.4);
+      }
+      
+      /* 랭킹 섹션 포켓몬 스타일 */
+      .pokemon-ranking {
+        background: var(--pokemon-white);
+        border: 4px solid var(--pokemon-black);
+        border-radius: 8px;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+      
+      .pokemon-ranking::-webkit-scrollbar {
+        width: 8px;
+      }
+      
+      .pokemon-ranking::-webkit-scrollbar-track {
+        background: var(--pokemon-white);
+        border: 1px solid var(--pokemon-black);
+      }
+      
+      .pokemon-ranking::-webkit-scrollbar-thumb {
+        background: var(--pokemon-orange);
+        border: 1px solid var(--pokemon-black);
+        border-radius: 4px;
+      }
+      
+      /* 축하 이펙트 포켓몬 스타일 */
+      .pokemon-celebration {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+        text-align: center;
+        background: var(--pokemon-white);
+        border: 6px solid var(--pokemon-black);
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 
+          inset 4px 4px 0px rgba(255,255,255,0.5),
+          inset -4px -4px 0px rgba(0,0,0,0.3),
+          12px 12px 24px rgba(0,0,0,0.6);
+      }
+      
+      /* 마우스 호버 효과 - 간단하게! */
+      .pokemon-hover:hover {
+        transform: translateY(-2px);
+        /* 간단한 호버 효과만 */
+        box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
+        transition: all 0.2s ease;
+      }
+      
+      /* 키보드 단축키 표시 */
+      .pokemon-shortcut {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: var(--pokemon-black);
+        color: var(--pokemon-white);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-family: 'Galmuri9', monospace;
       }
     `;
     
     const styleElement = document.createElement('style');
-    styleElement.textContent = safeUIStyles;
+    styleElement.textContent = pokemonStyles;
     document.head.appendChild(styleElement);
+    
+    // 키보드 단축키 지원
+    const handleKeyPress = (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        refreshMessage();
+      } else if (e.key === 'Escape') {
+        handleExit();
+      }
+    };
+    
+    document.addEventListener('keydown', handleKeyPress);
     
     return () => {
       if (document.head.contains(styleElement)) {
         document.head.removeChild(styleElement);
       }
+      document.removeEventListener('keydown', handleKeyPress);
     };
-  }, []);
+  }, [refreshMessage, handleExit]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      <BackgroundEffects />
+    <div className="pokemon-screen">
+      {/* 포켓몬 스타일 메인 윈도우 */}
+      <div className="pokemon-window max-w-[1400px] mx-auto my-8">
+        
+        {/* 🎮 시간낭비 계산기 헤더 */}
+        <div className="text-center py-6 border-b-4 border-black">
+          <h1 className="pokemon-title mb-2">
+            시간낭비 <span className="text-yellow-500">계산기</span>
+          </h1>
+          <p className="pokemon-font text-lg text-gray-700">
+            당신의 소중한 시간이 흘러가고 있습니다!
+          </p>
+        </div>
 
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
-        <div className="safe-layout bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-6 lg:p-8 w-full max-w-7xl">
+        {/* 통계 바 */}
+        <div className="pokemon-stats">
+          <div className="pokemon-font">
+            동시 접속자: <span className="text-yellow-300">{concurrentUsers || 1}명</span>
+          </div>
+          <div className="pokemon-font">
+            총 방문 횟수: <span className="text-yellow-300">{visits}회</span>
+          </div>
+          <div className="pokemon-font">
+            누적 시간낭비: <span className="text-yellow-300">{Math.floor(totalTimeWasted / 60)}시간</span>
+          </div>
+        </div>
+
+        {/* 🔥 PC 친화적 3열 그리드 레이아웃 */}
+        <div className="pokemon-grid">
           
-          {/* 📊 통계 바 - 최상단 고정 */}
-          <div className="safe-layout">
-            <StatsBar 
-              visits={visits}
-              totalTimeWasted={totalTimeWasted}
-              extremeMode={extremeMode}
-              currentElapsedTime={elapsedTime}
-            />
-          </div>
-
-          {/* 🎯 헤더 - 사이트 제목 */}
-          <div className="safe-layout">
-            <SiteHeader 
-              elapsedTime={elapsedTime}
-              extremeMode={extremeMode}
-            />
-          </div>
-
-          {/* 🔥 핵심 영역 - 타이머 + 비난 메시지 (가로 분할) */}
-          <div className="safe-layout grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            {/* 왼쪽: 타이머 영역 - 안전하게 격리 */}
-            <div className="safe-timer space-y-4">
-              <TimerSection 
-                elapsedTime={elapsedTime}
-                extremeMode={extremeMode}
-              />
+          {/* 왼쪽 컬럼: 타이머 + 메시지 */}
+          <div className="space-y-6">
+            {/* 타이머 섹션 */}
+            <div className="pokemon-dialog pokemon-hover relative">
+              <div className="pokemon-shortcut">SPACE</div>
+              <div className="text-center mb-4">
+                <div className="pokemon-font text-xl text-gray-700 mb-2">
+                  현재 낭비 시간
+                </div>
+                <div className={`pokemon-timer ${extremeMode ? 'pokemon-danger' : ''}`}>
+                  {formatTime(elapsedTime)}
+                </div>
+              </div>
+              
+              {extremeMode && (
+                <div className="text-center">
+                  <div className="pokemon-font text-red-600 text-lg animate-bounce">
+                    ⚠️ 위험! 시간이 너무 많이 낭비되었습니다!
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* 오른쪽: 비난 메시지 - 안전하게 격리 */}
-            <div className="safe-message space-y-4">
-              <MessageSection 
-                displayMessage={displayMessage}
-                messageData={currentMessageData}
-                isTyping={isTyping}
-                messageShake={messageShake}
-                extremeMode={extremeMode}
-                onRefreshMessage={refreshMessage}
-                onActivitySelect={handleActivitySelect}
-                compact={false}
-              />
+            {/* 비난 메시지 섹션 */}
+            <div className="pokemon-dialog pokemon-hover">
+              <div className="pokemon-font text-lg mb-4 text-gray-800">
+                메시지:
+              </div>
+              
+              <div className={`text-black text-lg font-bold leading-relaxed mb-6 p-4 bg-gray-50 rounded border-2 border-gray-300 ${isTyping ? 'pokemon-typing' : ''}`}>
+                {displayMessage}
+              </div>
+              
+              <div className="text-center">
+                <button 
+                  onClick={refreshMessage}
+                  className="pokemon-button"
+                >
+                  다른 메시지 듣기
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* 💰 광고 영역 - 완전 안전한 고정 */}
-          <div className="safe-ad-section mb-6">
+          {/* 중앙 컬럼: 광고 + 공유 */}
+          <div className="space-y-6">
+            {/* 광고 섹션 */}
             <AdSection 
               showAd={showAd}
               adMessage={adMessage}
@@ -235,63 +418,81 @@ function App() {
               elapsedTime={elapsedTime}
               onProductClick={handleProductClick}
             />
-          </div>
 
-          {/* 🏆 랭킹 + 공유 영역 (가로 분할) - 안전하게 격리 */}
-          <div className="safe-layout grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            {/* 왼쪽: 랭킹 (크기 축소) */}
-            <div className="safe-layout h-[400px] overflow-y-auto ranking-scrollbar bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl">
-              <RankingSection 
-                isVisible={true}
-                currentUser={currentUser}
-              />
-            </div>
-
-            {/* 오른쪽: 공유 섹션 */}
-            <div className="safe-layout flex items-center justify-center">
+            {/* 공유 섹션 */}
+            <div className="pokemon-dialog pokemon-hover">
+              <div className="pokemon-font text-lg mb-4 text-gray-800">
+                친구도 시간낭비시키기
+              </div>
+              
               <ShareSection 
                 elapsedTime={elapsedTime}
                 formatTime={formatTime}
                 showModernModal={showModernModal}
               />
             </div>
-          </div>
 
-          {/* 🎮 액션 버튼들 - 하단 고정 */}
-          <div className="safe-layout flex flex-wrap gap-4 justify-center items-center pt-4 border-t border-white/10">
-            <FloatingExitButton 
-              elapsedTime={elapsedTime}
-              onExit={handleExit}
-              inline={true}
-              showAlways={true}
-            />
-            
-            <div className="text-white/70 text-sm">
-              💡 생산적인 활동을 시작해보세요!
+            {/* 탈출 버튼 */}
+            <div className="pokemon-dialog pokemon-hover text-center">
+              <div className="pokemon-shortcut">ESC</div>
+              <div className="pokemon-font text-lg mb-4 text-gray-800">
+                현실로 돌아가기
+              </div>
+              
+              <FloatingExitButton 
+                elapsedTime={elapsedTime}
+                onExit={handleExit}
+                inline={true}
+                showAlways={true}
+              />
             </div>
           </div>
 
-          <div className="safe-layout">
-            <EasterEgg elapsedTime={elapsedTime} />
+          {/* 오른쪽 컬럼: 랭킹 */}
+          <div className="pokemon-dialog pokemon-hover">
+            <div className="pokemon-font text-lg mb-4 text-gray-800">
+              시간낭비 명예의 전당
+            </div>
+            
+            <div className="pokemon-ranking">
+              <RankingSection 
+                isVisible={true}
+                currentUser={currentUser}
+              />
+            </div>
+          </div>
+
+        </div>
+
+        {/* 하단 액션 바 */}
+        <div className="pokemon-stats mt-6">
+          <div className="pokemon-font text-sm">
+            💡 SPACE: 메시지 새로고침 | ESC: 게임 종료
+          </div>
+          <div className="pokemon-font text-sm">
+            💻 시간낭비 계산기 v2.0
           </div>
         </div>
+
       </div>
 
-      <div className="safe-layout">
-        <LiveFeedNotifications />
-      </div>
+      {/* 이스터 에그 */}
+      <EasterEgg elapsedTime={elapsedTime} />
+
+      {/* 라이브 피드 */}
+      <LiveFeedNotifications />
       
-      <div className="safe-layout">
-        <DevTools isVisible={import.meta.env.DEV} />
-      </div>
+      {/* 개발자 도구 */}
+      <DevTools isVisible={import.meta.env.DEV} />
 
-      {/* 🎉 완전히 안전한 축하 이펙트 - 다른 UI에 절대 영향 없음 */}
+      {/* 🎉 축하 이펙트 - 포켓몬 스타일 */}
       <CelebrationEffect 
         isActive={showCelebration}
         celebration={currentCelebration}
         onComplete={handleCelebrationComplete}
       />
 
+      {/* 모달들 */}
       <RankingRegistrationModal
         isOpen={showRankingModal}
         onClose={handleRankingModalClose}
