@@ -81,14 +81,14 @@ const AdSection = React.memo(({ showAd, adMessage, extremeMode, elapsedTime, onP
               animationDuration: '3s'
             }} />
             <div className="pokemon-font text-red-600 font-bold">
-              1분 더 냭비해야 광고 자격 획득!
+              1분 더 낭비해야 광고 자격 획득!
             </div>
           </div>
 
           {/* 빈정거리는 메시지 */}
           <div className="mt-4 p-3 bg-red-100 border-2 border-red-400 rounded-lg animate-pulse">
             <div className="pokemon-font text-sm text-red-700 text-center font-bold">
-              🚫 시간냭비 초보자는 광고 금지! 가서 더 냭비해와!
+              🚫 시간낭비 초보자는 광고 금지! 가서 더 낭비해와!
             </div>
           </div>
         </div>

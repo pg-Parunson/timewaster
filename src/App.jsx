@@ -745,7 +745,7 @@ function App() {
         {/* 하단 액션 바 */}
         <div className="pokemon-stats mt-6">
           <div className="pokemon-font text-sm">
-            🌍 전 세계 시간냭비자들과 함께 하는 매직타임!
+            🌍 전 세계 시간낭비자들과 함께 하는 매직타임!
           </div>
           <div className="pokemon-font text-sm">
             💻 시간 낭비 마스터 v2.3 - 완전체 UI/UX + BGM
