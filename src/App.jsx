@@ -73,162 +73,9 @@ function App() {
   // 축하 시스템 초기화 (범위 제한)
   const { showCelebration, currentCelebration, handleCelebrationComplete } = useCelebrationSystem(elapsedTime);
 
-  // CSS 애니메이션 스타일 주입
+  // 기본 UI 스타일 주입 (축하 이펙트는 별도 컴포넌트에서 처리)
   useEffect(() => {
-    const celebrationStyles = `
-      @keyframes celebration-float {
-        0% {
-          transform: translateY(30px) rotate(0deg);
-          opacity: 0;
-          scale: 0.8;
-        }
-        20% {
-          opacity: 1;
-          scale: 1;
-        }
-        80% {
-          transform: translateY(-20px) rotate(180deg);
-          opacity: 1;
-          scale: 1;
-        }
-        100% {
-          transform: translateY(-50px) rotate(360deg);
-          opacity: 0;
-          scale: 0.5;
-        }
-      }
-      
-      @keyframes bounce {
-        0%, 20%, 50%, 80%, 100% {
-          transform: scale(1);
-        }
-        40% {
-          transform: scale(1.1) translateY(-10px);
-        }
-        60% {
-          transform: scale(1.05) translateY(-5px);
-        }
-      }
-      
-      @keyframes spin {
-        from {
-          transform: rotate(0deg) translateX(-50%) translateY(-50%);
-        }
-        to {
-          transform: rotate(360deg) translateX(-50%) translateY(-50%);
-        }
-      }
-      
-      @keyframes pulse {
-        0%, 100% {
-          transform: translateX(-50%) translateY(-50%) scale(1);
-          opacity: 1;
-        }
-        50% {
-          transform: translateX(-50%) translateY(-50%) scale(1.05);
-          opacity: 0.9;
-        }
-      }
-      
-      @keyframes float {
-        0%, 100% {
-          transform: translateY(0px) translateX(-50%) translateY(-50%);
-        }
-        50% {
-          transform: translateY(-20px) translateX(-50%) translateY(-50%);
-        }
-      }
-      
-      @keyframes rainbow {
-        0% { opacity: 1; }
-        50% { opacity: 0.8; }
-        100% { opacity: 1; }
-      }
-      
-      @keyframes shake {
-        0%, 100% { transform: translateX(-50%) translateY(-50%); }
-        25% { transform: translateX(-50%) translateY(-50%) translateX(5px); }
-        75% { transform: translateX(-50%) translateY(-50%) translateX(-5px); }
-      }
-      
-      @keyframes mega {
-        0% { transform: scale(1) translateX(-50%) translateY(-50%); }
-        50% { transform: scale(1.3) translateX(-50%) translateY(-50%); }
-        100% { transform: scale(1) translateX(-50%) translateY(-50%); }
-      }
-      
-      @keyframes unicorn {
-        0% { 
-          transform: translateX(-50%) translateY(-50%) rotate(0deg);
-        }
-        50% { 
-          transform: translateX(-50%) translateY(-50%) rotate(5deg);
-        }
-        100% { 
-          transform: translateX(-50%) translateY(-50%) rotate(0deg);
-        }
-      }
-      
-      @keyframes dragon {
-        0% { 
-          transform: translateX(-50%) translateY(-50%) scale(1);
-        }
-        50% { 
-          transform: translateX(-50%) translateY(-50%) scale(1.2);
-        }
-        100% { 
-          transform: translateX(-50%) translateY(-50%) scale(1);
-        }
-      }
-      
-      .animate-celebration-float {
-        animation: celebration-float linear forwards;
-      }
-      
-      .message-container {
-        position: relative;
-        width: 100%;
-        max-width: 100%;
-        overflow: hidden;
-        border-radius: 0 !important;
-        transform: none !important;
-        contain: layout style size;
-      }
-      
-      .message-container * {
-        max-width: 100%;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        box-sizing: border-box;
-        transform: none !important;
-      }
-      
-      .message-container p {
-        transform: none !important;
-        position: relative !important;
-        left: auto !important;
-        right: auto !important;
-        margin: 0 auto !important;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 100% !important;
-      }
-      
-      @keyframes slideInRight {
-        0% {
-          transform: translateX(100%);
-          opacity: 0;
-        }
-        100% {
-          transform: translateX(0);
-          opacity: 1;
-        }
-      }
-      
-      .animate-slideInRight {
-        animation: slideInRight 0.5s ease-out;
-      }
-      
+    const safeUIStyles = `
       .scrollbar-hide {
         -ms-overflow-style: none;
         scrollbar-width: none;
@@ -271,40 +118,61 @@ function App() {
         animation: fadeIn 0.3s ease-out;
       }
       
+      @keyframes slideInRight {
+        0% {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        100% {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      
+      .animate-slideInRight {
+        animation: slideInRight 0.5s ease-out;
+      }
+      
       @keyframes retro-blink {
         0%, 50% { opacity: 1; }
         51%, 100% { opacity: 0.3; }
       }
       
-      @keyframes celebration-flash {
-        0%, 100% { opacity: 0.05; }
-        20% { opacity: 0.3; }
-        50% { opacity: 0.2; }
-        80% { opacity: 0.25; }
+      /* 안전한 레이아웃 보장 */
+      .safe-layout {
+        position: relative;
+        isolation: isolate;
+        transform: none !important;
       }
       
-      /* 광고 박스 완전 고정 */
-      .ad-section-fixed {
+      .safe-ad-section {
         position: relative !important;
         transform: none !important;
         z-index: 1 !important;
+        contain: layout style;
+      }
+      
+      .safe-timer {
+        position: relative;
+        z-index: 2;
         isolation: isolate;
       }
       
-      /* 축하 이펙트 범위 제한 */
-      .celebration-zone {
+      .safe-message {
         position: relative;
-        overflow: hidden;
+        z-index: 2;
         isolation: isolate;
       }
     `;
     
     const styleElement = document.createElement('style');
-    styleElement.textContent = celebrationStyles;
+    styleElement.textContent = safeUIStyles;
     document.head.appendChild(styleElement);
     
     return () => {
-      document.head.removeChild(styleElement);
+      if (document.head.contains(styleElement)) {
+        document.head.removeChild(styleElement);
+      }
     };
   }, []);
 
@@ -313,34 +181,38 @@ function App() {
       <BackgroundEffects />
 
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-6 lg:p-8 w-full max-w-7xl">
+        <div className="safe-layout bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-6 lg:p-8 w-full max-w-7xl">
           
           {/* 📊 통계 바 - 최상단 고정 */}
-          <StatsBar 
-            visits={visits}
-            totalTimeWasted={totalTimeWasted}
-            extremeMode={extremeMode}
-            currentElapsedTime={elapsedTime}
-          />
+          <div className="safe-layout">
+            <StatsBar 
+              visits={visits}
+              totalTimeWasted={totalTimeWasted}
+              extremeMode={extremeMode}
+              currentElapsedTime={elapsedTime}
+            />
+          </div>
 
           {/* 🎯 헤더 - 사이트 제목 */}
-          <SiteHeader 
-            elapsedTime={elapsedTime}
-            extremeMode={extremeMode}
-          />
+          <div className="safe-layout">
+            <SiteHeader 
+              elapsedTime={elapsedTime}
+              extremeMode={extremeMode}
+            />
+          </div>
 
           {/* 🔥 핵심 영역 - 타이머 + 비난 메시지 (가로 분할) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            {/* 왼쪽: 타이머 영역 */}
-            <div className="celebration-zone space-y-4">
+          <div className="safe-layout grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {/* 왼쪽: 타이머 영역 - 안전하게 격리 */}
+            <div className="safe-timer space-y-4">
               <TimerSection 
                 elapsedTime={elapsedTime}
                 extremeMode={extremeMode}
               />
             </div>
 
-            {/* 오른쪽: 비난 메시지 - 메인으로! */}
-            <div className="space-y-4">
+            {/* 오른쪽: 비난 메시지 - 안전하게 격리 */}
+            <div className="safe-message space-y-4">
               <MessageSection 
                 displayMessage={displayMessage}
                 messageData={currentMessageData}
@@ -354,8 +226,8 @@ function App() {
             </div>
           </div>
 
-          {/* 💰 광고 영역 - 완전 고정, 독립 섹션 */}
-          <div className="ad-section-fixed mb-6">
+          {/* 💰 광고 영역 - 완전 안전한 고정 */}
+          <div className="safe-ad-section mb-6">
             <AdSection 
               showAd={showAd}
               adMessage={adMessage}
@@ -365,10 +237,10 @@ function App() {
             />
           </div>
 
-          {/* 🏆 랭킹 + 공유 영역 (가로 분할) */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          {/* 🏆 랭킹 + 공유 영역 (가로 분할) - 안전하게 격리 */}
+          <div className="safe-layout grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* 왼쪽: 랭킹 (크기 축소) */}
-            <div className="h-[400px] overflow-y-auto ranking-scrollbar bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl">
+            <div className="safe-layout h-[400px] overflow-y-auto ranking-scrollbar bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl">
               <RankingSection 
                 isVisible={true}
                 currentUser={currentUser}
@@ -376,7 +248,7 @@ function App() {
             </div>
 
             {/* 오른쪽: 공유 섹션 */}
-            <div className="flex items-center justify-center">
+            <div className="safe-layout flex items-center justify-center">
               <ShareSection 
                 elapsedTime={elapsedTime}
                 formatTime={formatTime}
@@ -386,7 +258,7 @@ function App() {
           </div>
 
           {/* 🎮 액션 버튼들 - 하단 고정 */}
-          <div className="flex flex-wrap gap-4 justify-center items-center pt-4 border-t border-white/10">
+          <div className="safe-layout flex flex-wrap gap-4 justify-center items-center pt-4 border-t border-white/10">
             <FloatingExitButton 
               elapsedTime={elapsedTime}
               onExit={handleExit}
@@ -399,15 +271,21 @@ function App() {
             </div>
           </div>
 
-          <EasterEgg elapsedTime={elapsedTime} />
+          <div className="safe-layout">
+            <EasterEgg elapsedTime={elapsedTime} />
+          </div>
         </div>
       </div>
 
-      <LiveFeedNotifications />
+      <div className="safe-layout">
+        <LiveFeedNotifications />
+      </div>
       
-      <DevTools isVisible={import.meta.env.DEV} />
+      <div className="safe-layout">
+        <DevTools isVisible={import.meta.env.DEV} />
+      </div>
 
-      {/* 축하 이펙트 - 전체 화면 덕개 */}
+      {/* 🎉 완전히 안전한 축하 이펙트 - 다른 UI에 절대 영향 없음 */}
       <CelebrationEffect 
         isActive={showCelebration}
         celebration={currentCelebration}
