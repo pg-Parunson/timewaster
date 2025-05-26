@@ -145,17 +145,26 @@ const FlyingMessageManager = () => {
     }
     
     // Firebase에 전송 (다른 사용자들에게도 보이게)
-    console.log('🔥 Firebase에 메시지 전송');
+    console.log('🔥 Firebase에 메시지 전송 시도');
     const chatRef = ref(database, 'live-feed/global-chat');
     push(chatRef, { 
       message, 
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      userAgent: navigator.userAgent.substring(0, 50) // 디버깅용
     })
     .then(() => {
       console.log('✅ Firebase 전송 성공!');
     })
     .catch((error) => {
       console.error('❌ Firebase 전송 실패:', error);
+      console.error('❌ 에러 상세:', {
+        code: error.code,
+        message: error.message,
+        stack: error.stack
+      });
+      
+      // 에러 상황에서도 사용자에게 피드백
+      addFlyingChatMessage('😅 메시지 전송에 실패했지만 로컬에서는 보여요!', false);
     });
     
     setChatCooldown(60000); // 1분 쿨다운
@@ -198,7 +207,11 @@ const FlyingMessageManager = () => {
         <button
           onClick={() => setChatModal(true)}
           disabled={false} // 모달은 항상 열 수 있게 하고, 모달 내에서 제한
-          className="pokemon-button shadow-lg"
+          className={`pokemon-button shadow-lg transition-all duration-300 ${
+            canChat 
+              ? 'bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600' 
+              : 'bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600'
+          }`}
           title={canChat ? "글로벌 메시지 보내기" : `메시지 권한은 1분 체류 후 부여됩니다`}
         >
           💬 {canChat ? '메시지 보내기' : `메시지 (권한대기중)`}

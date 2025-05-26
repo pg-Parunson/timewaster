@@ -1,11 +1,12 @@
-// 🎉 포켓몬 골드 스타일 축하 이펙트 컴포넌트
-// UI 레이아웃에 전혀 영향을 주지 않는 오버레이 방식
+// 🎉 압도적인 포켓몬 골드 스타일 축하 이펙트 컴포넌트
+// 화면을 완전히 장악하는 오버레이 방식
 
 import React, { useState, useEffect, useRef } from 'react';
 
-const PokemonCelebrationEffect = ({ isActive, celebration, onComplete }) => {
+const EpicPokemonCelebrationEffect = ({ isActive, celebration, onComplete }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [particles, setParticles] = useState([]);
+  const [phase, setPhase] = useState(0); // 0: 준비, 1: 폭발, 2: 메시지, 3: 피날레
   const timeoutRef = useRef(null);
   
   useEffect(() => {
@@ -15,31 +16,38 @@ const PokemonCelebrationEffect = ({ isActive, celebration, onComplete }) => {
     }
     
     if (isActive && celebration) {
-      console.log('🎉 포켓몬 축하 이펙트 시작:', celebration.message);
+      console.log('🎉 압도적인 포켓몬 축하 이펙트 시작:', celebration.message);
       setIsVisible(true);
+      setPhase(1);
       
-      // 포켓몬 스타일 파티클 생성
-      const pokemonEmojis = ['⭐', '✨', '🎉', '🎊', '💫', '🌟', '💥', '🔥'];
-      const newParticles = Array.from({ length: 12 }, (_, i) => ({
+      // 압도적인 파티클 생성 (30개!)
+      const epicEmojis = ['⭐', '✨', '🎉', '🎊', '💫', '🌟', '💥', '🔥', '🎆', '🎇', '💎', '👑', '🏆', '🎖️', '🥇'];
+      const newParticles = Array.from({ length: 30 }, (_, i) => ({
         id: i,
-        x: 15 + Math.random() * 70, // 15%~85% 범위
-        y: 20 + Math.random() * 60, // 20%~80% 범위
-        emoji: pokemonEmojis[i % pokemonEmojis.length],
-        delay: i * 0.15,
-        duration: 3 + Math.random() * 1.5
+        x: Math.random() * 100, // 전체 화면
+        y: Math.random() * 100, 
+        emoji: epicEmojis[i % epicEmojis.length],
+        delay: i * 0.05,
+        duration: 4 + Math.random() * 2,
+        size: 0.8 + Math.random() * 0.4 // 크기 다양화
       }));
       setParticles(newParticles);
       
+      // 단계별 전환
+      setTimeout(() => setPhase(2), 800);   // 메시지 등장
+      setTimeout(() => setPhase(3), 3000);  // 피날레
+      
       timeoutRef.current = setTimeout(() => {
-        console.log('🎉 포켓몬 축하 이펙트 종료');
+        console.log('🎉 압도적인 축하 이펙트 종료');
         setIsVisible(false);
         setParticles([]);
+        setPhase(0);
         setTimeout(() => {
           if (onComplete) {
             onComplete();
           }
-        }, 300);
-      }, 3500);
+        }, 500);
+      }, 5000);
     }
     
     return () => {
@@ -56,143 +64,222 @@ const PokemonCelebrationEffect = ({ isActive, celebration, onComplete }) => {
   
   return (
     <>
-      {/* 포켓몬 스타일 축하 이펙트 CSS */}
+      {/* 압도적인 포켓몬 축하 이펙트 CSS */}
       <style jsx>{`
-        @keyframes pokemon-flash {
-          0% { opacity: 0; background-color: rgba(255, 215, 0, 0); }
-          15% { opacity: 1; background-color: rgba(255, 215, 0, 0.1); }
-          30% { opacity: 0.5; background-color: rgba(255, 107, 53, 0.05); }
-          85% { opacity: 0.2; background-color: rgba(255, 215, 0, 0.02); }
-          100% { opacity: 0; background-color: rgba(255, 215, 0, 0); }
-        }
-        
-        @keyframes pokemon-bounce {
-          0%, 100% { 
-            transform: translate(-50%, -50%) scale(1) rotate(0deg); 
-          }
-          25% { 
-            transform: translate(-50%, -50%) scale(1.1) rotate(-1deg); 
-          }
-          50% { 
-            transform: translate(-50%, -50%) scale(1.05) rotate(1deg); 
-          }
-          75% { 
-            transform: translate(-50%, -50%) scale(1.08) rotate(-0.5deg); 
-          }
-        }
-        
-        @keyframes pokemon-particle-float {
+        @keyframes epic-screen-flash {
           0% { 
-            transform: translateY(0px) scale(0.3) rotate(0deg);
-            opacity: 0;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0) 0%, rgba(255, 215, 0, 0) 100%);
+          }
+          10% { 
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, rgba(255, 107, 53, 0.2) 100%);
           }
           20% { 
-            opacity: 1;
-            transform: translateY(-15px) scale(0.7) rotate(45deg);
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.6) 0%, rgba(255, 107, 53, 0.3) 100%);
           }
-          60% { 
-            opacity: 0.8;
-            transform: translateY(-40px) scale(1) rotate(180deg);
+          40% { 
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, rgba(255, 107, 53, 0.15) 100%);
           }
           100% { 
-            transform: translateY(-80px) scale(1.3) rotate(360deg);
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, rgba(255, 107, 53, 0.05) 100%);
+          }
+        }
+        
+        @keyframes epic-message-entrance {
+          0% { 
+            transform: translate(-50%, -50%) scale(0.3) rotate(-15deg);
+            opacity: 0;
+          }
+          50% { 
+            transform: translate(-50%, -50%) scale(1.2) rotate(5deg);
+            opacity: 1;
+          }
+          100% { 
+            transform: translate(-50%, -50%) scale(1) rotate(0deg);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes epic-message-pulse {
+          0%, 100% { 
+            transform: translate(-50%, -50%) scale(1) rotate(0deg);
+          }
+          25% { 
+            transform: translate(-50%, -50%) scale(1.05) rotate(-1deg);
+          }
+          75% { 
+            transform: translate(-50%, -50%) scale(1.05) rotate(1deg);
+          }
+        }
+        
+        @keyframes epic-particle-explosion {
+          0% { 
+            transform: translateY(0px) scale(0.2) rotate(0deg);
+            opacity: 0;
+          }
+          10% { 
+            opacity: 1;
+            transform: translateY(-20px) scale(0.6) rotate(90deg);
+          }
+          50% { 
+            opacity: 1;
+            transform: translateY(-80px) scale(1.2) rotate(270deg);
+          }
+          100% { 
+            transform: translateY(-150px) scale(1.5) rotate(720deg);
             opacity: 0;
           }
         }
         
-        .pokemon-celebration-overlay {
+        @keyframes epic-border-glow {
+          0%, 100% {
+            box-shadow: 
+              4px 4px 0px rgba(0, 0, 0, 0.4),
+              inset 2px 2px 0px rgba(255, 255, 255, 0.3),
+              0 0 20px rgba(255, 215, 0, 0.5);
+          }
+          50% {
+            box-shadow: 
+              4px 4px 0px rgba(0, 0, 0, 0.4),
+              inset 2px 2px 0px rgba(255, 255, 255, 0.3),
+              0 0 40px rgba(255, 215, 0, 0.8),
+              0 0 60px rgba(255, 107, 53, 0.6);
+          }
+        }
+        
+        .epic-celebration-overlay {
           position: fixed !important;
           top: 0 !important;
           left: 0 !important;
           right: 0 !important;
           bottom: 0 !important;
-          z-index: 9999 !important;
+          z-index: 99999 !important;
           pointer-events: none !important;
           overflow: hidden !important;
           font-family: 'Galmuri11', 'Galmuri9', monospace !important;
         }
         
-        .pokemon-flash-bg {
+        .epic-flash-bg {
           position: absolute !important;
           top: 0 !important;
           left: 0 !important;
           width: 100% !important;
           height: 100% !important;
-          animation: pokemon-flash 3.5s ease-in-out !important;
+          animation: epic-screen-flash 5s ease-in-out !important;
           pointer-events: none !important;
         }
         
-        .pokemon-message-container {
+        .epic-message-container {
           position: absolute !important;
           top: 50% !important;
           left: 50% !important;
           transform: translate(-50%, -50%) !important;
-          animation: pokemon-bounce 1.5s ease-in-out infinite !important;
           pointer-events: none !important;
-          z-index: 10000 !important;
+          z-index: 100000 !important;
         }
         
-        .pokemon-message-box {
-          background: linear-gradient(135deg, #FFD700 0%, #FF6B35 100%) !important;
+        .epic-message-container.phase-1 {
+          animation: epic-message-entrance 1s ease-out !important;
+        }
+        
+        .epic-message-container.phase-2 {
+          animation: epic-message-pulse 1.5s ease-in-out infinite !important;
+        }
+        
+        .epic-message-box {
+          background: linear-gradient(135deg, #FFD700 0%, #FF6B35 50%, #FFD700 100%) !important;
           color: #000000 !important;
-          border: 4px solid #000000 !important;
-          border-radius: 12px !important;
-          padding: 20px 28px !important;
-          font-size: 20px !important;
+          border: 6px solid #000000 !important;
+          border-radius: 20px !important;
+          padding: 40px 60px !important;
+          font-size: 28px !important;
           font-weight: bold !important;
           text-align: center !important;
-          max-width: 350px !important;
-          box-shadow: 
-            4px 4px 0px rgba(0, 0, 0, 0.4),
-            inset 2px 2px 0px rgba(255, 255, 255, 0.3) !important;
-          text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.8) !important;
-          line-height: 1.3 !important;
+          max-width: 80vw !important;
+          min-width: 400px !important;
+          text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.8) !important;
+          line-height: 1.4 !important;
+          animation: epic-border-glow 2s ease-in-out infinite !important;
         }
         
-        .pokemon-particle {
-          position: absolute !important;
-          font-size: 28px !important;
-          pointer-events: none !important;
-          animation: pokemon-particle-float 4s ease-out forwards !important;
-          z-index: 9998 !important;
-          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3) !important;
-        }
-        
-        .pokemon-celebration-title {
-          font-size: 24px !important;
-          margin-bottom: 8px !important;
+        .epic-title {
+          font-size: 36px !important;
+          margin-bottom: 16px !important;
           display: block !important;
+          text-shadow: 3px 3px 0px rgba(255, 255, 255, 0.9) !important;
         }
         
-        .pokemon-celebration-message {
-          font-size: 16px !important;
+        .epic-message {
+          font-size: 22px !important;
           color: #003366 !important;
-          font-weight: normal !important;
+          font-weight: bold !important;
+        }
+        
+        .epic-particle {
+          position: absolute !important;
+          font-size: 32px !important;
+          pointer-events: none !important;
+          animation: epic-particle-explosion 5s ease-out forwards !important;
+          z-index: 99998 !important;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5) !important;
+        }
+        
+        .epic-particle.large {
+          font-size: 48px !important;
+        }
+        
+        .epic-particle.medium {
+          font-size: 40px !important;
+        }
+        
+        .epic-particle.small {
+          font-size: 28px !important;
+        }
+        
+        /* 반응형 */
+        @media (max-width: 768px) {
+          .epic-message-box {
+            padding: 30px 40px !important;
+            font-size: 24px !important;
+            min-width: 300px !important;
+          }
+          
+          .epic-title {
+            font-size: 30px !important;
+          }
+          
+          .epic-message {
+            font-size: 18px !important;
+          }
         }
       `}</style>
       
-      {/* 포켓몬 골드 스타일 축하 오버레이 */}
-      <div className="pokemon-celebration-overlay">
-        {/* 포켓몬 골드 컬러 배경 플래시 */}
-        <div className="pokemon-flash-bg" />
+      {/* 압도적인 포켓몬 골드 스타일 축하 오버레이 */}
+      <div className="epic-celebration-overlay">
+        {/* 화면 전체 플래시 */}
+        <div className="epic-flash-bg" />
         
-        {/* 포켓몬 대화창 스타일 축하 메시지 */}
-        <div className="pokemon-message-container">
-          <div className="pokemon-message-box">
-            <div className="pokemon-celebration-title">
-              🎉 축하합니다! 🎉
-            </div>
-            <div className="pokemon-celebration-message">
-              {celebration.message}
+        {/* 압도적인 메시지 */}
+        {phase >= 2 && (
+          <div className={`epic-message-container ${phase === 2 ? 'phase-1' : 'phase-2'}`}>
+            <div className="epic-message-box">
+              <div className="epic-title">
+                🎉 대단합니다! 🎉
+              </div>
+              <div className="epic-message">
+                {celebration.message}
+              </div>
             </div>
           </div>
-        </div>
+        )}
         
-        {/* 포켓몬 스타일 파티클 효과 */}
+        {/* 압도적인 파티클 폭발 효과 */}
         {particles.map((particle) => (
           <div
             key={particle.id}
-            className="pokemon-particle"
+            className={`epic-particle ${
+              particle.size > 1.1 ? 'large' : 
+              particle.size > 0.9 ? 'medium' : 'small'
+            }`}
             style={{
               left: `${particle.x}%`,
               top: `${particle.y}%`,
@@ -208,4 +295,4 @@ const PokemonCelebrationEffect = ({ isActive, celebration, onComplete }) => {
   );
 };
 
-export default PokemonCelebrationEffect;
+export default EpicPokemonCelebrationEffect;

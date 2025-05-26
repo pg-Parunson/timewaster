@@ -18,6 +18,7 @@ import LiveFeedNotifications from './components/LiveFeedNotifications.jsx';
 import DevTools from './components/DevTools.jsx';
 import TimerSection from './components/TimerSection.jsx';
 import FlyingMessageManager from './components/flying-messages/FlyingMessageManager.jsx';
+import BGMManager from './components/BGMManager.jsx';
 
 // 훅스 imports
 import { useCelebrationSystem } from './hooks/useCelebrationSystem.jsx';
@@ -279,6 +280,38 @@ function App() {
       .pokemon-button:focus {
         outline: none;
         box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.5), 3px 3px 0px rgba(0,0,0,0.4);
+      }
+      
+      /* 위기 번쩍거림 효과 - 타이머용 (파란색) */
+      @keyframes pokemon-danger-blink {
+        0%, 50% { 
+          background-color: rgba(59, 130, 246, 0.2);
+          border-color: #3B82F6;
+        }
+        51%, 100% { 
+          background-color: transparent;
+          border-color: var(--pokemon-black);
+        }
+      }
+      
+      .pokemon-danger {
+        animation: pokemon-danger-blink 1.5s infinite;
+      }
+      
+      /* 광고 번쩍거림 효과 - 은은한 초록색 */
+      @keyframes pokemon-ad-blink {
+        0%, 50% { 
+          background-color: rgba(34, 197, 94, 0.08);
+          border-color: rgba(34, 197, 94, 0.2);
+        }
+        51%, 100% { 
+          background-color: transparent;
+          border-color: var(--pokemon-black);
+        }
+      }
+      
+      .pokemon-ad-blink {
+        animation: pokemon-ad-blink 2.2s infinite;
       }
       
       /* 위기 번쩍거림 효과 */
@@ -714,7 +747,7 @@ function App() {
             🌍 전 세계 시간냭비자들과 함께 하는 매직타임!
           </div>
           <div className="pokemon-font text-sm">
-            💻 시간 낭비 마스터 v2.2 - 완전체 UI/UX
+            💻 시간 낭비 마스터 v2.3 - 완전체 UI/UX + BGM
           </div>
         </div>
 
@@ -725,6 +758,9 @@ function App() {
 
       {/* 날아가는 메시지 시스템 */}
       <FlyingMessageManager />
+      
+      {/* BGM 시스템 */}
+      <BGMManager elapsedTime={elapsedTime} />
       
       {/* 개발자 도구 */}
       <DevTools isVisible={import.meta.env.DEV} />

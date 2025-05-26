@@ -1,15 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Clock, Zap } from 'lucide-react';
 import { getRecommendedProduct } from '../data/coupangProducts';
 
 // 포켓몬 스타일 광고 영역 컴포넌트
 const AdSection = React.memo(({ showAd, adMessage, extremeMode, elapsedTime, onProductClick }) => {
+  const [isBlinking, setIsBlinking] = useState(false);
   const product = getRecommendedProduct(elapsedTime);
+
+  // 광고 반짝거림 주기 관리 (10초 on → 1분 off)
+  useEffect(() => {
+    if (!showAd) return;
+    
+    const startBlinking = () => {
+      setIsBlinking(true);
+      setTimeout(() => {
+        setIsBlinking(false);
+      }, 10000); // 10초 반짝거림
+    };
+    
+    // 처음 시작
+    startBlinking();
+    
+    // 1분 10초마다 반복 (10초 반짝 + 60초 휴식)
+    const interval = setInterval(startBlinking, 70000);
+    
+    return () => clearInterval(interval);
+  }, [showAd]);
 
   return (
     <div className="w-full">
       {showAd ? (
-        <div className={`pokemon-dialog pokemon-hover ${extremeMode ? 'pokemon-danger' : ''}`}>
+        <div className={`pokemon-dialog pokemon-hover ${isBlinking ? 'pokemon-ad-blink' : ''}`}>
           {/* 포켓몬 스타일 광고 메시지 */}
           <div className="flex items-center justify-center gap-2 mb-4">
             <Zap className="w-5 h-5 text-yellow-500 animate-bounce" />
