@@ -222,7 +222,7 @@ class RankingService {
           .filter(session => session.isActive && session.currentTime > 0)
           .filter(session => this.isSessionInPeriod(session, period))
           .sort((a, b) => b.currentTime - a.currentTime)
-          .slice(0, 10); // TOP 10
+          .slice(0, 20); // TOP 20으로 증가!
 
         return sessions.map((session, index) => ({
           rank: index + 1,
@@ -240,7 +240,7 @@ class RankingService {
           .filter(session => session.isActive && session.currentTime > 0)
           .filter(session => this.isSessionInPeriod(session, period))
           .sort((a, b) => b.currentTime - a.currentTime)
-          .slice(0, 10);
+          .slice(0, 20); // 로컬 모드도 TOP 20
 
         return sessions.map((session, index) => ({
           rank: index + 1,

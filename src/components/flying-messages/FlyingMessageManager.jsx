@@ -97,8 +97,8 @@ const FlyingMessageManager = () => {
       const data = snapshot.val();
       if (data) {
         const latestChat = Object.values(data).sort((a, b) => b.timestamp - a.timestamp)[0];
-        if (latestChat && Date.now() - latestChat.timestamp < 5000) {
-          addFlyingChatMessage(latestChat.message);
+        if (latestChat && Date.now() - latestChat.timestamp < 3000) { // 3초 이내 메시지만 표시
+          addFlyingChatMessage(latestChat.message, false); // 다른 사람 메시지
         }
       }
     });
@@ -129,23 +129,35 @@ const FlyingMessageManager = () => {
   };
 
   const handleSendChatMessage = (message) => {
+    console.log('💬 메시지 전송 시작:', message);
+    
     // 내 메시지를 화면에 날아가게 표시 (내 메시지 표시)
     setTimeout(() => {
+      console.log('✨ 내 메시지 화면에 표시:', message);
       addFlyingChatMessage(message, true); // isMyMessage = true
     }, 500); // 0.5초 후 날아가게
     
     if (!database) {
       // Firebase가 없을 때는 로컬로만 테스트
+      console.log('💻 로컬 모드: Firebase 없이 테스트');
       setChatCooldown(60000); // 1분 쿨다운
       return;
     }
     
     // Firebase에 전송 (다른 사용자들에게도 보이게)
+    console.log('🔥 Firebase에 메시지 전송');
     const chatRef = ref(database, 'live-feed/global-chat');
     push(chatRef, { 
       message, 
       timestamp: Date.now()
+    })
+    .then(() => {
+      console.log('✅ Firebase 전송 성공!');
+    })
+    .catch((error) => {
+      console.error('❌ Firebase 전송 실패:', error);
     });
+    
     setChatCooldown(60000); // 1분 쿨다운
   };
 

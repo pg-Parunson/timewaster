@@ -380,12 +380,12 @@ function App() {
         box-shadow: 4px 4px 0px rgba(0,0,0,0.4);
       }
       
-      /* 랭킹 섹션 포켓몬 스타일 */
+      /* 랭킹 섹션 포켓몬 스타일 - 20위까지 보여주기 */
       .pokemon-ranking {
         background: var(--pokemon-white);
         border: 4px solid var(--pokemon-black);
         border-radius: 8px;
-        max-height: 400px;
+        max-height: 600px; /* 400px에서 600px로 증가 */
         overflow-y: auto;
       }
       
@@ -574,6 +574,12 @@ function App() {
           <p className={`pokemon-subtitle ${isAnimating ? 'animating' : ''}`}>
             {currentSubtitle}
           </p>
+          
+          {/* 키보드 단축키 안내 - 잘 보이는 곳으로 이동! */}
+          <div className="mt-4 pokemon-font text-sm text-gray-600">
+            🔄 <kbd className="px-2 py-1 bg-gray-200 border border-gray-400 rounded text-xs">SPACE</kbd> 메시지 새로고침 | 
+            💫 <kbd className="px-2 py-1 bg-gray-200 border border-gray-400 rounded text-xs ml-2">ESC</kbd> 게임 종료
+          </div>
         </div>
 
         {/* 통계 바 */}
@@ -665,11 +671,11 @@ function App() {
               />
             </div>
 
-            {/* 탈출 버튼 */}
-            <div className="pokemon-dialog pokemon-hover text-center">
-              <div className="pokemon-shortcut">ESC</div>
-              <div className="pokemon-font text-lg mb-4 text-gray-800">
-                현실로 돌아가기
+            {/* 탈출 버튼 - 더 눈에 띄게! */}
+            <div className="pokemon-dialog pokemon-hover text-center bg-red-50 border-red-300">
+              <div className="pokemon-shortcut bg-red-600 text-white font-bold">ESC</div>
+              <div className="pokemon-font text-xl mb-4 text-red-800 font-bold">
+                🚨 현실로 돌아가기 🚨
               </div>
               
               <FloatingExitButton 
@@ -678,6 +684,10 @@ function App() {
                 inline={true}
                 showAlways={true}
               />
+              
+              <div className="mt-3 text-sm text-red-600 pokemon-font">
+                너무 오래 있으면 정말 위험해요!
+              </div>
             </div>
           </div>
 
@@ -700,10 +710,10 @@ function App() {
         {/* 하단 액션 바 */}
         <div className="pokemon-stats mt-6">
           <div className="pokemon-font text-sm">
-            💡 SPACE: 메시지 새로고침 | ESC: 게임 종료
+            🌍 전 세계 시간냭비자들과 함께 하는 매직타임!
           </div>
           <div className="pokemon-font text-sm">
-            💻 시간 낭비 마스터 v2.1 - 회전 부제목 추가
+            💻 시간 낭비 마스터 v2.2 - 완전체 UI/UX
           </div>
         </div>
 
