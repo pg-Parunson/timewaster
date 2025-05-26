@@ -12,8 +12,23 @@ const FlyingMessageManager = () => {
   const [flyingRankingMessages, setFlyingRankingMessages] = useState([]);
   const [flyingChatMessages, setFlyingChatMessages] = useState([]);
   const [chatModal, setChatModal] = useState(false);
-  const [chatCooldown, setChatCooldown] = useState(0);
+  const [chatCooldown, setChatCooldown] = useState(60000); // 처음에는 1분 쿨다운으로 시작
   const [messageIdCounter, setMessageIdCounter] = useState(0);
+  const [totalTimeWasted, setTotalTimeWasted] = useState(0); // 총 체류 시간 추적
+
+  // 체류 시간 추적 (1초마다 업데이트)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTotalTimeWasted(prev => prev + 1);
+      
+      // 1분(60초)마다 채팅 권한 부여
+      if (totalTimeWasted > 0 && totalTimeWasted % 60 === 0 && chatCooldown > 0) {
+        setChatCooldown(0); // 채팅 권한 부여!
+      }
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [totalTimeWasted, chatCooldown]);
 
   // 5분마다 채팅 권한 복구
   useEffect(() => {
@@ -41,7 +56,7 @@ const FlyingMessageManager = () => {
       }, 10000);
       
       setTimeout(() => {
-        addFlyingChatMessage("여기 정말 중독성 있네요 ㅠㅠ");
+        addFlyingChatMessage("여기 정말 중독성 있네요 ㅠㅠ", false); // 다른 사람 메시지
       }, 15000);
       
       return;
@@ -100,9 +115,9 @@ const FlyingMessageManager = () => {
     setFlyingRankingMessages(prev => [...prev, { id, message }]);
   };
 
-  const addFlyingChatMessage = (message) => {
+  const addFlyingChatMessage = (message, isMyMessage = false) => {
     const id = Date.now() + Math.random();
-    setFlyingChatMessages(prev => [...prev, { id, message }]);
+    setFlyingChatMessages(prev => [...prev, { id, message, isMyMessage }]);
   };
 
   const removeFlyingMessage = (id, type) => {
@@ -114,21 +129,24 @@ const FlyingMessageManager = () => {
   };
 
   const handleSendChatMessage = (message) => {
+    // 내 메시지를 화면에 날아가게 표시 (내 메시지 표시)
+    setTimeout(() => {
+      addFlyingChatMessage(message, true); // isMyMessage = true
+    }, 500); // 0.5초 후 날아가게
+    
     if (!database) {
-      // Firebase가 없을 때 로컬로 테스트
-      setTimeout(() => {
-        addFlyingChatMessage(message);
-      }, 1000);
-      setChatCooldown(300000); // 5분 쿨다운
+      // Firebase가 없을 때는 로컬로만 테스트
+      setChatCooldown(60000); // 1분 쿨다운
       return;
     }
     
+    // Firebase에 전송 (다른 사용자들에게도 보이게)
     const chatRef = ref(database, 'live-feed/global-chat');
     push(chatRef, { 
       message, 
       timestamp: Date.now()
     });
-    setChatCooldown(300000); // 5분 쿨다운
+    setChatCooldown(60000); // 1분 쿨다운
   };
 
   const canChat = chatCooldown === 0;
@@ -158,6 +176,7 @@ const FlyingMessageManager = () => {
           key={msg.id}
           id={msg.id}
           message={msg.message}
+          isMyMessage={msg.isMyMessage}
           onComplete={(id) => removeFlyingMessage(id, 'chat')}
         />
       ))}
@@ -166,11 +185,11 @@ const FlyingMessageManager = () => {
       <div className="fixed bottom-4 left-4 z-40">
         <button
           onClick={() => setChatModal(true)}
-          disabled={!canChat}
-          className={`pokemon-button ${!canChat ? 'opacity-50 cursor-not-allowed' : ''}`}
-          title={canChat ? "글로벌 메시지 보내기" : `${Math.ceil(chatCooldown / 1000)}초 후 사용 가능`}
+          disabled={false} // 모달은 항상 열 수 있게 하고, 모달 내에서 제한
+          className="pokemon-button"
+          title={canChat ? "글로벌 메시지 보내기" : `메시지 권한은 1분 체류 후 부여됩니다`}
         >
-          💬 {canChat ? '메시지 보내기' : `${Math.ceil(chatCooldown / 60000)}분`}
+          💬 {canChat ? '메시지 보내기' : `메시지 (권한대기중)`}
         </button>
       </div>
 
@@ -180,6 +199,7 @@ const FlyingMessageManager = () => {
         onClose={() => setChatModal(false)}
         onSendMessage={handleSendChatMessage}
         remainingTime={chatCooldown}
+        canChat={canChat}
       />
     </>
   );

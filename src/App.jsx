@@ -27,6 +27,49 @@ import { useModalLogic } from './hooks/useModalLogic.jsx';
 // 유틸리티 imports
 import { formatTime } from './utils/helpers';
 
+// 시간에 따른 타이머 색상 계산 함수
+const getTimerColor = (elapsedTime) => {
+  const minutes = Math.floor(elapsedTime / 60);
+  
+  if (minutes < 1) {
+    // 1분 미만: 기본 주황색
+    return {
+      color: 'var(--pokemon-orange)',
+      textShadow: '4px 4px 0px var(--pokemon-navy), -2px -2px 0px var(--pokemon-white)'
+    };
+  } else if (minutes < 3) {
+    // 1-3분: 노란색으로 변화
+    return {
+      color: '#FFD700',
+      textShadow: '4px 4px 0px #B8860B, -2px -2px 0px var(--pokemon-white)'
+    };
+  } else if (minutes < 5) {
+    // 3-5분: 주황색
+    return {
+      color: '#FF8C00',
+      textShadow: '4px 4px 0px #CC4400, -2px -2px 0px var(--pokemon-white)'
+    };
+  } else if (minutes < 10) {
+    // 5-10분: 붉은색
+    return {
+      color: '#FF4444',
+      textShadow: '4px 4px 0px #CC0000, -2px -2px 0px var(--pokemon-white)'
+    };
+  } else if (minutes < 15) {
+    // 10-15분: 진한 붉은색
+    return {
+      color: '#CC0000',
+      textShadow: '4px 4px 0px #800000, -2px -2px 0px var(--pokemon-white)'
+    };
+  } else {
+    // 15분 이상: 자주색 (전설의 색상)
+    return {
+      color: '#8B00FF',
+      textShadow: '4px 4px 0px #4B0080, -2px -2px 0px var(--pokemon-white)'
+    };
+  }
+};
+
 // 회전 부제목 배열
 const rotatingSubtitles = [
   "당신의 소중한 인생이 녹고 있습니다",
@@ -241,8 +284,8 @@ function App() {
       /* 위기 번쩍거림 효과 */
       @keyframes pokemon-danger-blink {
         0%, 50% { 
-          background-color: rgba(220, 38, 38, 0.3);
-          border-color: #DC2626;
+          background-color: rgba(59, 130, 246, 0.2); /* 부드러운 파란색 */
+          border-color: #3B82F6; /* 파란색 경계선 */
         }
         51%, 100% { 
           background-color: transparent;
@@ -251,7 +294,7 @@ function App() {
       }
       
       .pokemon-danger {
-        animation: pokemon-danger-blink 1s infinite;
+        animation: pokemon-danger-blink 1.5s infinite; /* 살짝 느리게 */
       }
       
       /* 레트로 타이핑 효과 */
@@ -317,15 +360,12 @@ function App() {
         box-shadow: 3px 3px 0px rgba(0,0,0,0.3);
       }
       
-      /* 타이머 대형 디스플레이 - 반응형 개선! */
+      /* 타이머 대형 디스플레이 - 반응형 개선 & 동적 색상! */
       .pokemon-timer {
         font-family: 'Galmuri14', 'Galmuri11', monospace;
         font-weight: bold;
         font-size: clamp(2.5rem, 5vw, 4rem); /* 반응형 크기 */
-        color: var(--pokemon-orange);
-        text-shadow: 
-          4px 4px 0px var(--pokemon-navy),
-          -2px -2px 0px var(--pokemon-white);
+        /* color와 text-shadow는 JavaScript에서 동적으로 설정 */
         text-align: center;
         padding: 24px;
         background: var(--pokemon-white);
@@ -335,6 +375,7 @@ function App() {
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: color 0.5s ease, text-shadow 0.5s ease; /* 부드러운 색상 전환 */
         /* 타이머만 예외적으로 그림자 유지 */
         box-shadow: 4px 4px 0px rgba(0,0,0,0.4);
       }
@@ -560,14 +601,19 @@ function App() {
                 <div className="pokemon-font text-xl text-gray-700 mb-2">
                   현재 낭비 시간
                 </div>
-                <div className={`pokemon-timer ${extremeMode ? 'pokemon-danger' : ''}`}>
+                <div 
+                  className={`pokemon-timer ${extremeMode ? 'pokemon-danger' : ''}`}
+                  style={getTimerColor(elapsedTime)}
+                >
                   {formatTime(elapsedTime)}
                 </div>
               </div>
               
               {extremeMode && (
                 <div className="text-center">
-                  <div className="pokemon-font text-red-600 text-lg animate-bounce">
+                  <div className="pokemon-font text-lg animate-bounce" style={{
+                    color: getTimerColor(elapsedTime).color
+                  }}>
                     ⚠️ 위험! 시간이 너무 많이 낭비되었습니다!
                   </div>
                 </div>
