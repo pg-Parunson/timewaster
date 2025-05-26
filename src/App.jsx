@@ -161,6 +161,7 @@ function App() {
     handleProductClick,
     handleExit,
     handleRankingModalClose,
+    handleRankingModalExit,
     confirmExit,
     setShowModal
   } = useModalLogic({
