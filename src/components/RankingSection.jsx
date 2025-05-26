@@ -4,19 +4,43 @@ import { Trophy, Crown, Medal, Users } from 'lucide-react';
 import { rankingService } from '../services/rankingService.jsx';
 import { RANKING_PERIODS, RANKING_LABELS } from '../config/firebase.js';
 
-const RankingSection = ({ isVisible = true }) => {
+const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null, elapsedTime = 0 }) => {
   const [ranking, setRanking] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activePeriod, setActivePeriod] = useState(RANKING_PERIODS.DAILY);
   const [unsubscribe, setUnsubscribe] = useState(null);
+  const [myRank, setMyRank] = useState(null);
+  const [showMyRank, setShowMyRank] = useState(false);
 
   useEffect(() => {
     // 현재 사용자 정보 설정
-    const user = rankingService.getCurrentUser();
+    const user = propCurrentUser || rankingService.getCurrentUser();
     setCurrentUser(user);
-  }, []);
+  }, [propCurrentUser]);
+
+  // 내 현재 순위 계산
+  useEffect(() => {
+    if (elapsedTime > 0 && currentUser) {
+      const calculateMyRank = async () => {
+        try {
+          const expectedRank = await rankingService.getExpectedRank(elapsedTime);
+          setMyRank({
+            rank: expectedRank,
+            time: elapsedTime,
+            username: currentUser.anonymousName || '나'
+          });
+          
+          // 10위 안에 있지 않으면 내 순위를 따로 보여주기
+          setShowMyRank(expectedRank > 10);
+        } catch (error) {
+          console.log('내 순위 계산 실패:', error);
+        }
+      };
+      calculateMyRank();
+    }
+  }, [elapsedTime, currentUser]);
 
   useEffect(() => {
     // 기존 리스너 정리
@@ -134,7 +158,8 @@ const RankingSection = ({ isVisible = true }) => {
             </div>
           ) : (
             <div className="space-y-2">
-              {ranking.map((user, index) => (
+              {/* TOP 10 랭킹 표시 */}
+              {ranking.slice(0, 10).map((user, index) => (
                 <div
                   key={`${user.anonymousName}-${index}`}
                   className={`
@@ -191,11 +216,109 @@ const RankingSection = ({ isVisible = true }) => {
                   </div>
                 </div>
               ))}
+              
+              {/* 더 보기 영역 (스크롤 가능) */}
+              {ranking.length > 10 && (
+                <>
+                  <div className="border-t-2 border-gray-300 my-2 pt-2">
+                    <p className="text-center pokemon-font text-xs text-gray-500 mb-2">
+                      👇 더 많은 랭킹 보기
+                    </p>
+                  </div>
+                  
+                  <div className="max-h-32 overflow-y-auto space-y-1">
+                    {ranking.slice(10, 20).map((user, index) => (
+                      <div
+                        key={`${user.anonymousName}-extended-${index}`}
+                        className={`
+                          flex items-center gap-2 p-1.5 rounded-lg transition-all text-sm
+                          ${user.isCurrentUser 
+                            ? 'bg-blue-100 border-2 border-blue-400 shadow-md' 
+                            : 'bg-gray-50 border border-gray-200 hover:bg-gray-100'
+                          }
+                        `}
+                      >
+                        {/* 순위 */}
+                        <div className="flex items-center gap-1 min-w-[40px]">
+                          <span className="text-xs">{getRankEmoji(user.rank)}</span>
+                          <span className="text-xs font-bold text-gray-600">{user.rank}</span>
+                        </div>
+
+                        {/* 닉네임 */}
+                        <div className="flex-1 min-w-0 px-1">
+                          <div className={`
+                            pokemon-font text-xs
+                            ${user.isCurrentUser ? 'text-blue-700 font-bold' : 'text-gray-700'}
+                          `}>
+                            {user.anonymousName}
+                            {user.isCurrentUser && (
+                              <span className="ml-1 text-xs bg-blue-500 text-white px-1 py-0.5 rounded-full">
+                                나
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 시간 */}
+                        <div className="text-right min-w-[50px]">
+                          <div className={`
+                            pokemon-font text-xs font-bold
+                            ${user.isCurrentUser ? 'text-blue-600' : 'text-gray-600'}
+                          `}>
+                            {user.timeDisplay}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+              
+              {/* 내 현재 순위 (10위 밖일 때만 표시) */}
+              {showMyRank && myRank && (
+                <>
+                  <div className="border-t-2 border-blue-300 my-2 pt-2">
+                    <p className="text-center pokemon-font text-xs text-blue-600 mb-2">
+                      📍 내 현재 예상 순위
+                    </p>
+                  </div>
+                  
+                  <div className="bg-blue-50 border-2 border-blue-400 rounded-lg p-2 shadow-md">
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1 min-w-[50px]">
+                        <span className="text-sm">🎯</span>
+                        <span className="text-sm font-bold text-blue-700">#{myRank.rank}</span>
+                      </div>
+                      
+                      <div className="flex-1 px-2">
+                        <div className="pokemon-font text-sm text-blue-800 font-bold">
+                          {myRank.username}
+                          <span className="ml-1 text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full">
+                            나
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="text-right min-w-[60px]">
+                        <div className="pokemon-font text-xs font-bold text-blue-600">
+                          {Math.floor(myRank.time / 60)}:{String(myRank.time % 60).padStart(2, '0')}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-1 text-center">
+                      <p className="pokemon-font text-xs text-blue-600">
+                        💪 계속 머물러서 순위를 올려보세요!
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           )}
 
           {/* 참여 독려 메시지 */}
-          {ranking.length > 0 && (
+          {ranking.length > 0 && !showMyRank && (
             <div className="mt-3 p-2 bg-yellow-100 border-2 border-yellow-400 rounded-lg">
               <p className="text-center pokemon-font text-yellow-800 text-xs">
                 💪 더 오래 머물러서 명예의 전당에 이름을 올려보세요!
@@ -208,7 +331,7 @@ const RankingSection = ({ isVisible = true }) => {
       {/* 하단 정보 */}
       <div className="mt-3 pt-2 border-t-2 border-gray-300">
         <div className="flex justify-between items-center pokemon-font text-xs text-gray-600">
-          <span>실시간 업데이트</span>
+          <span>TOP 20 랭킹</span>
           <span className="flex items-center gap-1">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             LIVE

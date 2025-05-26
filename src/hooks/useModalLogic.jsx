@@ -74,6 +74,13 @@ export const useModalLogic = ({
   };
 
   const handleRankingModalClose = () => {
+    // 더 시간을 낭비하고 싶어요 버튼을 눌렀을 때는 바로 돌아가기
+    setShowRankingModal(false);
+    // 추가 확인 모달 없이 바로 게임으로 복귀
+  };
+
+  const handleRankingModalExit = () => {
+    // ESC나 실제 종료 버튼을 눌렀을 때만 확인 모달 표시
     setShowRankingModal(false);
     showModernModal(
       "현실로 돌아가시겠습니까?",
@@ -115,6 +122,7 @@ export const useModalLogic = ({
     handleProductClick,
     handleExit,
     handleRankingModalClose,
+    handleRankingModalExit,
     confirmExit,
     
     // 세터들

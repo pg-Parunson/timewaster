@@ -598,7 +598,7 @@ function App() {
         {/* 🔥 PC 친화적 3열 그리드 레이아웃 */}
         <div className="pokemon-grid">
           
-          {/* 왼쪽 컬럼: 타이머 + 메시지 */}
+          {/* 왼쪽 컬럼: 타이머 + 메시지 + 현실로 돌아가기 */}
           <div className="space-y-6">
             {/* 타이머 섹션 */}
             <div className="pokemon-dialog pokemon-hover relative">
@@ -645,6 +645,25 @@ function App() {
                 </button>
               </div>
             </div>
+
+            {/* 현실로 돌아가기 - 메시지 섹션 아래로 이동! */}
+            <div className="pokemon-dialog pokemon-hover text-center bg-red-50 border-red-300">
+              <div className="pokemon-shortcut bg-red-600 text-white font-bold">ESC</div>
+              <div className="pokemon-font text-xl mb-4 text-red-800 font-bold">
+                🚨 현실로 돌아가기 🚨
+              </div>
+              
+              <FloatingExitButton 
+                elapsedTime={elapsedTime}
+                onExit={handleExit}
+                inline={true}
+                showAlways={true}
+              />
+              
+              <div className="mt-3 text-sm text-red-600 pokemon-font">
+                너무 오래 있으면 정말 위험해요!
+              </div>
+            </div>
           </div>
 
           {/* 중앙 컬럼: 광고 + 공유 */}
@@ -670,25 +689,6 @@ function App() {
                 showModernModal={showModernModal}
               />
             </div>
-
-            {/* 탈출 버튼 - 더 눈에 띄게! */}
-            <div className="pokemon-dialog pokemon-hover text-center bg-red-50 border-red-300">
-              <div className="pokemon-shortcut bg-red-600 text-white font-bold">ESC</div>
-              <div className="pokemon-font text-xl mb-4 text-red-800 font-bold">
-                🚨 현실로 돌아가기 🚨
-              </div>
-              
-              <FloatingExitButton 
-                elapsedTime={elapsedTime}
-                onExit={handleExit}
-                inline={true}
-                showAlways={true}
-              />
-              
-              <div className="mt-3 text-sm text-red-600 pokemon-font">
-                너무 오래 있으면 정말 위험해요!
-              </div>
-            </div>
           </div>
 
           {/* 오른쪽 컬럼: 랭킹 */}
@@ -701,6 +701,7 @@ function App() {
               <RankingSection 
                 isVisible={true}
                 currentUser={currentUser}
+                elapsedTime={elapsedTime}
               />
             </div>
           </div>
@@ -740,6 +741,7 @@ function App() {
         isOpen={showRankingModal}
         onClose={handleRankingModalClose}
         onConfirm={confirmExit}
+        onExit={handleRankingModalExit}
         elapsedTime={elapsedTime}
         currentUser={currentUser}
         totalTimeWasted={totalTimeWasted}

@@ -5,7 +5,8 @@ import { rankingService } from '../services/rankingService.jsx';
 const RankingRegistrationModal = ({ 
   isOpen, 
   onClose, 
-  onConfirm, 
+  onConfirm,
+  onExit, // 실제 종료 시 사용
   elapsedTime, 
   currentUser,
   totalTimeWasted,
@@ -13,6 +14,7 @@ const RankingRegistrationModal = ({
   adClicks 
 }) => {
   const [customNickname, setCustomNickname] = useState('');
+  const [customComment, setCustomComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [rankPosition, setRankPosition] = useState(null);
@@ -48,9 +50,10 @@ const RankingRegistrationModal = ({
     
     try {
       const finalNickname = customNickname.trim() || currentUser?.anonymousName || '익명';
+      const finalComment = customComment.trim();
       
-      // Firebase 랭킹에 등록
-      await rankingService.submitScore(elapsedTime, finalNickname);
+      // Firebase 랭킹에 등록 (소감 포함)
+      await rankingService.submitScore(elapsedTime, finalNickname, finalComment);
       
       // 성공 후 종료 처리
       onConfirm();
@@ -65,7 +68,11 @@ const RankingRegistrationModal = ({
 
   // 그냥 종료 (랭킹 등록 안함)
   const handleSkipRanking = () => {
-    onConfirm();
+    if (onExit) {
+      onExit(); // 확인 모달 표시
+    } else {
+      onConfirm(); // 바로 종료
+    }
   };
 
   if (!isOpen) return null;
@@ -75,40 +82,40 @@ const RankingRegistrationModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fadeIn">
-        {/* 헤더 */}
+      <div className="pokemon-dialog max-w-md w-full p-6 animate-fadeIn">
+        {/* 헤더 - 포켓몬 컨셉에 맞게 */}
         <div className="text-center mb-6">
           <div className="text-6xl mb-2">🏆</div>
-          <h2 className="text-2xl font-bold text-white mb-2">
+          <h2 className="pokemon-font text-2xl font-bold text-gray-800 mb-2">
             시간낭비 기록 달성!
           </h2>
-          <p className="text-white/70">
+          <p className="pokemon-font text-gray-600">
             {formatTime(elapsedTime)}의 소중한 시간을 낭비하셨습니다
           </p>
         </div>
 
-        {/* 통계 요약 */}
-        <div className="bg-white/5 rounded-xl p-4 mb-6 space-y-2">
+        {/* 통계 요약 - 포켓몬 스타일 */}
+        <div className="bg-gray-100 border-2 border-gray-300 rounded-lg p-4 mb-6 space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-white/70">이번 세션</span>
-            <span className="text-white font-mono">{formatTime(elapsedTime)}</span>
+            <span className="pokemon-font text-gray-600">이번 세션</span>
+            <span className="pokemon-font text-gray-800 font-bold">{formatTime(elapsedTime)}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-white/70">총 방문 횟수</span>
-            <span className="text-white">{visits}회</span>
+            <span className="pokemon-font text-gray-600">총 방문 횟수</span>
+            <span className="pokemon-font text-gray-800">{visits}회</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-white/70">누적 시간낭비</span>
-            <span className="text-white font-mono">{formatTime(totalTimeWasted + elapsedTime)}</span>
+            <span className="pokemon-font text-gray-600">누적 시간낭비</span>
+            <span className="pokemon-font text-gray-800 font-bold">{formatTime(totalTimeWasted + elapsedTime)}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-white/70">광고 클릭</span>
-            <span className="text-white">{adClicks}회</span>
+            <span className="pokemon-font text-gray-600">광고 클릭</span>
+            <span className="pokemon-font text-gray-800">{adClicks}회</span>
           </div>
           {rankPosition && (
-            <div className="flex justify-between text-sm pt-2 border-t border-white/10">
-              <span className="text-white/70">예상 순위</span>
-              <span className="text-yellow-400 font-bold">#{rankPosition}</span>
+            <div className="flex justify-between text-sm pt-2 border-t-2 border-gray-300">
+              <span className="pokemon-font text-gray-600">예상 순위</span>
+              <span className="pokemon-font text-yellow-600 font-bold">#{rankPosition}</span>
             </div>
           )}
         </div>
@@ -116,13 +123,13 @@ const RankingRegistrationModal = ({
         {/* 랭킹 등록 섹션 */}
         {isWorthRegistering ? (
           <div className="mb-6">
-            <h3 className="text-lg font-bold text-white mb-3 text-center">
+            <h3 className="pokemon-font text-lg font-bold text-gray-800 mb-3 text-center">
               🎖️ 랭킹에 기록하시겠습니까?
             </h3>
             
             {/* 닉네임 입력 */}
             <div className="mb-4">
-              <label className="block text-sm text-white/70 mb-2">
+              <label className="block pokemon-font text-sm text-gray-700 mb-2">
                 닉네임 (선택사항)
               </label>
               <input
@@ -130,28 +137,46 @@ const RankingRegistrationModal = ({
                 value={customNickname}
                 onChange={handleNicknameChange}
                 placeholder={currentUser?.anonymousName || "익명의 시간낭비자"}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-purple-400 focus:bg-white/15 transition-all"
+                className="w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-lg pokemon-font text-gray-800 placeholder-gray-500 focus:outline-none focus:border-blue-400 transition-all"
                 maxLength="12"
               />
-              <p className="text-xs text-white/50 mt-1">
+              <p className="pokemon-font text-xs text-gray-500 mt-1">
                 {customNickname.length}/12자 (비워두면 기본 닉네임 사용)
               </p>
             </div>
 
             {/* 미리보기 */}
-            <div className="bg-white/5 rounded-lg p-3 mb-4">
-              <p className="text-sm text-white/70 mb-1">랭킹 표시 미리보기:</p>
-              <div className="flex items-center justify-between bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-lg p-2">
+            <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-3 mb-4">
+              <p className="pokemon-font text-sm text-gray-600 mb-2">랭킹 표시 미리보기:</p>
+              <div className="flex items-center justify-between bg-gradient-to-r from-blue-100 to-blue-200 border-2 border-blue-300 rounded-lg p-3">
                 <div className="flex items-center space-x-2">
-                  <span className="text-yellow-400 font-bold">#{rankPosition || '?'}</span>
-                  <span className="text-white font-medium">
+                  <span className="pokemon-font text-blue-700 font-bold">#{rankPosition || '?'}</span>
+                  <span className="pokemon-font text-gray-800 font-medium">
                     {customNickname || currentUser?.anonymousName || '익명'}
                   </span>
                 </div>
-                <span className="text-white/80 font-mono text-sm">
+                <span className="pokemon-font text-gray-700 font-bold text-sm">
                   {formatTime(elapsedTime)}
                 </span>
               </div>
+            </div>
+
+            {/* 소감 남기기 영역 */}
+            <div className="mb-4">
+              <label className="block pokemon-font text-sm text-gray-700 mb-2">
+                한마디 소감 남기기 (선택사항)
+              </label>
+              <textarea
+                value={customComment}
+                onChange={(e) => setCustomComment(e.target.value.slice(0, 50))}
+                placeholder="시간낭비에 대한 소감을 남겨보세요..."
+                className="w-full px-3 py-2 bg-white border-2 border-gray-300 rounded-lg pokemon-font text-sm text-gray-800 placeholder-gray-500 focus:outline-none focus:border-blue-400 transition-all resize-none"
+                rows="2"
+                maxLength="50"
+              />
+              <p className="pokemon-font text-xs text-gray-500 mt-1">
+                {customComment.length}/50자
+              </p>
             </div>
 
             {/* 버튼들 */}
@@ -159,11 +184,11 @@ const RankingRegistrationModal = ({
               <button
                 onClick={handleRegisterRanking}
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 text-white font-bold py-3 px-6 rounded-xl transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                className="pokemon-button w-full disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <div className="flex items-center justify-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-800 rounded-full animate-spin"></div>
                     <span>등록 중...</span>
                   </div>
                 ) : (
@@ -173,7 +198,7 @@ const RankingRegistrationModal = ({
               
               <button
                 onClick={handleSkipRanking}
-                className="w-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white font-medium py-3 px-6 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 hover:text-gray-800 pokemon-font font-medium py-3 px-6 rounded-lg border-2 border-gray-400 transition-all focus:outline-none focus:ring-2 focus:ring-gray-400"
               >
                 랭킹 등록 없이 그냥 종료
               </button>
@@ -182,23 +207,28 @@ const RankingRegistrationModal = ({
         ) : (
           <div className="mb-6 text-center">
             <div className="text-4xl mb-3">😅</div>
-            <p className="text-white/70 mb-4">
-              1분 이상 시간을 낭비해야 랭킹에 등록할 수 있어요
-            </p>
+            <div className="pokemon-dialog bg-yellow-100 border-2 border-yellow-400 rounded-lg p-4 mb-4">
+              <p className="pokemon-font text-yellow-800 font-bold mb-2">
+                🎮 시간낭비 마스터 규칙 📋
+              </p>
+              <p className="pokemon-font text-yellow-700 text-sm">
+                1분 이상 시간을 낭비해야 명예의 전당에 등록할 수 있습니다!
+              </p>
+            </div>
             <button
               onClick={handleSkipRanking}
-              className="w-full bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold py-3 px-6 rounded-xl transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              className="pokemon-button w-full"
             >
               그냥 종료
             </button>
           </div>
         )}
 
-        {/* 취소 버튼 */}
+        {/* 더 시간낭비하기 버튼 - 바로 돌아가기 */}
         <div className="text-center">
           <button
             onClick={onClose}
-            className="text-white/50 hover:text-white/70 text-sm underline transition-colors"
+            className="pokemon-font text-gray-500 hover:text-gray-700 text-sm underline transition-colors"
           >
             아직 더 시간을 낭비하고 싶어요
           </button>
