@@ -14,8 +14,8 @@ const BGMManager = ({ elapsedTime }) => {
   const bgmTracks = {
     // 테마송 (랜덤 재생)
     themes: [
-      { name: 'theme1', file: '/bgm/theme1.mp3', title: '시간낭비 테마 1' },
-      { name: 'theme2', file: '/bgm/theme2.mp3', title: '시간낭비 테마 2' }
+      { name: 'themesong1', file: '/bgm/themesong1.mp3', title: '시간낭비 테마 1' },
+      { name: 'themesong2', file: '/bgm/themesong2.mp3', title: '시간낭비 테마 2' }
     ],
     // 단계별 BGM
     phases: [
