@@ -14,15 +14,15 @@ const BGMManager = ({ elapsedTime }) => {
   const bgmTracks = {
     // 테마송 (랜덤 재생)
     themes: [
-      { name: 'themesong1', file: '/bgm/themesong1.mp3', title: '시간낭비 테마 1' },
-      { name: 'themesong2', file: '/bgm/themesong2.mp3', title: '시간낭비 테마 2' }
+      { name: 'themesong1', file: './bgm/themesong1.mp3', title: '시간낭비 테마 1' },
+      { name: 'themesong2', file: './bgm/themesong2.mp3', title: '시간낭비 테마 2' }
     ],
     // 단계별 BGM
     phases: [
-      { phase: 1, minTime: 0, maxTime: 300, file: '/bgm/phase1.mp3', title: '초보자의 시간낭비' },
-      { phase: 2, minTime: 300, maxTime: 900, file: '/bgm/phase2.mp3', title: '중급자의 시간낭비' },
-      { phase: 3, minTime: 900, maxTime: 1800, file: '/bgm/phase3.mp3', title: '고급자의 시간낭비' },
-      { phase: 4, minTime: 1800, maxTime: Infinity, file: '/bgm/phase4.mp3', title: '마스터의 시간낭비' }
+      { phase: 1, minTime: 0, maxTime: 300, file: './bgm/phase1.mp3', title: '초보자의 시간낭비' },
+      { phase: 2, minTime: 300, maxTime: 900, file: './bgm/phase2.mp3', title: '중급자의 시간낭비' },
+      { phase: 3, minTime: 900, maxTime: 1800, file: './bgm/phase3.mp3', title: '고급자의 시간낭비' },
+      { phase: 4, minTime: 1800, maxTime: Infinity, file: './bgm/phase4.mp3', title: '마스터의 시간낭비' }
     ]
   };
   
@@ -133,9 +133,11 @@ const BGMManager = ({ elapsedTime }) => {
   
   // 볼륨 변경
   const handleVolumeChange = (newVolume) => {
-    setVolume(newVolume);
+    // 최대 볼륨을 50%로 제한
+    const limitedVolume = Math.min(newVolume, 0.5);
+    setVolume(limitedVolume);
     if (audioRef.current && !isMuted) {
-      audioRef.current.volume = newVolume;
+      audioRef.current.volume = limitedVolume;
     }
   };
   
@@ -182,20 +184,13 @@ const BGMManager = ({ elapsedTime }) => {
           <input
             type="range"
             min="0"
-            max="1"
-            step="0.1"
+            max="0.5"
+            step="0.05"
             value={volume}
             onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
             className="w-16 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-            title="볼륨 조절"
+            title="볼륨 조절 (최대 50%)"
           />
-        </div>
-        
-        {/* 단계 표시 */}
-        <div className="mt-2 text-center">
-          <span className="pokemon-font text-xs text-purple-600">
-            🎼 Phase {getCurrentPhaseBGM()?.phase || 1}
-          </span>
         </div>
       </div>
       
