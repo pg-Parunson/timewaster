@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import "galmuri/dist/galmuri.css";
 
 // 컴포넌트 imports
@@ -17,6 +17,7 @@ import RankingSection from './components/RankingSection.jsx';
 import LiveFeedNotifications from './components/LiveFeedNotifications.jsx';
 import DevTools from './components/DevTools.jsx';
 import TimerSection from './components/TimerSection.jsx';
+import FlyingMessageManager from './components/flying-messages/FlyingMessageManager.jsx';
 
 // 훅스 imports
 import { useCelebrationSystem } from './hooks/useCelebrationSystem.jsx';
@@ -26,7 +27,64 @@ import { useModalLogic } from './hooks/useModalLogic.jsx';
 // 유틸리티 imports
 import { formatTime } from './utils/helpers';
 
+// 회전 부제목 배열
+const rotatingSubtitles = [
+  "당신의 소중한 인생이 녹고 있습니다",
+  "시간은 금이라고? 지금 파산중", 
+  "뇌세포 실시간 사망 알림",
+  "하루 24시간 중 몇 시간을 날렸나요?",
+  "엄마가 보면 울 사이트",
+  "생산성 -100% 달성 중",
+  "당신의 집중력이 산산조각나는 소리",
+  "미래의 나에게 미안한 시간들",
+  "프로급 시간낭비 스킬을 배워보세요",
+  "시간 마스터가 되는 그 순간까지"
+];
+
+// 회전 부제목 훅
+const useRotatingSubtitle = () => {
+  const [currentSubtitleIndex, setCurrentSubtitleIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsAnimating(true);
+      
+      setTimeout(() => {
+        setCurrentSubtitleIndex(prev => 
+          (prev + 1) % rotatingSubtitles.length
+        );
+        setIsAnimating(false);
+      }, 500); // 0.5초 페이드 아웃 후 변경
+      
+    }, 10000); // 10초마다 변경
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return {
+    currentSubtitle: rotatingSubtitles[currentSubtitleIndex],
+    isAnimating
+  };
+};
+
+// 메시지 타입별 스타일 함수
+const getMessageStyle = (messageType) => {
+  const styles = {
+    warning: 'bg-red-50 border-red-300 text-red-800',
+    motivation: 'bg-blue-50 border-blue-300 text-blue-800', 
+    funny: 'bg-green-50 border-green-300 text-green-800',
+    sarcastic: 'bg-yellow-50 border-yellow-300 text-yellow-800',
+    urgent: 'bg-orange-50 border-orange-300 text-orange-800',
+    default: 'bg-gray-50 border-gray-300 text-gray-800'
+  };
+  return styles[messageType] || styles.default;
+};
+
 function App() {
+  // 회전 부제목 훅
+  const { currentSubtitle, isAnimating } = useRotatingSubtitle();
+  
   // 타이머 로직 훅
   const {
     elapsedTime,
@@ -111,6 +169,29 @@ function App() {
         letter-spacing: 2px;
       }
       
+      /* 회전 부제목 스타일 */
+      .pokemon-subtitle {
+        font-family: 'Galmuri11', 'Galmuri9', monospace;
+        font-size: 1.1rem;
+        color: var(--pokemon-navy);
+        text-shadow: 1px 1px 0px var(--pokemon-white);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+        min-height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .pokemon-subtitle.animating {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      
+      .pokemon-subtitle:not(.animating) {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      
       /* 포켓몬 대화창 스타일 - 깔끔하게 단순화! */
       .pokemon-dialog {
         background: var(--pokemon-white);
@@ -122,7 +203,7 @@ function App() {
         box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
       }
       
-      /* 포켓몬 버튼 스타일 - 깔끔하게 단순화! */
+      /* 포켓몬 버튼 스타일 - 인터랙션 강화! */
       .pokemon-button {
         background: linear-gradient(135deg, var(--pokemon-gold) 0%, var(--pokemon-orange) 100%);
         color: var(--pokemon-black);
@@ -133,20 +214,28 @@ function App() {
         font-weight: bold;
         font-size: 1rem;
         cursor: pointer;
-        /* 복잡한 그림자 제거 - 깔끔하게 */
+        min-height: 44px; /* 터치 친화적 최소 크기 */
         box-shadow: 3px 3px 0px rgba(0,0,0,0.4);
-        transition: all 0.1s ease;
+        transition: all 0.15s ease;
+        position: relative;
+        overflow: hidden;
       }
       
       .pokemon-button:hover {
         transform: translateY(-2px);
-        /* 간단한 호버 효과만 */
         box-shadow: 5px 5px 0px rgba(0,0,0,0.4);
+        background: linear-gradient(135deg, #FFDC00 0%, #FF8C42 100%); /* 약간 더 밝게 */
       }
       
       .pokemon-button:active {
-        transform: translateY(0px);
+        transform: translateY(1px);
         box-shadow: 2px 2px 0px rgba(0,0,0,0.4);
+      }
+      
+      /* 버튼 클릭 피드백 애니메이션 */
+      .pokemon-button:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.5), 3px 3px 0px rgba(0,0,0,0.4);
       }
       
       /* 위기 번쩍거림 효과 */
@@ -228,11 +317,11 @@ function App() {
         box-shadow: 3px 3px 0px rgba(0,0,0,0.3);
       }
       
-      /* 타이머 대형 디스플레이 - 깔끔하게 유지! */
+      /* 타이머 대형 디스플레이 - 반응형 개선! */
       .pokemon-timer {
         font-family: 'Galmuri14', 'Galmuri11', monospace;
         font-weight: bold;
-        font-size: 4rem;
+        font-size: clamp(2.5rem, 5vw, 4rem); /* 반응형 크기 */
         color: var(--pokemon-orange);
         text-shadow: 
           4px 4px 0px var(--pokemon-navy),
@@ -242,6 +331,10 @@ function App() {
         background: var(--pokemon-white);
         border: 4px solid var(--pokemon-black);
         border-radius: 12px;
+        min-height: 120px; /* 최소 높이 보장 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
         /* 타이머만 예외적으로 그림자 유지 */
         box-shadow: 4px 4px 0px rgba(0,0,0,0.4);
       }
@@ -296,6 +389,94 @@ function App() {
         transition: all 0.2s ease;
       }
       
+      /* 메시지 섹션 스타일 강화 */
+      .pokemon-message {
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .pokemon-message::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+        transition: left 0.5s ease;
+      }
+      
+      .pokemon-message:hover::before {
+        left: 100%;
+      }
+      
+      /* 반응형 그리드 개선 */
+      @media (max-width: 768px) {
+        .pokemon-grid {
+          padding: 12px;
+          gap: 12px;
+        }
+        
+        .pokemon-stats {
+          flex-direction: column;
+          gap: 8px;
+          text-align: center;
+          padding: 12px 16px;
+        }
+        
+        .pokemon-title {
+          font-size: 2rem;
+        }
+        
+        .pokemon-button {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+      
+      /* 날아가는 메시지 애니메이션 */
+      @keyframes slide-in-right {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      
+      .animate-slide-in-right {
+        animation: slide-in-right 0.3s ease-out;
+      }
+      
+      @keyframes fly-across {
+        from {
+          transform: translateX(-100vw);
+        }
+        to {
+          transform: translateX(100vw);
+        }
+      }
+      
+      .animate-fly-across {
+        animation: fly-across 8s linear;
+      }
+      
+      @keyframes float {
+        0%, 100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+      
+      .animate-float {
+        animation: float 3s ease-in-out infinite;
+      }
+      
       /* 키보드 단축키 표시 */
       .pokemon-shortcut {
         position: absolute;
@@ -307,6 +488,12 @@ function App() {
         border-radius: 4px;
         font-size: 0.75rem;
         font-family: 'Galmuri9', monospace;
+        opacity: 0.7;
+        transition: opacity 0.2s ease;
+      }
+      
+      .pokemon-shortcut:hover {
+        opacity: 1;
       }
     `;
     
@@ -338,13 +525,13 @@ function App() {
       {/* 포켓몬 스타일 메인 윈도우 */}
       <div className="pokemon-window max-w-[1400px] mx-auto my-8">
         
-        {/* 🎮 시간낭비 계산기 헤더 */}
+        {/* 🎮 시간 낭비 마스터 헤더 */}
         <div className="text-center py-6 border-b-4 border-black">
-          <h1 className="pokemon-title mb-2">
-            시간낭비 <span className="text-yellow-500">계산기</span>
+          <h1 className="pokemon-title mb-3">
+            시간 낭비 <span className="text-yellow-500">마스터</span>
           </h1>
-          <p className="pokemon-font text-lg text-gray-700">
-            당신의 소중한 시간이 흘러가고 있습니다!
+          <p className={`pokemon-subtitle ${isAnimating ? 'animating' : ''}`}>
+            {currentSubtitle}
           </p>
         </div>
 
@@ -393,7 +580,7 @@ function App() {
                 메시지:
               </div>
               
-              <div className={`text-black text-lg font-bold leading-relaxed mb-6 p-4 bg-gray-50 rounded border-2 border-gray-300 ${isTyping ? 'pokemon-typing' : ''}`}>
+              <div className={`pokemon-message text-black text-lg font-bold leading-relaxed mb-6 p-4 rounded-lg border-2 ${getMessageStyle(currentMessageData?.type || 'default')} ${isTyping ? 'pokemon-typing' : ''}`}>
                 {displayMessage}
               </div>
               
@@ -470,7 +657,7 @@ function App() {
             💡 SPACE: 메시지 새로고침 | ESC: 게임 종료
           </div>
           <div className="pokemon-font text-sm">
-            💻 시간낭비 계산기 v2.0
+            💻 시간 낭비 마스터 v2.1 - 회전 부제목 추가
           </div>
         </div>
 
@@ -479,8 +666,8 @@ function App() {
       {/* 이스터 에그 */}
       <EasterEgg elapsedTime={elapsedTime} />
 
-      {/* 라이브 피드 */}
-      <LiveFeedNotifications />
+      {/* 날아가는 메시지 시스템 */}
+      <FlyingMessageManager />
       
       {/* 개발자 도구 */}
       <DevTools isVisible={import.meta.env.DEV} />
