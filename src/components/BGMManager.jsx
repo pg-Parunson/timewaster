@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Volume2, VolumeX, Music } from 'lucide-react';
 
-const BGMManager = ({ elapsedTime }) => {
+const BGMManager = ({ elapsedTime, compact = false }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.3);
   const [currentTrack, setCurrentTrack] = useState(null);
@@ -168,22 +168,24 @@ const BGMManager = ({ elapsedTime }) => {
   };
   
   return (
-    <div className="fixed top-4 right-4 z-40">
-      <div className="pokemon-dialog p-3 bg-white/90 backdrop-blur-sm">
-        {/* 현재 재생중인 트랙 */}
-        <div className="flex items-center gap-2 mb-2">
-          <Music className="w-4 h-4 text-purple-600" />
-          <span className="pokemon-font text-xs text-gray-700">
-            {currentTrack ? currentTrack.title : 'BGM 로딩 중...'}
-          </span>
-        </div>
+    <div className={compact ? "" : "fixed top-4 right-4 z-40"}>
+      <div className={`${compact ? 'bg-white/80 backdrop-blur-sm p-2 rounded-lg border-2 border-gray-300' : 'pokemon-dialog p-3 bg-white/90 backdrop-blur-sm'}`}>
+        {/* 현재 재생중인 트랙 - compact 모드에서는 숨김 */}
+        {!compact && (
+          <div className="flex items-center gap-2 mb-2">
+            <Music className="w-4 h-4 text-purple-600" />
+            <span className="pokemon-font text-xs text-gray-700">
+              {currentTrack ? currentTrack.title : 'BGM 로딩 중...'}
+            </span>
+          </div>
+        )}
         
         {/* 컨트롤 버튼들 */}
-        <div className="flex items-center gap-2">
+        <div className={`flex items-center ${compact ? 'gap-1' : 'gap-2'}`}>
           {/* 재생/일시정지 */} 
           <button
             onClick={togglePlay}
-            className="pokemon-button p-2 min-h-8"
+            className={`${compact ? 'p-1 min-h-6 text-xs' : 'p-2 min-h-8'} pokemon-button`}
             title={isPlaying ? '일시정지' : '재생'}
           >
             {isPlaying ? '⏸️' : '▶️'}
@@ -192,23 +194,25 @@ const BGMManager = ({ elapsedTime }) => {
           {/* 음소거 */}
           <button
             onClick={toggleMute}
-            className="pokemon-button p-2 min-h-8"
+            className={`${compact ? 'p-1 min-h-6 text-xs' : 'p-2 min-h-8'} pokemon-button`}
             title={isMuted ? '음소거 해제' : '음소거'}
           >
-            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            {isMuted ? <VolumeX className={compact ? "w-3 h-3" : "w-4 h-4"} /> : <Volume2 className={compact ? "w-3 h-3" : "w-4 h-4"} />}
           </button>
           
-          {/* 볼륨 슬라이더 */}
-          <input
-            type="range"
-            min="0"
-            max="0.5"
-            step="0.05"
-            value={volume}
-            onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-            className="w-16 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-            title="볼륨 조절 (최대 50%)"
-          />
+          {/* 볼륨 슬라이더 - compact 모드에서는 숨김 */}
+          {!compact && (
+            <input
+              type="range"
+              min="0"
+              max="0.5"
+              step="0.05"
+              value={volume}
+              onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+              className="w-16 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              title="볼륨 조절 (최대 50%)"
+            />
+          )}
         </div>
       </div>
       

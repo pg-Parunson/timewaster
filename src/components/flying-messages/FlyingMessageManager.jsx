@@ -210,7 +210,7 @@ const FlyingMessageManager = () => {
           className={`pokemon-button shadow-lg transition-all duration-300 ${
             canChat 
               ? 'bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600' 
-              : 'bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600'
+              : 'bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 opacity-70'
           }`}
           title={canChat ? "글로벌 메시지 보내기" : `메시지 권한은 1분 체류 후 부여됩니다`}
         >

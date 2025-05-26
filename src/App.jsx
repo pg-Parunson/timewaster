@@ -598,10 +598,10 @@ function App() {
   return (
     <div className="pokemon-screen">
       {/* 포켓몬 스타일 메인 윈도우 */}
-      <div className="pokemon-window max-w-[1400px] mx-auto my-8">
+      <div className="pokemon-window max-w-[1400px] mx-auto my-8 relative">
         
         {/* 🎮 시간 낭비 마스터 헤더 */}
-        <div className="text-center py-6 border-b-4 border-black">
+        <div className="text-center py-6 border-b-4 border-black relative">
           <h1 className="pokemon-title mb-3">
             시간 낭비 <span className="text-yellow-500">마스터</span>
           </h1>
@@ -613,6 +613,11 @@ function App() {
           <div className="mt-4 pokemon-font text-sm text-gray-600">
             🔄 <kbd className="px-2 py-1 bg-gray-200 border border-gray-400 rounded text-xs">SPACE</kbd> 메시지 새로고침 | 
             💫 <kbd className="px-2 py-1 bg-gray-200 border border-gray-400 rounded text-xs ml-2">ESC</kbd> 게임 종료
+          </div>
+          
+          {/* BGM 컴트롤 - 헤더 오른쪽 구석에 간략하게 */}
+          <div className="absolute top-4 right-4">
+            <BGMManager elapsedTime={elapsedTime} compact={true} />
           </div>
         </div>
 
@@ -761,9 +766,6 @@ function App() {
 
       {/* 날아가는 메시지 시스템 */}
       <FlyingMessageManager />
-      
-      {/* BGM 시스템 */}
-      <BGMManager elapsedTime={elapsedTime} />
       
       {/* 개발자 도구 */}
       <DevTools isVisible={import.meta.env.DEV} />
