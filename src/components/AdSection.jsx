@@ -51,23 +51,23 @@ const AdSection = React.memo(({ showAd, adMessage, extremeMode, elapsedTime, onP
         </div>
       ) : (
         <div className="pokemon-dialog text-center">
-          <div className="pokemon-font text-lg mb-4 text-gray-800">
-            잠시만 기다려주세요...
+          <div className="pokemon-font text-xl mb-4 text-red-800 font-bold">
+            😤 아직 광고 볼 자격도 없어 돌아가! 😤
           </div>
           
           <div className="flex flex-col items-center gap-3">
-            <Clock className="w-12 h-12 text-gray-400 animate-spin" style={{
+            <Clock className="w-12 h-12 text-red-400 animate-spin" style={{
               animationDuration: '3s'
             }} />
-            <div className="pokemon-font text-gray-600">
-              1분 후 특별한 상품이 나타납니다
+            <div className="pokemon-font text-red-600 font-bold">
+              1분 더 냭비해야 광고 자격 획득!
             </div>
           </div>
 
-          {/* 포켓몬 스타일 대기 메시지 */}
-          <div className="mt-4 p-3 bg-gray-100 border-2 border-gray-400 rounded-lg">
-            <div className="pokemon-font text-sm text-gray-700 text-center">
-              ⏰ 시간을 더 낭비할수록 더 좋은 상품이 나와요!
+          {/* 빈정거리는 메시지 */}
+          <div className="mt-4 p-3 bg-red-100 border-2 border-red-400 rounded-lg animate-pulse">
+            <div className="pokemon-font text-sm text-red-700 text-center font-bold">
+              🚫 시간냭비 초보자는 광고 금지! 가서 더 냭비해와!
             </div>
           </div>
         </div>

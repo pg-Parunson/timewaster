@@ -193,12 +193,12 @@ const FlyingMessageManager = () => {
         />
       ))}
 
-      {/* 채팅 버튼 */}
-      <div className="fixed bottom-4 left-4 z-40">
+      {/* 채팅 버튼 - 중앙 하단으로 이동! */}
+      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-40">
         <button
           onClick={() => setChatModal(true)}
           disabled={false} // 모달은 항상 열 수 있게 하고, 모달 내에서 제한
-          className="pokemon-button"
+          className="pokemon-button shadow-lg"
           title={canChat ? "글로벌 메시지 보내기" : `메시지 권한은 1분 체류 후 부여됩니다`}
         >
           💬 {canChat ? '메시지 보내기' : `메시지 (권한대기중)`}
