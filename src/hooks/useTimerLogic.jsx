@@ -21,7 +21,7 @@ export const useTimerLogic = () => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [currentMessage, setCurrentMessage] = useState("당신의 소중한 시간이 흘러가고 있습니다...");
   const [currentMessageData, setCurrentMessageData] = useState(null);
-  const [displayMessage, setDisplayMessage] = useState("");
+  const [displayMessage, setDisplayMessage] = useState("당신의 소중한 시간이 흘러가고 있습니다..."); // 초기값 설정
   const [userHistory, setUserHistory] = useState({ visits: 1, patterns: {} });
   const [buttonText, setButtonText] = useState(BUTTON_TEXTS[0]);
   const [showAd, setShowAd] = useState(false);
@@ -41,7 +41,7 @@ export const useTimerLogic = () => {
   
   const typingRef = useRef(null);
 
-  // 타이핑 애니메이션 함수
+  // 타이핑 애니메이션 함수 - 속도 개선
   const typeMessage = useCallback((message) => {
     if (typingRef.current) {
       clearTimeout(typingRef.current);
@@ -55,6 +55,7 @@ export const useTimerLogic = () => {
       return;
     }
     
+    console.log('🎭 타이핑 효과 시작:', message.slice(0, 20) + '...');
     setIsTyping(true);
     setDisplayMessage("");
     
@@ -67,8 +68,10 @@ export const useTimerLogic = () => {
         currentText += chars[index];
         setDisplayMessage(currentText);
         index++;
-        typingRef.current = setTimeout(type, 30 + Math.random() * 20);
+        // 타이핑 속도를 빠르게 조정 (20-35ms)
+        typingRef.current = setTimeout(type, 20 + Math.random() * 15);
       } else {
+        console.log('🎭 타이핑 효과 완료');
         setIsTyping(false);
       }
     };
@@ -171,10 +174,16 @@ export const useTimerLogic = () => {
     };
   }, []);
 
-  // 초기 메시지 타이핑
+  // 초기 메시지 타이핑 - 안전하게 수정
   useEffect(() => {
-    typeMessage(currentMessage);
-  }, []);
+    // 첫 로드시에만 실행
+    const timer = setTimeout(() => {
+      console.log('🚀 초기 메시지 타이핑 시작:', currentMessage);
+      typeMessage(currentMessage);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []); // 의도적으로 빈 배열 사용
 
   // 타이머 업데이트
   useEffect(() => {

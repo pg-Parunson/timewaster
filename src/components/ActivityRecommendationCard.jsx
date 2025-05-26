@@ -22,6 +22,85 @@ const ActivityRecommendationCard = ({
     optimalActivities
   } = recommendation;
 
+  // 테마 색상을 직접 매핑하여 Tailwind 동적 클래스 문제 해결
+  const getThemeColors = (colorName) => {
+    const colorMap = {
+      emerald: {
+        gradient: 'from-emerald-400 to-emerald-600',
+        bg: 'bg-emerald-400/95',
+        text: 'text-emerald-50',
+        border: 'border-emerald-300/80',
+        shadow: 'shadow-emerald-400/40'
+      },
+      cyan: {
+        gradient: 'from-cyan-400 to-cyan-600', 
+        bg: 'bg-cyan-400/95',
+        text: 'text-cyan-50',
+        border: 'border-cyan-300/80',
+        shadow: 'shadow-cyan-400/40'
+      },
+      violet: {
+        gradient: 'from-violet-400 to-violet-600',
+        bg: 'bg-violet-400/95', 
+        text: 'text-violet-50',
+        border: 'border-violet-300/80',
+        shadow: 'shadow-violet-400/40'
+      },
+      amber: {
+        gradient: 'from-amber-400 to-amber-600',
+        bg: 'bg-amber-400/95',
+        text: 'text-amber-50', 
+        border: 'border-amber-300/80',
+        shadow: 'shadow-amber-400/40'
+      },
+      rose: {
+        gradient: 'from-rose-400 to-rose-600',
+        bg: 'bg-rose-400/95',
+        text: 'text-rose-50',
+        border: 'border-rose-300/80', 
+        shadow: 'shadow-rose-400/40'
+      },
+      blue: {
+        gradient: 'from-blue-400 to-blue-600',
+        bg: 'bg-blue-400/95',
+        text: 'text-blue-50',
+        border: 'border-blue-300/80',
+        shadow: 'shadow-blue-400/40'
+      },
+      fuchsia: {
+        gradient: 'from-fuchsia-400 to-fuchsia-600',
+        bg: 'bg-fuchsia-400/95', 
+        text: 'text-fuchsia-50',
+        border: 'border-fuchsia-300/80',
+        shadow: 'shadow-fuchsia-400/40'
+      },
+      yellow: {
+        gradient: 'from-yellow-400 to-yellow-600',
+        bg: 'bg-yellow-400/95',
+        text: 'text-yellow-50',
+        border: 'border-yellow-300/80',
+        shadow: 'shadow-yellow-400/40'
+      },
+      teal: {
+        gradient: 'from-teal-400 to-teal-600',
+        bg: 'bg-teal-400/95',
+        text: 'text-teal-50', 
+        border: 'border-teal-300/80',
+        shadow: 'shadow-teal-400/40'
+      },
+      pink: {
+        gradient: 'from-pink-400 to-pink-600',
+        bg: 'bg-pink-400/95',
+        text: 'text-pink-50',
+        border: 'border-pink-300/80',
+        shadow: 'shadow-pink-400/40'
+      }
+    };
+    return colorMap[colorName] || colorMap.emerald;
+  };
+
+  const themeColors = getThemeColors(theme.color);
+
   const getEnergyColor = (level) => {
     switch(level) {
       case '낮음': return 'text-yellow-600';
@@ -34,27 +113,36 @@ const ActivityRecommendationCard = ({
 
   const getDifficultyBadge = (difficulty) => {
     const colors = {
-      '매우 쉬움': 'bg-green-500/80 text-green-100 border border-green-400/50',
-      '쉬움': 'bg-blue-500/80 text-blue-100 border border-blue-400/50',
-      '보통': 'bg-yellow-500/80 text-yellow-100 border border-yellow-400/50',
-      '어려움': 'bg-orange-500/80 text-orange-100 border border-orange-400/50',
-      '매우 어려움': 'bg-red-500/80 text-red-100 border border-red-400/50',
-      '전문가': 'bg-purple-500/80 text-purple-100 border border-purple-400/50',
-      '레전드': 'bg-pink-500/80 text-pink-100 border border-pink-400/50'
+      '매우 쉬움': 'bg-green-400/90 text-green-50 border border-green-300/70 shadow-lg',
+      '쉬움': 'bg-blue-400/90 text-blue-50 border border-blue-300/70 shadow-lg',
+      '보통': 'bg-yellow-400/90 text-yellow-50 border border-yellow-300/70 shadow-lg',
+      '어려움': 'bg-orange-400/90 text-orange-50 border border-orange-300/70 shadow-lg',
+      '매우 어려움': 'bg-red-400/90 text-red-50 border border-red-300/70 shadow-lg',
+      '전문가': 'bg-purple-400/90 text-purple-50 border border-purple-300/70 shadow-lg',
+      '레전드': 'bg-pink-400/90 text-pink-50 border border-pink-300/70 shadow-lg'
     };
-    return colors[difficulty] || 'bg-gray-500/80 text-gray-100 border border-gray-400/50';
+    return colors[difficulty] || 'bg-gray-400/90 text-gray-50 border border-gray-300/70 shadow-lg';
   };
 
   return (
     <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-xl">
-      {/* 헤더 */}
-      <div className="flex items-center gap-3 mb-4">
-        <div className={`w-10 h-10 rounded-full bg-gradient-to-r from-${theme.color}-400 to-${theme.color}-600 flex items-center justify-center`}>
-          <span className="text-xl">{theme.icon}</span>
+      {/* 헤더 - 더 밝고 가운데 정렬 */}
+      <div className="flex items-center justify-center gap-3 mb-4">
+        <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${themeColors.gradient} flex items-center justify-center shadow-lg`}>
+          <span className="text-2xl">{theme.icon}</span>
         </div>
-        <div>
-          <h3 className="text-white font-bold text-lg">{theme.description}</h3>
-          <p className="text-white/70 text-sm">{timeSpent} 활용 가능</p>
+        <div className="text-center">
+          <div className="flex items-center justify-center mb-1">
+            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${themeColors.gradient} ${themeColors.text} text-sm font-bold border ${themeColors.border} shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105`}
+              style={{
+                textShadow: '0 1px 2px rgba(0,0,0,0.6)',
+                boxShadow: `0 3px 12px rgba(16, 185, 129, 0.5)`
+              }}
+            >
+              <span className="font-bold">{theme.description}</span>
+            </span>
+          </div>
+          <p className="text-white/70 text-sm font-medium">{timeSpent} 활용 가능</p>
         </div>
       </div>
 
@@ -130,9 +218,10 @@ const ActivityRecommendationCard = ({
             {optimalActivities.slice(0, 4).map((activity, index) => (
               <span
                 key={index}
-                className="px-3 py-1.5 bg-gradient-to-r from-yellow-500/90 to-orange-500/90 text-white text-xs font-semibold rounded-full border border-yellow-400/70 shadow-lg"
+                className="px-3 py-1.5 bg-gradient-to-r from-yellow-400/95 to-orange-400/95 text-yellow-50 text-xs font-bold rounded-full border border-yellow-300/80 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
                 style={{
-                  textShadow: '1px 1px 1px rgba(0,0,0,0.5)'
+                  textShadow: '0 1px 2px rgba(0,0,0,0.6)',
+                  boxShadow: '0 2px 8px rgba(245, 158, 11, 0.4)'
                 }}
               >
                 {activity}

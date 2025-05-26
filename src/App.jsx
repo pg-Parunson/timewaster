@@ -70,7 +70,7 @@ function App() {
     currentUser
   });
   
-  // 축하 시스템 초기화
+  // 축하 시스템 초기화 (범위 제한)
   const { showCelebration, currentCelebration, handleCelebrationComplete } = useCelebrationSystem(elapsedTime);
 
   // CSS 애니메이션 스타일 주입
@@ -282,6 +282,21 @@ function App() {
         50% { opacity: 0.2; }
         80% { opacity: 0.25; }
       }
+      
+      /* 광고 박스 완전 고정 */
+      .ad-section-fixed {
+        position: relative !important;
+        transform: none !important;
+        z-index: 1 !important;
+        isolation: isolate;
+      }
+      
+      /* 축하 이펙트 범위 제한 */
+      .celebration-zone {
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+      }
     `;
     
     const styleElement = document.createElement('style');
@@ -299,6 +314,8 @@ function App() {
 
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-6 lg:p-8 w-full max-w-7xl">
+          
+          {/* 📊 통계 바 - 최상단 고정 */}
           <StatsBar 
             visits={visits}
             totalTimeWasted={totalTimeWasted}
@@ -306,14 +323,24 @@ function App() {
             currentElapsedTime={elapsedTime}
           />
 
+          {/* 🎯 헤더 - 사이트 제목 */}
           <SiteHeader 
             elapsedTime={elapsedTime}
             extremeMode={extremeMode}
           />
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-            <div className="lg:col-span-1 space-y-4">
-              {/* 비난 메시지 섹션을 여기로 이동 */}
+          {/* 🔥 핵심 영역 - 타이머 + 비난 메시지 (가로 분할) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {/* 왼쪽: 타이머 영역 */}
+            <div className="celebration-zone space-y-4">
+              <TimerSection 
+                elapsedTime={elapsedTime}
+                extremeMode={extremeMode}
+              />
+            </div>
+
+            {/* 오른쪽: 비난 메시지 - 메인으로! */}
+            <div className="space-y-4">
               <MessageSection 
                 displayMessage={displayMessage}
                 messageData={currentMessageData}
@@ -322,57 +349,70 @@ function App() {
                 extremeMode={extremeMode}
                 onRefreshMessage={refreshMessage}
                 onActivitySelect={handleActivitySelect}
-                compact={true}
+                compact={false}
               />
-              
-              <TimerSection 
-                elapsedTime={elapsedTime}
-                extremeMode={extremeMode}
-              />
-              
-              <AdSection 
-                showAd={showAd}
-                adMessage={adMessage}
-                extremeMode={extremeMode}
-                elapsedTime={elapsedTime}
-                onProductClick={handleProductClick}
-              />
-            </div>
-
-            <div className="lg:col-span-2">
-              <div className="w-full h-[500px] overflow-y-auto ranking-scrollbar bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.2) rgba(255,255,255,0.05)' }}>
-                <RankingSection 
-                  isVisible={true}
-                  currentUser={currentUser}
-                />
-              </div>
             </div>
           </div>
 
-          <ShareSection 
-            elapsedTime={elapsedTime}
-            formatTime={formatTime}
-            showModernModal={showModernModal}
-          />
+          {/* 💰 광고 영역 - 완전 고정, 독립 섹션 */}
+          <div className="ad-section-fixed mb-6">
+            <AdSection 
+              showAd={showAd}
+              adMessage={adMessage}
+              extremeMode={extremeMode}
+              elapsedTime={elapsedTime}
+              onProductClick={handleProductClick}
+            />
+          </div>
+
+          {/* 🏆 랭킹 + 공유 영역 (가로 분할) */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            {/* 왼쪽: 랭킹 (크기 축소) */}
+            <div className="h-[400px] overflow-y-auto ranking-scrollbar bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl">
+              <RankingSection 
+                isVisible={true}
+                currentUser={currentUser}
+              />
+            </div>
+
+            {/* 오른쪽: 공유 섹션 */}
+            <div className="flex items-center justify-center">
+              <ShareSection 
+                elapsedTime={elapsedTime}
+                formatTime={formatTime}
+                showModernModal={showModernModal}
+              />
+            </div>
+          </div>
+
+          {/* 🎮 액션 버튼들 - 하단 고정 */}
+          <div className="flex flex-wrap gap-4 justify-center items-center pt-4 border-t border-white/10">
+            <FloatingExitButton 
+              elapsedTime={elapsedTime}
+              onExit={handleExit}
+              inline={true}
+              showAlways={true}
+            />
+            
+            <div className="text-white/70 text-sm">
+              💡 생산적인 활동을 시작해보세요!
+            </div>
+          </div>
 
           <EasterEgg elapsedTime={elapsedTime} />
         </div>
       </div>
 
-      <FloatingExitButton 
-        elapsedTime={elapsedTime}
-        onExit={handleExit}
-      />
+      <LiveFeedNotifications />
+      
+      <DevTools isVisible={import.meta.env.DEV} />
 
+      {/* 축하 이펙트 - 전체 화면 덕개 */}
       <CelebrationEffect 
         isActive={showCelebration}
         celebration={currentCelebration}
         onComplete={handleCelebrationComplete}
       />
-
-      <LiveFeedNotifications />
-      
-      <DevTools isVisible={import.meta.env.DEV} />
 
       <RankingRegistrationModal
         isOpen={showRankingModal}
