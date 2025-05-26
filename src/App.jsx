@@ -687,12 +687,14 @@ function App() {
                 🚨 현실로 돌아가기 🚨
               </div>
               
-              <FloatingExitButton 
-                elapsedTime={elapsedTime}
-                onExit={handleExit}
-                inline={true}
-                showAlways={true}
-              />
+              <div className="flex justify-center">
+                <FloatingExitButton 
+                  elapsedTime={elapsedTime}
+                  onExit={handleExit}
+                  inline={true}
+                  showAlways={true}
+                />
+              </div>
               
               <div className="mt-3 text-sm text-red-600 pokemon-font">
                 너무 오래 있으면 정말 위험해요!

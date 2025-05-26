@@ -103,11 +103,8 @@ const EpicPokemonCelebrationEffect = ({ isActive, celebration, onComplete }) => 
           0%, 100% { 
             transform: translate(-50%, -50%) scale(1) rotate(0deg);
           }
-          25% { 
-            transform: translate(-50%, -50%) scale(1.05) rotate(-1deg);
-          }
-          75% { 
-            transform: translate(-50%, -50%) scale(1.05) rotate(1deg);
+          50% { 
+            transform: translate(-50%, -50%) scale(1.02) rotate(0deg);
           }
         }
         
@@ -182,7 +179,7 @@ const EpicPokemonCelebrationEffect = ({ isActive, celebration, onComplete }) => 
         }
         
         .epic-message-container.phase-2 {
-          animation: epic-message-pulse 1.5s ease-in-out infinite !important;
+          animation: epic-message-pulse 3s ease-in-out infinite !important;
         }
         
         .epic-message-box {

@@ -66,38 +66,56 @@ const BGMManager = ({ elapsedTime }) => {
   const loadAndPlayTrack = (track) => {
     if (!audioRef.current) return;
     
+    console.log('🎵 트랙 로드 및 재생:', track.title);
+    
     audioRef.current.src = track.file;
     audioRef.current.volume = 0;
     setCurrentTrack(track);
     
-    const playPromise = audioRef.current.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          // 페이드 인
-          const fadeIn = () => {
-            const audio = audioRef.current;
-            const targetVolume = isMuted ? 0 : volume;
-            if (audio.volume < targetVolume - 0.05) {
-              audio.volume = Math.min(targetVolume, audio.volume + 0.05);
-              setTimeout(fadeIn, 50);
-            }
-          };
-          fadeIn();
-        })
-        .catch(error => {
-          console.log('🎵 BGM 자동재생 실패 (사용자 상호작용 필요):', error);
-          setIsPlaying(false);
-        });
-    }
+    // 로드 완료 후 재생 시도
+    const handleCanPlay = () => {
+      console.log('🎵 오디오 로드 완료, 재생 시도');
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log('🎵 재생 성공!');
+            setIsPlaying(true);
+            // 페이드 인
+            const fadeIn = () => {
+              const audio = audioRef.current;
+              if (!audio) return;
+              const targetVolume = isMuted ? 0 : volume;
+              if (audio.volume < targetVolume - 0.05) {
+                audio.volume = Math.min(targetVolume, audio.volume + 0.05);
+                setTimeout(fadeIn, 50);
+              }
+            };
+            fadeIn();
+          })
+          .catch(error => {
+            console.log('🎵 자동재생 실패 (사용자 상호작용 필요):', error);
+            setIsPlaying(false);
+          });
+      }
+      audioRef.current.removeEventListener('canplay', handleCanPlay);
+    };
+    
+    audioRef.current.addEventListener('canplay', handleCanPlay);
+    audioRef.current.load(); // 강제 로드
   };
   
-  // 초기 테마송 재생
+  // 초기 테마송 재생 - 컴포넌트 마운트 후 약간의 지연
   useEffect(() => {
     if (elapsedTime === 0) {
-      const randomTheme = getRandomTheme();
-      console.log('🎵 랜덤 테마송 선택:', randomTheme.title);
-      changeTrack(randomTheme);
+      // 약간의 지연 후 재생 시도 (DOM 완전 로드 대기)
+      const timer = setTimeout(() => {
+        const randomTheme = getRandomTheme();
+        console.log('🎵 초기 테마송 선택:', randomTheme.title);
+        changeTrack(randomTheme);
+      }, 1000); // 1초 지연
+      
+      return () => clearTimeout(timer);
     }
   }, []); // 컴포넌트 마운트 시 한 번만
   

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Trophy, Crown, Medal, Users } from 'lucide-react';
 import { rankingService } from '../services/rankingService.jsx';
 import { RANKING_PERIODS, RANKING_LABELS } from '../config/firebase.js';
+import { formatTime } from '../utils/helpers';
 
 const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null, elapsedTime = 0 }) => {
   const [ranking, setRanking] = useState([]);
@@ -301,7 +302,7 @@ const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null,
                       
                       <div className="text-right min-w-[60px]">
                         <div className="pokemon-font text-xs font-bold text-blue-600">
-                          {Math.floor(myRank.time / 60)}:{String(myRank.time % 60).padStart(2, '0')}
+                          {formatTime(myRank.time)}
                         </div>
                       </div>
                     </div>
