@@ -1,21 +1,25 @@
-# 🎮 시간낭비 계산기 v2.0
+# 🎮 시간낭비 계산기 v2.3
 
-> **완벽한 레트로 픽셀 스타일로 재탄생한 시간낭비의 예술** ✨
+> **완벽한 레트로 픽셀 스타일 + BGM 시스템으로 완전체 단계 돌입!** ✨
 
 [![배포 상태](https://img.shields.io/badge/배포-준비완료-brightgreen)](https://pg-parunson.github.io/timewaster/)
 [![UI 상태](https://img.shields.io/badge/UI-레트로픽셀-ff6b35)](https://github.com/pg-Parunson/timewaster)
-[![가독성](https://img.shields.io/badge/가독성-95%25-success)](https://github.com/pg-Parunson/timewaster)
+[![가독성](https://img.shields.io/badge/가독성-98%25-success)](https://github.com/pg-Parunson/timewaster)
+[![BGM](https://img.shields.io/badge/BGM-시스템-purple)](https://github.com/pg-Parunson/timewaster)
 
 ---
 
-## 🎉 **v2.0 완전 리뉴얼 완성!**
+## 🎉 **v2.3 압도적 업데이트 완성!**
 
-### **✨ 새로워진 특징들**
-- 🎨 **Galmuri 한글 픽셀 폰트**로 진정한 레트로 감성
-- 📖 **95% 가독성 달성** - 모든 텍스트가 선명하게!
-- 💻 **PC 친화적 3열 레이아웃** - 대화면 최적화
-- ⌨️ **키보드 단축키** - SPACE(메시지), ESC(종료)
-- 🖱️ **마우스 호버 효과** - 모든 요소에 3D 애니메이션
+### **🎵 새롭게 추가된 특징들**
+- 🎵 **BGM 시스템** - 테마송 + 단계별 자동 전환 + 볼륨 조절
+- 🎆 **압도적 축하 이펙트** - 화면 전체 30개 파티클 폭발
+- 💬 **메시지 버튼 색상 시스템** - 권한 상태에 따른 색상 변경
+- 🏆 **랭킹 시스템 대형 개선** - 내 순위 표시 + 스크롤 TOP 20
+- ✨ **반짝거림 효과 분리** - 타이머(파랑) vs 광고(초록)
+- 📝 **소감 남기기 기능** - 랭킹 등록 시 개인화
+- 🎮 **자연스러운 UX 개선** - 현실로 돌아가기 위치 조정
+- 📖 **98% 가독성 달성** - 모든 텍스트가 더욱 선명하게!
 
 ---
 
