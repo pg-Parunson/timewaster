@@ -49,7 +49,9 @@ const RankingRegistrationModal = ({
     setIsSubmitting(true);
     
     try {
-      const finalNickname = customNickname.trim() || currentUser?.anonymousName || '익명';
+      // 사용자가 닉네임을 입력했는지 확인
+      const hasCustomNickname = customNickname.trim().length > 0;
+      const finalNickname = hasCustomNickname ? customNickname.trim() : currentUser?.anonymousName || '익명';
       const finalComment = customComment.trim();
       
       // Firebase 랭킹에 등록 (소감 포함)
