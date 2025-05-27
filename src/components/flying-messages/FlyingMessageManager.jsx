@@ -15,6 +15,7 @@ const FlyingMessageManager = () => {
   const [chatCooldown, setChatCooldown] = useState(60000); // 처음에는 1분 쿨다운으로 시작
   const [messageIdCounter, setMessageIdCounter] = useState(0);
   const [totalTimeWasted, setTotalTimeWasted] = useState(0); // 총 체류 시간 추적
+  const [lastProcessedMessage, setLastProcessedMessage] = useState(null); // 중복 방지
 
   // 체류 시간 추적 (1초마다 업데이트)
   useEffect(() => {
@@ -66,6 +67,8 @@ const FlyingMessageManager = () => {
     const rankingRef = ref(database, 'live-feed/ranking-updates');
     const chatRef = ref(database, 'live-feed/global-chat');
 
+    console.log('🔥 Firebase 리스너 설정 중...');
+
     // 새 접속자 알림
     const unsubscribeConnection = onValue(connectionsRef, (snapshot) => {
       const data = snapshot.val();
@@ -92,31 +95,48 @@ const FlyingMessageManager = () => {
       }
     });
 
-    // 글로벌 채팅 메시지
+    // 🔥 강화된 글로벌 채팅 메시지 리스너
     const unsubscribeChat = onValue(chatRef, (snapshot) => {
       const data = snapshot.val();
+      console.log('📨 Firebase 채팅 데이터 수신:', data);
+      
       if (data) {
-        const latestChat = Object.values(data).sort((a, b) => b.timestamp - a.timestamp)[0];
-        if (latestChat && Date.now() - latestChat.timestamp < 3000) { // 3초 이내 메시지만 표시
+        const messages = Object.entries(data)
+          .map(([key, value]) => ({ ...value, key }))
+          .sort((a, b) => b.timestamp - a.timestamp);
+        
+        const latestChat = messages[0];
+        console.log('📨 최신 채팅 메시지:', latestChat);
+        
+        // 새로운 메시지이고, 10초 이내에 작성된 경우만 표시
+        if (latestChat && 
+            Date.now() - latestChat.timestamp < 10000 && 
+            lastProcessedMessage !== latestChat.key) {
+          
+          console.log('🎉 새 글로벌 메시지 표시:', latestChat.message);
           addFlyingChatMessage(latestChat.message, false); // 다른 사람 메시지
+          setLastProcessedMessage(latestChat.key);
         }
       }
     });
 
     return () => {
+      console.log('🔥 Firebase 리스너 정리 중...');
       off(connectionsRef);
       off(rankingRef);
       off(chatRef);
     };
-  }, []);
+  }, [lastProcessedMessage]);
 
   const addFlyingRankingMessage = (message) => {
     const id = Date.now() + Math.random();
+    console.log('🏆 랭킹 메시지 추가:', message);
     setFlyingRankingMessages(prev => [...prev, { id, message }]);
   };
 
   const addFlyingChatMessage = (message, isMyMessage = false) => {
     const id = Date.now() + Math.random();
+    console.log('💬 채팅 메시지 추가:', message, '내 메시지:', isMyMessage);
     setFlyingChatMessages(prev => [...prev, { id, message, isMyMessage }]);
   };
 
@@ -131,11 +151,9 @@ const FlyingMessageManager = () => {
   const handleSendChatMessage = (message) => {
     console.log('💬 메시지 전송 시작:', message);
     
-    // 내 메시지를 화면에 날아가게 표시 (내 메시지 표시)
-    setTimeout(() => {
-      console.log('✨ 내 메시지 화면에 표시:', message);
-      addFlyingChatMessage(message, true); // isMyMessage = true
-    }, 500); // 0.5초 후 날아가게
+    // 🚀 내 메시지를 즉시 화면에 표시!
+    console.log('✨ 내 메시지 즉시 화면에 표시:', message);
+    addFlyingChatMessage(message, true); // isMyMessage = true, 즉시!
     
     if (!database) {
       // Firebase가 없을 때는 로컬로만 테스트
@@ -150,7 +168,8 @@ const FlyingMessageManager = () => {
     push(chatRef, { 
       message, 
       timestamp: Date.now(),
-      userAgent: navigator.userAgent.substring(0, 50) // 디버깅용
+      userAgent: navigator.userAgent.substring(0, 50),
+      isMyMessage: false // 다른 사용자들에게는 내 메시지가 아님
     })
     .then(() => {
       console.log('✅ Firebase 전송 성공!');
@@ -163,7 +182,7 @@ const FlyingMessageManager = () => {
         stack: error.stack
       });
       
-      // 에러 상황에서도 사용자에게 피드백
+      // 에러 상황에서도 피드백
       addFlyingChatMessage('😅 메시지 전송에 실패했지만 로컬에서는 보여요!', false);
     });
     
