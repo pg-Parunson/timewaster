@@ -29,7 +29,11 @@ const ShareSection = ({ elapsedTime, formatTime, showModernModal }) => {
       <div className="flex flex-col gap-3">
         <button
           onClick={handleShareToX}
-          className="group relative w-full bg-gradient-to-r from-gray-900 via-black to-gray-900 hover:from-black hover:via-gray-800 hover:to-black text-white px-6 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl border-4 border-black flex items-center justify-center gap-3"
+          className="pokemon-button w-full flex items-center justify-center gap-3"
+          style={{
+            background: 'linear-gradient(135deg, #000000 0%, #434343 100%)',
+            color: '#FFFFFF'
+          }}
         >
           <div className="w-5 h-5 flex items-center justify-center">
             {/* X 로고 SVG */}

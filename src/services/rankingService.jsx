@@ -225,7 +225,8 @@ class RankingService {
 
         return sessions.map((session, index) => ({
           rank: index + 1,
-          anonymousName: session.anonymousName,
+          anonymousName: session.finalNickname || session.anonymousName, // 🐛 사용자 닉네임 우선 사용
+          comment: session.finalComment || '', // 🐛 소감 데이터 추가
           timeInSeconds: session.currentTime,
           timeDisplay: this.formatTime(session.currentTime),
           isCurrentUser: session.sessionId === this.sessionId
@@ -243,7 +244,8 @@ class RankingService {
 
         return sessions.map((session, index) => ({
           rank: index + 1,
-          anonymousName: session.anonymousName,
+          anonymousName: session.finalNickname || session.anonymousName, // 🐛 로컬 모드에도 사용자 닉네임 우선
+          comment: session.finalComment || '', // 🐛 로컬 모드에도 소감 추가
           timeInSeconds: session.currentTime,
           timeDisplay: this.formatTime(session.currentTime),
           isCurrentUser: session.sessionId === this.sessionId
@@ -470,8 +472,8 @@ class RankingService {
     }
   }
 
-  // 랭킹에 점수 제출 (종료 시)
-  async submitScore(timeInSeconds, customNickname = null) {
+  // 랭킹에 점수 제출 (종료 시) - 🐛 소감 저장 추가
+  async submitScore(timeInSeconds, customNickname = null, customComment = '') {
     try {
       if (!this.sessionId) {
         throw new Error('활성 세션이 없습니다');
@@ -483,9 +485,10 @@ class RankingService {
         // Firebase 모드
         const sessionRef = ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}`);
         
-        // 세션 정보 업데이트
+        // 세션 정보 업데이트 - 🐛 소감 저장 추가
         await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/finalTime`), timeInSeconds);
         await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/finalNickname`), finalNickname);
+        await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/finalComment`), customComment); // 🐛 소감 저장
         await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/submittedToRanking`), true);
         await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/endTime`), serverTimestamp());
         
@@ -504,6 +507,7 @@ class RankingService {
         if (sessionIndex >= 0) {
           stored[sessionIndex].finalTime = timeInSeconds;
           stored[sessionIndex].finalNickname = finalNickname;
+          stored[sessionIndex].finalComment = customComment; // 🐛 로컬 모드에도 소감 저장
           stored[sessionIndex].submittedToRanking = true;
           stored[sessionIndex].endTime = Date.now();
           

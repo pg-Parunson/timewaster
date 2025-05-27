@@ -177,7 +177,7 @@ const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null,
                     {getRankIcon(user.rank)}
                   </div>
 
-                  {/* 닉네임 */}
+                  {/* 닉네임 + 소감 */}
                   <div className="flex-1 min-w-0 px-2">
                     <div className={`
                       pokemon-font text-sm
@@ -200,6 +200,12 @@ const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null,
                         </span>
                       )}
                     </div>
+                    {/* 🐛 소감 표시 추가 */}
+                    {user.comment && (
+                      <div className="pokemon-font text-xs text-gray-500 mt-0.5 truncate">
+                        📝 {user.comment}
+                      </div>
+                    )}
                   </div>
 
                   {/* 시간 */}
@@ -245,7 +251,7 @@ const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null,
                           <span className="text-xs font-bold text-gray-600">{user.rank}</span>
                         </div>
 
-                        {/* 닉네임 */}
+                        {/* 닉네임 + 소감 */}
                         <div className="flex-1 min-w-0 px-1">
                           <div className={`
                             pokemon-font text-xs
@@ -258,6 +264,12 @@ const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null,
                               </span>
                             )}
                           </div>
+                          {/* 🐛 확장 랭킹에도 소감 표시 */}
+                          {user.comment && (
+                            <div className="pokemon-font text-xs text-gray-400 truncate">
+                              📝 {user.comment}
+                            </div>
+                          )}
                         </div>
 
                         {/* 시간 */}
