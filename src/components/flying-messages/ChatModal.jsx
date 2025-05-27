@@ -6,10 +6,18 @@ const ChatModal = ({ isOpen, onClose, onSendMessage, remainingTime, canChat, cha
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log('📝 폼 제출 시도:', { message: message.trim(), canChat, maxLength });
+    
     if (message.trim() && message.length <= maxLength) {
+      console.log('✅ 전송 조건 충족 - onSendMessage 호출');
       onSendMessage(message.trim());
       setMessage('');
       onClose();
+    } else {
+      console.warn('⚠️ 전송 조건 불충족:', { 
+        isEmpty: !message.trim(), 
+        tooLong: message.length > maxLength 
+      });
     }
   };
 

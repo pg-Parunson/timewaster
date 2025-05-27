@@ -134,10 +134,12 @@ const EpicPokemonCelebrationEffect = ({ isActive, celebration, onComplete }) => 
       zIndex: 100000,
       opacity: showMessage ? 1 : 0,
       transition: 'opacity 0.5s ease-in-out',
-      // 애니메이션을 단계별로 적용
+      // 처음 등장: entrance 애니메이션, 이후: 반복 애니메이션
       animation: phase === 2 
         ? 'epicMessageEntrance 1s ease-out' 
-        : 'none' // phase 3부터는 애니메이션 없음
+        : phase >= 3 
+        ? 'epicMessageHeartbeat 2s ease-in-out infinite'
+        : 'none'
     },
     messageBox: {
       background: 'linear-gradient(135deg, #FFD700 0%, #FF6B35 50%, #FFD700 100%)',
@@ -190,7 +192,7 @@ const EpicPokemonCelebrationEffect = ({ isActive, celebration, onComplete }) => 
   };
 
   useEffect(() => {
-    // CSS 애니메이션을 동적으로 추가 - heartbeat 제거!
+    // CSS 애니메이션을 동적으로 추가 - heartbeat 추가!
     const styleSheet = document.createElement('style');
     styleSheet.type = 'text/css';
     styleSheet.innerHTML = `
@@ -203,6 +205,15 @@ const EpicPokemonCelebrationEffect = ({ isActive, celebration, onComplete }) => 
         }
         100% { 
           transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        }
+      }
+      
+      @keyframes epicMessageHeartbeat {
+        0%, 100% { 
+          transform: translate(-50%, -50%) scale(1);
+        }
+        50% { 
+          transform: translate(-50%, -50%) scale(1.05);
         }
       }
       
