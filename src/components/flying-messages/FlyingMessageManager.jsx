@@ -19,19 +19,25 @@ const FlyingMessageManager = () => {
   const [totalTimeWasted, setTotalTimeWasted] = useState(0); // 총 체류 시간 추적
   const [lastProcessedMessage, setLastProcessedMessage] = useState(null); // 중복 방지
 
-  // 체류 시간 추적 (1초마다 업데이트)
+  // 체류 시간 추적 및 1분마다 채팅 권한 자동 지급
   useEffect(() => {
     const interval = setInterval(() => {
-      setTotalTimeWasted(prev => prev + 1);
-      
-      // 1분(60초)마다 채팅 권한 부여
-      if (totalTimeWasted > 0 && totalTimeWasted % 60 === 0 && chatCooldown > 0) {
-        setChatCooldown(0); // 채팅 권한 부여!
-      }
+      setTotalTimeWasted(prev => {
+        const newTime = prev + 1;
+        
+        // 1분(60초)마다 채팅 권한 자동 지급
+        if (newTime > 0 && newTime % 60 === 0) {
+          console.log('⏰ 1분 경과! 채팅 권한 1개 자동 지급!');
+          setChatTokens(prevTokens => prevTokens + 1);
+          addFlyingChatMessage('🎁 1분 체류 보상! 채팅 권한 1개 획득!', false);
+        }
+        
+        return newTime;
+      });
     }, 1000);
     
     return () => clearInterval(interval);
-  }, [totalTimeWasted, chatCooldown]);
+  }, []);
 
   // 광고 쿨다운 처리
   useEffect(() => {

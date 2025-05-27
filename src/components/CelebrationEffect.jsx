@@ -108,21 +108,6 @@ const EpicPokemonCelebrationEffect = ({ isActive, celebration, onComplete }) => 
           }
         }
         
-        @keyframes epic-message-glow {
-          0%, 100% {
-            box-shadow: 
-              4px 4px 0px rgba(0, 0, 0, 0.4),
-              inset 2px 2px 0px rgba(255, 255, 255, 0.3),
-              0 0 20px rgba(255, 215, 0, 0.6);
-          }
-          50% {
-            box-shadow: 
-              4px 4px 0px rgba(0, 0, 0, 0.4),
-              inset 2px 2px 0px rgba(255, 255, 255, 0.3),
-              0 0 30px rgba(255, 215, 0, 0.8);
-          }
-        }
-        
         @keyframes epic-particle-explosion {
           0% { 
             transform: translateY(0px) scale(0.2) rotate(0deg);
@@ -194,7 +179,10 @@ const EpicPokemonCelebrationEffect = ({ isActive, celebration, onComplete }) => 
           min-width: 400px !important;
           text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.8) !important;
           line-height: 1.4 !important;
-          animation: epic-message-glow 3s ease-in-out infinite !important;
+          box-shadow: 
+            4px 4px 0px rgba(0, 0, 0, 0.4),
+            inset 2px 2px 0px rgba(255, 255, 255, 0.3),
+            0 0 25px rgba(255, 215, 0, 0.7) !important;
         }
         
         .epic-title {
