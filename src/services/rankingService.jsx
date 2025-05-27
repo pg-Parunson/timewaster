@@ -216,38 +216,56 @@ class RankingService {
           return [];
         }
 
-        // 세션 데이터를 기간별로 필터링
+        // 세션 데이터를 기간별로 필터링 - 🐛 랭킹 제출된 세션도 포함
         const sessions = Object.values(sessionsSnapshot.val())
-          .filter(session => session.isActive && session.currentTime > 0)
+          .filter(session => {
+            // 활성 세션이거나 랭킹에 제출된 세션 포함
+            const hasValidTime = (session.currentTime > 0) || (session.finalTime > 0);
+            return (session.isActive || session.submittedToRanking) && hasValidTime;
+          })
           .filter(session => this.isSessionInPeriod(session, period))
-          .sort((a, b) => b.currentTime - a.currentTime)
+          .sort((a, b) => {
+            // finalTime이 있으면 우선, 없으면 currentTime 사용
+            const timeA = a.finalTime || a.currentTime || 0;
+            const timeB = b.finalTime || b.currentTime || 0;
+            return timeB - timeA;
+          })
           .slice(0, 20); // TOP 20으로 증가!
 
         return sessions.map((session, index) => ({
           rank: index + 1,
           anonymousName: session.finalNickname || session.anonymousName, // 🐛 사용자 닉네임 우선 사용
           comment: session.finalComment || '', // 🐛 소감 데이터 추가
-          timeInSeconds: session.currentTime,
-          timeDisplay: this.formatTime(session.currentTime),
+          timeInSeconds: session.finalTime || session.currentTime, // 🐛 finalTime 우선 사용
+          timeDisplay: this.formatTime(session.finalTime || session.currentTime),
           isCurrentUser: session.sessionId === this.sessionId
         }));
       } else {
         // 로컬 모드
         const stored = JSON.parse(localStorage.getItem('timewaster_local_ranking') || '[]');
         
-        // 로컬 랭킹 생성 (기간별 필터링)
+        // 로컬 랭킹 생성 (기간별 필터링) - 🐛 랭킹 제출된 세션도 포함
         const sessions = stored
-          .filter(session => session.isActive && session.currentTime > 0)
+          .filter(session => {
+            // 활성 세션이거나 랭킹에 제출된 세션 포함
+            const hasValidTime = (session.currentTime > 0) || (session.finalTime > 0);
+            return (session.isActive || session.submittedToRanking) && hasValidTime;
+          })
           .filter(session => this.isSessionInPeriod(session, period))
-          .sort((a, b) => b.currentTime - a.currentTime)
+          .sort((a, b) => {
+            // finalTime이 있으면 우선, 없으면 currentTime 사용
+            const timeA = a.finalTime || a.currentTime || 0;
+            const timeB = b.finalTime || b.currentTime || 0;
+            return timeB - timeA;
+          })
           .slice(0, 20); // 로컬 모드도 TOP 20
 
         return sessions.map((session, index) => ({
           rank: index + 1,
           anonymousName: session.finalNickname || session.anonymousName, // 🐛 로컬 모드에도 사용자 닉네임 우선
           comment: session.finalComment || '', // 🐛 로컬 모드에도 소감 추가
-          timeInSeconds: session.currentTime,
-          timeDisplay: this.formatTime(session.currentTime),
+          timeInSeconds: session.finalTime || session.currentTime, // 🐛 로컬 finalTime 우선
+          timeDisplay: this.formatTime(session.finalTime || session.currentTime),
           isCurrentUser: session.sessionId === this.sessionId
         }));
       }
