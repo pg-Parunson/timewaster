@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const ChatModal = ({ isOpen, onClose, onSendMessage, remainingTime, canChat }) => {
+const ChatModal = ({ isOpen, onClose, onSendMessage, remainingTime, canChat, chatTokens, onAdClick, canGetTokenFromAd }) => {
   const [message, setMessage] = useState('');
   const maxLength = 50;
 
@@ -20,15 +20,36 @@ const ChatModal = ({ isOpen, onClose, onSendMessage, remainingTime, canChat }) =
       <div className="pokemon-window max-w-md w-full mx-4">
         <div className="pokemon-dialog">
           <h3 className="pokemon-font text-xl font-bold mb-2 text-center">
-            🗨️ 글로벌 메시지 전송 <span className="text-sm font-normal text-gray-600">(메시지 {canChat ? '1개' : '0개'} 사용가능)</span>
+            🗨️ 글로벌 메시지 전송 <span className="text-sm font-normal text-gray-600">(채팅권한: {chatTokens}개)</span>
           </h3>
           
           {!canChat && (
             <div className="mb-4 p-3 bg-yellow-50 border border-yellow-300 rounded-lg">
-              <div className="pokemon-font text-sm text-yellow-800 text-center">
-                ⚠️ 메시지 전송 권한이 없습니다<br/>
-                <span className="font-bold">사이트에서 1분 체류 시 권한이 주어집니다!</span>
+              <div className="pokemon-font text-sm text-yellow-800 text-center mb-3">
+                ⚠️ 채팅 권한이 없습니다!<br/>
+                <span className="font-bold">광고를 클릭해서 채팅 권한을 획득하세요!</span>
               </div>
+              
+              {/* 광고 버튼 */}
+              <button
+                onClick={() => {
+                  onAdClick();
+                  if (canGetTokenFromAd) {
+                    // 성공 시 채팅 권한 표시 업데이트
+                  }
+                }}
+                disabled={!canGetTokenFromAd}
+                className={`w-full pokemon-button text-sm py-2 ${
+                  canGetTokenFromAd 
+                    ? 'bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white' 
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                {canGetTokenFromAd 
+                  ? '🎆 광고 보고 채팅권한 획득!' 
+                  : `⏰ 광고 쿨다운: ${Math.ceil(remainingTime / 1000)}초`
+                }
+              </button>
             </div>
           )}
           
@@ -37,7 +58,7 @@ const ChatModal = ({ isOpen, onClose, onSendMessage, remainingTime, canChat }) =
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder={canChat ? "전 세계 시간낭비자들에게 메시지를 보내세요..." : "1분 체류 후 메시지 전송이 가능합니다."}
+                placeholder={canChat ? "전 세계 시간낭비자들에게 메시지를 보내세요..." : "채팅 권한이 없습니다. 광고를 클릭해 권한을 획득하세요."}
                 className={`w-full p-3 border-2 rounded-lg pokemon-font resize-none ${
                   canChat ? 'border-gray-300' : 'border-gray-200 bg-gray-100 cursor-not-allowed'
                 }`}
@@ -66,14 +87,14 @@ const ChatModal = ({ isOpen, onClose, onSendMessage, remainingTime, canChat }) =
                   (!message.trim() || !canChat) ? 'opacity-50 cursor-not-allowed bg-gray-300 text-gray-600' : ''
                 }`}
               >
-                {canChat ? '전송 🚀' : '전송 불가 ❌'}
+                {canChat ? '전송 🚀' : '채팅 권한 없음 ❌'}
               </button>
             </div>
           </form>
           
           {remainingTime > 0 && (
             <div className="mt-3 text-center text-xs text-gray-600 pokemon-font">
-              다음 채팅 권한까지: {Math.ceil(remainingTime / 1000)}초
+              다음 광고 클릭 가능까지: {Math.ceil(remainingTime / 1000)}초
             </div>
           )}
         </div>
