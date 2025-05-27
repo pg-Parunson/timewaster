@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 
 const FlyingChatMessage = ({ message, id, isMyMessage, onComplete }) => {
-  const [position, setPosition] = useState({ 
+  const [position, setPosition] = useState(() => ({
     x: window.innerWidth + 200, 
     y: Math.random() * 300 + 150 
-  });
+  }));
   
   useEffect(() => {
+    console.log('💬 채팅 메시지 애니메이션 시작:', message);
+    
     const startTime = Date.now();
     const duration = 12000; // 12초 동안 천천히 날아감
     const startX = window.innerWidth + 200;
     const endX = -400;
+    const initialY = position.y; // 초기 Y 위치 고정
     
     const animate = () => {
       const elapsed = Date.now() - startTime;
@@ -18,18 +21,19 @@ const FlyingChatMessage = ({ message, id, isMyMessage, onComplete }) => {
       
       setPosition({
         x: startX + (endX - startX) * progress,
-        y: position.y + Math.sin(progress * Math.PI * 4) * 10 // 부드러운 물결
+        y: initialY + Math.sin(progress * Math.PI * 4) * 10 // 부드러운 물결
       });
       
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
+        console.log('💬 채팅 메시지 애니메이션 완료:', message);
         onComplete(id);
       }
     };
     
     requestAnimationFrame(animate);
-  }, [id, onComplete, position.y]);
+  }, [id, onComplete, message]); // position.y 제거!
 
   return (
     <div 
