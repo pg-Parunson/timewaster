@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { storage } from '../utils/storage';
 import { analytics } from '../utils/analytics';
 import { rankingService } from '../services/rankingService.jsx';
+import { statsService } from '../services/statsService.jsx'; // 📊 실제 통계 서비스 import
 import { addMilestoneNotification, addRankingNotification, addActivityNotification } from '../services/liveFeedService.jsx';
 import { getTimeBasedActivityRecommendation } from '../data/timeBasedActivities';
 import { 
@@ -33,7 +34,7 @@ export const useTimerLogic = () => {
   const [isPageVisible, setIsPageVisible] = useState(true);
   const [extremeMode, setExtremeMode] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const [concurrentUsers, setConcurrentUsers] = useState(3);
+  const [concurrentUsers, setConcurrentUsers] = useState(1); // 📊 기본값 1로 변경
   const [currentUser, setCurrentUser] = useState(null);
   const [isRankingInitialized, setIsRankingInitialized] = useState(false);
   const [currentRank, setCurrentRank] = useState(null);
@@ -138,16 +139,55 @@ export const useTimerLogic = () => {
     setTimeout(() => setMessageShake(false), 500);
   }, [elapsedTime, visits, adClicks, extremeMode, currentRank, typeMessage]);
 
-  // 초기화 효과들
+  // 📊 초기화 효과들 - 실제 Firebase 통계 사용
   useEffect(() => {
-    const visits = storage.incrementVisits();
-    const storedData = storage.getAllData();
+    const initializeStats = async () => {
+      try {
+        // 📊 Firebase 방문 횟수 증가 및 통계 업데이트
+        const newVisits = await statsService.incrementVisits();
+        setVisits(newVisits);
+        
+        // 📊 전체 통계 가져오기
+        const globalStats = await statsService.getGlobalStats();
+        setTotalTimeWasted(Math.floor(globalStats.totalTimeWasted / 60)); // 분 단위로 표시
+        
+        // 로컬 광고 클릭 수는 여전히 로컬에서 관리
+        const storedData = storage.getAllData();
+        setAdClicks(storedData.adClicks);
+        
+        // 📊 실시간 통계 리스너 등록
+        const unsubscribeStats = statsService.onStatsChange((stats) => {
+          setVisits(stats.totalVisits);
+          setTotalTimeWasted(Math.floor(stats.totalTimeWasted / 60));
+        });
+        
+        // 📊 동시 접속자 리스너 등록
+        const unsubscribeSessions = statsService.onActiveSessionsChange((activeSessions) => {
+          setConcurrentUsers(activeSessions);
+        });
+        
+        analytics.trackSessionStart(newVisits, globalStats.totalTimeWasted);
+        
+        // 정리 함수 반환
+        return () => {
+          unsubscribeStats();
+          unsubscribeSessions();
+        };
+      } catch (error) {
+        console.error('통계 초기화 실패:', error);
+        // 폴백: 로컬 데이터 사용
+        const visits = storage.incrementVisits();
+        const storedData = storage.getAllData();
+        
+        setVisits(visits);
+        setTotalTimeWasted(storedData.totalTimeWasted);
+        setAdClicks(storedData.adClicks);
+        
+        analytics.trackSessionStart(visits, storedData.totalTimeWasted);
+      }
+    };
     
-    setVisits(visits);
-    setTotalTimeWasted(storedData.totalTimeWasted);
-    setAdClicks(storedData.adClicks);
-    
-    analytics.trackSessionStart(visits, storedData.totalTimeWasted);
+    initializeStats();
   }, []);
 
   // Firebase 랭킹 시스템 초기화
@@ -168,6 +208,8 @@ export const useTimerLogic = () => {
     return () => {
       if (isRankingInitialized) {
         rankingService.endSession();
+        // 📊 세션 종료 시 통계 업데이트
+        statsService.updateOnSessionEnd(elapsedTime);
       }
     };
   }, []);
@@ -241,29 +283,6 @@ export const useTimerLogic = () => {
     }
   }, [showAd, isTyping, Math.floor(elapsedTime / 60)]);
 
-  // 실시간 동시 접속자 시뮬레이션
-  useEffect(() => {
-    const updateConcurrentUsers = () => {
-      const hour = new Date().getHours();
-      let baseUsers = 3;
-      let timeWeight = 1;
-      
-      if (hour >= 9 && hour <= 12) timeWeight = 1.3;
-      else if (hour >= 14 && hour <= 18) timeWeight = 1.5;
-      else if (hour >= 19 && hour <= 23) timeWeight = 1.8;
-      else if (hour >= 0 && hour <= 2) timeWeight = 1.2;
-      else timeWeight = 0.8;
-
-      const variation = (Math.random() - 0.5) * 4;
-      const newUsers = Math.max(1, Math.min(15, Math.round(baseUsers * timeWeight + variation)));
-      setConcurrentUsers(newUsers);
-    };
-
-    updateConcurrentUsers();
-    const interval = setInterval(updateConcurrentUsers, 25000);
-    return () => clearInterval(interval);
-  }, []);
-
   // 페이지 가시성 감지
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -286,6 +305,8 @@ export const useTimerLogic = () => {
     const handleBeforeUnload = (e) => {
       if (elapsedTime > 60) {
         storage.updateTotalTimeWasted(elapsedTime);
+        // 📊 Firebase 통계에도 시간 추가
+        statsService.updateOnSessionEnd(elapsedTime);
         
         const message = '정말로 나가시겠어요? 이제 막 재미있어지려고 했는데...';
         e.preventDefault();
