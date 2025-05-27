@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const ChatModal = ({ isOpen, onClose, onSendMessage, remainingTime, canChat, chatTokens, onAdClick, canGetTokenFromAd }) => {
+const ChatModal = ({ isOpen, onClose, onSendMessage, remainingTime, canChat, chatTokens, premiumTokens, onAdClick, canGetTokenFromAd }) => {
   const [message, setMessage] = useState('');
   const maxLength = 50;
 
@@ -28,14 +28,18 @@ const ChatModal = ({ isOpen, onClose, onSendMessage, remainingTime, canChat, cha
       <div className="pokemon-window max-w-md w-full mx-4">
         <div className="pokemon-dialog">
           <h3 className="pokemon-font text-xl font-bold mb-2 text-center">
-            🗨️ 글로벌 메시지 전송 <span className="text-sm font-normal text-gray-600">(채팅권한: {chatTokens}개)</span>
+            🗨️ 글로벌 메시지 전송 
+            <span className="text-sm font-normal text-gray-600">
+              (일반:{chatTokens}개 프리미엄:{premiumTokens}개)
+            </span>
           </h3>
           
           {!canChat && (
             <div className="mb-4 p-3 bg-yellow-50 border border-yellow-300 rounded-lg">
               <div className="pokemon-font text-sm text-yellow-800 text-center mb-3">
                 ⚠️ 채팅 권한이 없습니다!<br/>
-                <span className="font-bold">광고를 클릭해서 채팅 권한을 획득하세요!</span>
+                <span className="font-bold">광고를 클릭해서 프리미엄 채팅 권한을 획득하세요!</span><br/>
+                <span className="text-xs">프리미엄 메시지는 화려하게 빛나요! ✨</span>
               </div>
               
               {/* 광고 버튼 */}
@@ -54,7 +58,7 @@ const ChatModal = ({ isOpen, onClose, onSendMessage, remainingTime, canChat, cha
                 }`}
               >
                 {canGetTokenFromAd 
-                  ? '🎆 광고 보고 채팅권한 획득!' 
+                  ? '🎆 광고 보고 프리미엄 채팅권한 획득!' 
                   : `⏰ 광고 쿨다운: ${Math.ceil(remainingTime / 1000)}초`
                 }
               </button>
@@ -66,7 +70,12 @@ const ChatModal = ({ isOpen, onClose, onSendMessage, remainingTime, canChat, cha
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder={canChat ? "전 세계 시간낭비자들에게 메시지를 보내세요..." : "채팅 권한이 없습니다. 광고를 클릭해 권한을 획득하세요."}
+                placeholder={canChat 
+                  ? (premiumTokens > 0 
+                      ? "🎆 프리미엄 메시지로 화려하게 빛나는 메시지를 보내세요!" 
+                      : "💬 일반 메시지로 간단한 메시지를 보내세요...") 
+                  : "채팅 권한이 없습니다. 광고를 클릭해 권한을 획득하세요."
+                }
                 className={`w-full p-3 border-2 rounded-lg pokemon-font resize-none ${
                   canChat ? 'border-gray-300' : 'border-gray-200 bg-gray-100 cursor-not-allowed'
                 }`}
