@@ -29,7 +29,7 @@ const ShareSection = ({ elapsedTime, formatTime, showModernModal }) => {
       <div className="flex flex-col gap-3">
         <button
           onClick={handleShareToX}
-          className="pokemon-button w-full flex items-center justify-center gap-3"
+          className="group relative w-full bg-gradient-to-r from-gray-900 via-black to-gray-900 hover:from-black hover:via-gray-800 hover:to-black text-white px-6 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl border-4 border-black flex items-center justify-center gap-3"
         >
           <div className="w-5 h-5 flex items-center justify-center">
             {/* X 로고 SVG */}
@@ -37,7 +37,7 @@ const ShareSection = ({ elapsedTime, formatTime, showModernModal }) => {
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
             </svg>
           </div>
-          <span className="pokemon-font">X에서 공유하기</span>
+          <span className="pokemon-font font-bold">X에서 공유하기</span>
         </button>
         
         <button

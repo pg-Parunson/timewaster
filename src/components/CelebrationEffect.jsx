@@ -70,17 +70,14 @@ const EpicPokemonCelebrationEffect = ({ isActive, celebration, onComplete }) => 
           0% { 
             background: radial-gradient(circle, rgba(255, 215, 0, 0) 0%, rgba(255, 215, 0, 0) 100%);
           }
-          10% { 
-            background: radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, rgba(255, 107, 53, 0.2) 100%);
-          }
           20% { 
-            background: radial-gradient(circle, rgba(255, 215, 0, 0.6) 0%, rgba(255, 107, 53, 0.3) 100%);
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.2) 0%, rgba(255, 107, 53, 0.1) 100%);
           }
           40% { 
-            background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, rgba(255, 107, 53, 0.15) 100%);
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, rgba(255, 107, 53, 0.05) 100%);
           }
           100% { 
-            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, rgba(255, 107, 53, 0.05) 100%);
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, rgba(255, 107, 53, 0.02) 100%);
           }
         }
         
