@@ -2,12 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { database } from '../../config/firebase';
 import { ref, onValue, push, off } from 'firebase/database';
 import { formatTime } from '../../utils/helpers';
+import { getRandomCoupangProduct } from '../../data/coupangProducts'; // 🎯 랜덤 쿠팡 링크 import
 import ConnectionNotification from './ConnectionNotification';
 import FlyingRankingMessage from './FlyingRankingMessage';
 import FlyingChatMessage from './FlyingChatMessage';
 import ChatModal from './ChatModal';
 
-const FlyingMessageManager = () => {
+const FlyingMessageManager = ({ elapsedTime = 0 }) => { // 🕰️ elapsedTime prop 추가
   const [connectionNotification, setConnectionNotification] = useState(null);
   const [flyingRankingMessages, setFlyingRankingMessages] = useState([]);
   const [flyingChatMessages, setFlyingChatMessages] = useState([]);
@@ -164,14 +165,23 @@ const FlyingMessageManager = () => {
     }
   };
 
-  // 광고 클릭으로 채팅 권한 득기
+  // 🎯 광고 클릭으로 채팕 권한 얻기 - 랜덤 쿠팡 링크 연결
   const handleAdClick = () => {
     if (adChatCooldown === 0) {
-      setPremiumTokens(prev => prev + 1); // 프리미엄 토큰 1개 지급
+      // 🎯 랜덤 쿠팡 상품 선택
+      const randomProduct = getRandomCoupangProduct();
+      
+      console.log('🎆 광고 클릭 - 랜덤 상품:', randomProduct.name);
+      
+      // 쿠팡 링크 열기
+      window.open(randomProduct.url, '_blank');
+      
+      // 프리미엄 권한 지급
+      setPremiumTokens(prev => prev + 1);
       setAdChatCooldown(30000); // 30초 쿨다운
       
       // 성공 메시지 표시
-      addFlyingChatMessage('🎆 프리미엄 채팅 권한 1개 획득! 화려한 메시지를 보낼 수 있어요!', false);
+      addFlyingChatMessage(`🎆 ${randomProduct.name} 광고 시청! 프리미엄 채팡 권한 1개 획득!`, false);
     }
   };
   const handleSendChatMessage = (message) => {
@@ -346,6 +356,7 @@ const FlyingMessageManager = () => {
         premiumTokens={premiumTokens} // 프리미엄 토큰 전달
         onAdClick={handleAdClick}
         canGetTokenFromAd={canGetTokenFromAd}
+        elapsedTime={elapsedTime} // 🕰️ elapsedTime 전달
       />
     </>
   );

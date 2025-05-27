@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const ChatModal = ({ isOpen, onClose, onSendMessage, remainingTime, canChat, chatTokens, premiumTokens, onAdClick, canGetTokenFromAd }) => {
+const ChatModal = ({ isOpen, onClose, onSendMessage, remainingTime, canChat, chatTokens, premiumTokens, onAdClick, canGetTokenFromAd, elapsedTime }) => {
   const [message, setMessage] = useState('');
   const maxLength = 50;
 
@@ -38,28 +38,37 @@ const ChatModal = ({ isOpen, onClose, onSendMessage, remainingTime, canChat, cha
             <div className="mb-4 p-3 bg-yellow-50 border border-yellow-300 rounded-lg">
               <div className="pokemon-font text-sm text-yellow-800 text-center mb-3">
                 ⚠️ 채팅 권한이 없습니다!<br/>
-                <span className="font-bold">광고를 클릭해서 프리미엄 채팅 권한을 획득하세요!</span><br/>
-                <span className="text-xs">프리미엄 메시지는 화려하게 빛나요! ✨</span>
+                {elapsedTime < 60 ? (
+                  <>
+                    <span className="font-bold text-red-600">1분 후에 광고를 보고 프리미엄 채팅 권한을 획득할 수 있어요!</span><br/>
+                    <span className="text-xs">남은 시간: {60 - elapsedTime}초</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="font-bold">광고를 클릭해서 프리미엄 채팅 권한을 획득하세요!</span><br/>
+                    <span className="text-xs">프리미엄 메시지는 화려하게 빛나요! ✨</span>
+                  </>
+                )}
               </div>
               
               {/* 광고 버튼 */}
               <button
                 onClick={() => {
                   onAdClick();
-                  if (canGetTokenFromAd) {
-                    // 성공 시 채팅 권한 표시 업데이트
-                  }
                 }}
-                disabled={!canGetTokenFromAd}
+                disabled={elapsedTime < 60 || !canGetTokenFromAd}
                 className={`w-full pokemon-button text-sm py-2 ${
-                  canGetTokenFromAd 
+                  (elapsedTime >= 60 && canGetTokenFromAd)
                     ? 'bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white' 
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
               >
-                {canGetTokenFromAd 
-                  ? '🎆 광고 보고 프리미엄 채팅권한 획득!' 
-                  : `⏰ 광고 쿨다운: ${Math.ceil(remainingTime / 1000)}초`
+                {elapsedTime < 60 
+                  ? `🔒 1분 후 광고 시청 가능 (${60 - elapsedTime}초)` 
+                  : (canGetTokenFromAd 
+                      ? '🎆 광고 보고 프리미엄 채팅권한 획득!' 
+                      : `⏰ 광고 쿨다운: ${Math.ceil(remainingTime / 1000)}초`
+                    )
                 }
               </button>
             </div>

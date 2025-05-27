@@ -766,7 +766,7 @@ function App() {
       <EasterEgg elapsedTime={elapsedTime} />
 
       {/* 날아가는 메시지 시스템 */}
-      <FlyingMessageManager />
+      <FlyingMessageManager elapsedTime={elapsedTime} />
       
       {/* 🧪 테스트용 강제 메시지 - 개발 확인용 */}
       {import.meta.env.DEV && (

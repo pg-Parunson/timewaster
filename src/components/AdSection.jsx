@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, Zap } from 'lucide-react';
-import { getRecommendedProduct } from '../data/coupangProducts';
+import { getRecommendedProduct, getRandomCoupangProduct } from '../data/coupangProducts'; // 🎯 랜덤 쿠팡 링크 import
 
 // 포켓몬 스타일 광고 영역 컴포넌트
 const AdSection = React.memo(({ showAd, adMessage, extremeMode, elapsedTime, onProductClick }) => {

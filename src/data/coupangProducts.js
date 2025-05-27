@@ -66,6 +66,12 @@ export const COUPANG_PRODUCTS = [
   }
 ];
 
+// 🎯 광고 클릭 시 랜덤 쿠팡 링크 선택 함수
+export const getRandomCoupangProduct = () => {
+  const randomIndex = Math.floor(Math.random() * COUPANG_PRODUCTS.length);
+  return COUPANG_PRODUCTS[randomIndex];
+};
+
 // 시간대별 상황에 맞는 상품 추천 로직 - 안정화된 버전
 export const getRecommendedProduct = (elapsedSeconds) => {
   // 시간 기반으로 고정된 상품 선택 (랜덤 제거)

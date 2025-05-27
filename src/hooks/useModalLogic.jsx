@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { storage } from '../utils/storage';
 import { analytics } from '../utils/analytics';
-import { getRecommendedProduct } from '../data/coupangProducts';
+import { getRecommendedProduct, getRandomCoupangProduct } from '../data/coupangProducts'; // 🎯 랜덤 쿠팡 링크 import
 import { rankingService } from '../services/rankingService.jsx';
 
 // 모달 및 사용자 액션 관리 훅
@@ -47,7 +47,7 @@ export const useModalLogic = ({
 
   // 쿠팡 상품 클릭
   const handleProductClick = () => {
-    const product = getRecommendedProduct(elapsedTime);
+    const product = getRandomCoupangProduct(); // 🎯 랜덤 쿠팡 상품 선택
     
     analytics.trackCoupangClick(product.name, product.category, elapsedTime, adClicks + 1);
     
