@@ -1,278 +1,290 @@
 // 🎉 압도적인 포켓몬 골드 스타일 축하 이펙트 컴포넌트
-// 화면을 완전히 장악하는 오버레이 방식
+// 각 요소 독립 제어로 깜빡임 문제 해결
 
 import React, { useState, useEffect, useRef } from 'react';
 
 const EpicPokemonCelebrationEffect = ({ isActive, celebration, onComplete }) => {
-  const [isVisible, setIsVisible] = useState(false);
+  // celebration null 체크로 크래시 방지
+  if (!celebration) {
+    return null;
+  }
+
+  // 각 요소 독립적 상태 관리
+  const [showBackground, setShowBackground] = useState(false);
+  const [showParticles, setShowParticles] = useState(false);
+  const [showMessage, setShowMessage] = useState(false);
+  
   const [particles, setParticles] = useState([]);
-  const [phase, setPhase] = useState(0); // 0: 준비, 1: 폭발, 2: 메시지, 3: 피날레
-  const timeoutRef = useRef(null);
+  const [phase, setPhase] = useState(0); // 0: 준비, 1: 폭발, 2: 메시지 등장, 3: 메시지 안정
+  
+  const timeoutRefs = useRef([]);
+  
+  // 모든 타이머 정리
+  const clearAllTimeouts = () => {
+    timeoutRefs.current.forEach(timeout => clearTimeout(timeout));
+    timeoutRefs.current = [];
+  };
   
   useEffect(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
+    if (!isActive || !celebration) return;
     
-    if (isActive && celebration) {
-      console.log('🎉 압도적인 포켓몬 축하 이펙트 시작:', celebration.message);
-      setIsVisible(true);
-      setPhase(1);
-      
-      // 압도적인 파티클 생성 (30개!)
-      const epicEmojis = ['⭐', '✨', '🎉', '🎊', '💫', '🌟', '💥', '🔥', '🎆', '🎇', '💎', '👑', '🏆', '🎖️', '🥇'];
-      const newParticles = Array.from({ length: 30 }, (_, i) => ({
-        id: i,
-        x: Math.random() * 100, // 전체 화면
-        y: Math.random() * 100, 
-        emoji: epicEmojis[i % epicEmojis.length],
-        delay: i * 0.05,
-        duration: 4 + Math.random() * 2,
-        size: 0.8 + Math.random() * 0.4 // 크기 다양화
-      }));
-      setParticles(newParticles);
-      
-      // 단계별 전환
-      setTimeout(() => setPhase(2), 800);   // 메시지 등장
-      setTimeout(() => setPhase(3), 3000);  // 피날레
-      
-      timeoutRef.current = setTimeout(() => {
-        console.log('🎉 압도적인 축하 이펙트 종료');
-        setIsVisible(false);
-        setParticles([]);
-        setPhase(0);
+    clearAllTimeouts();
+    
+    // 압도적인 파티클 생성 (30개!)
+    const epicEmojis = ['⭐', '✨', '🎉', '🎊', '💫', '🌟', '💥', '🔥', '🎆', '🎇', '💎', '👑', '🏆', '🎖️', '🥇'];
+    const newParticles = Array.from({ length: 30 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100, 
+      emoji: epicEmojis[i % epicEmojis.length],
+      delay: i * 0.05,
+      duration: 4 + Math.random() * 2,
+      size: 0.8 + Math.random() * 0.4
+    }));
+    setParticles(newParticles);
+    
+    // 🎯 새로운 타이밍 설계
+    // 0.0초: 배경, 파티클 시작
+    setShowBackground(true);
+    setShowParticles(true);
+    setPhase(1);
+    
+    // 0.8초: 메시지 카드 등장 (entrance 애니메이션)
+    timeoutRefs.current.push(setTimeout(() => {
+      setShowMessage(true);
+      setPhase(2);
+    }, 800));
+    
+    // 2.0초: 메시지 안정화 (애니메이션 멈춤)
+    timeoutRefs.current.push(setTimeout(() => {
+      setPhase(3); // 애니메이션 없는 안정 상태
+    }, 2000));
+    
+    // 5.0초: 배경, 파티클만 제거 (메시지는 유지)
+    timeoutRefs.current.push(setTimeout(() => {
+      setShowBackground(false);
+      setShowParticles(false);
+    }, 5000));
+    
+    // 8.0초: 메시지 카드 제거 및 완료
+    timeoutRefs.current.push(setTimeout(() => {
+      setShowMessage(false);
+      timeoutRefs.current.push(setTimeout(() => {
+        if (onComplete) onComplete();
+      }, 500)); // 부드러운 페이드아웃 후 완료
+    }, 8000));
+    
+    return clearAllTimeouts;
+  }, [isActive, celebration, onComplete]);
+
+  // ESC 키로 즉시 종료
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.key === 'Escape' && (showBackground || showParticles || showMessage)) {
+        clearAllTimeouts();
+        setShowBackground(false);
+        setShowParticles(false);
+        setShowMessage(false);
         setTimeout(() => {
-          if (onComplete) {
-            onComplete();
-          }
-        }, 500);
-      }, 5000);
-    }
-    
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
+          if (onComplete) onComplete();
+        }, 100);
       }
     };
-  }, [isActive, celebration, onComplete]);
+    
+    if (isActive) {
+      document.addEventListener('keydown', handleKeyPress);
+      return () => document.removeEventListener('keydown', handleKeyPress);
+    }
+  }, [isActive, showBackground, showParticles, showMessage, onComplete]);
+
+  // CSS 스타일 객체들
+  const styles = {
+    overlay: {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      zIndex: 99999,
+      pointerEvents: showMessage ? 'auto' : 'none',
+      overflow: 'hidden',
+      fontFamily: "'Galmuri11', 'Galmuri9', monospace"
+    },
+    flashBg: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      background: phase === 1 
+        ? 'radial-gradient(circle, rgba(255, 215, 0, 0.2) 0%, rgba(255, 107, 53, 0.1) 100%)'
+        : phase === 2
+        ? 'radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, rgba(255, 107, 53, 0.05) 100%)'
+        : 'radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, rgba(255, 107, 53, 0.02) 100%)',
+      transition: 'background 0.5s ease-in-out, opacity 0.5s ease-in-out',
+      opacity: showBackground ? 1 : 0,
+      pointerEvents: 'none'
+    },
+    messageContainer: {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      pointerEvents: 'auto',
+      zIndex: 100000,
+      opacity: showMessage ? 1 : 0,
+      transition: 'opacity 0.5s ease-in-out',
+      // 애니메이션을 단계별로 적용
+      animation: phase === 2 
+        ? 'epicMessageEntrance 1s ease-out' 
+        : 'none' // phase 3부터는 애니메이션 없음
+    },
+    messageBox: {
+      background: 'linear-gradient(135deg, #FFD700 0%, #FF6B35 50%, #FFD700 100%)',
+      color: '#000000',
+      border: '6px solid #000000',
+      borderRadius: '20px',
+      padding: '40px 60px',
+      fontSize: '28px',
+      fontWeight: 'bold',
+      textAlign: 'center',
+      maxWidth: '80vw',
+      minWidth: '400px',
+      textShadow: '2px 2px 0px rgba(255, 255, 255, 0.8)',
+      lineHeight: '1.4',
+      boxShadow: `
+        4px 4px 0px rgba(0, 0, 0, 0.4),
+        inset 2px 2px 0px rgba(255, 255, 255, 0.3),
+        0 0 25px rgba(255, 215, 0, 0.7)
+      `,
+      cursor: 'pointer',
+      position: 'relative'
+    },
+    title: {
+      fontSize: '36px',
+      marginBottom: '16px',
+      display: 'block',
+      textShadow: '3px 3px 0px rgba(255, 255, 255, 0.9)'
+    },
+    message: {
+      fontSize: '22px',
+      color: '#003366',
+      fontWeight: 'bold'
+    },
+    closeHint: {
+      fontSize: '14px',
+      color: '#666',
+      marginTop: '16px',
+      opacity: 0.8
+    },
+    particle: {
+      position: 'absolute',
+      fontSize: '32px',
+      pointerEvents: 'none',
+      zIndex: 99998,
+      textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
+      opacity: showParticles ? 1 : 0,
+      transition: 'opacity 0.5s ease-in-out',
+      animation: 'epicParticleExplosion 5s ease-out forwards'
+    }
+  };
+
+  useEffect(() => {
+    // CSS 애니메이션을 동적으로 추가 - heartbeat 제거!
+    const styleSheet = document.createElement('style');
+    styleSheet.type = 'text/css';
+    styleSheet.innerHTML = `
+      @keyframes epicMessageEntrance {
+        0% { 
+          transform: translate(-50%, -50%) scale(0.3) rotate(-15deg);
+        }
+        50% { 
+          transform: translate(-50%, -50%) scale(1.2) rotate(5deg);
+        }
+        100% { 
+          transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        }
+      }
+      
+      @keyframes epicParticleExplosion {
+        0% { 
+          transform: translateY(0px) scale(0.2) rotate(0deg);
+        }
+        10% { 
+          transform: translateY(-20px) scale(0.6) rotate(90deg);
+        }
+        50% { 
+          transform: translateY(-80px) scale(1.2) rotate(270deg);
+        }
+        100% { 
+          transform: translateY(-150px) scale(1.5) rotate(720deg);
+        }
+      }
+    `;
+    document.head.appendChild(styleSheet);
+
+    return () => {
+      if (document.head.contains(styleSheet)) {
+        document.head.removeChild(styleSheet);
+      }
+    };
+  }, []);
+
+  // 메시지 카드 클릭으로 즉시 종료
+  const handleMessageClick = () => {
+    clearAllTimeouts();
+    setShowBackground(false);
+    setShowParticles(false);
+    setShowMessage(false);
+    setTimeout(() => {
+      if (onComplete) onComplete();
+    }, 100);
+  };
   
-  if (!isActive || !celebration || !isVisible) {
+  // 어떤 요소라도 보여야 할 때만 렌더링
+  if (!showBackground && !showParticles && !showMessage) {
     return null;
   }
   
   return (
-    <>
-      {/* 압도적인 포켓몬 축하 이펙트 CSS */}
-      <style jsx>{`
-        @keyframes epic-screen-flash {
-          0% { 
-            background: radial-gradient(circle, rgba(255, 215, 0, 0) 0%, rgba(255, 215, 0, 0) 100%);
-          }
-          20% { 
-            background: radial-gradient(circle, rgba(255, 215, 0, 0.2) 0%, rgba(255, 107, 53, 0.1) 100%);
-          }
-          40% { 
-            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, rgba(255, 107, 53, 0.05) 100%);
-          }
-          100% { 
-            background: radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, rgba(255, 107, 53, 0.02) 100%);
-          }
-        }
-        
-        @keyframes epic-message-entrance {
-          0% { 
-            transform: translate(-50%, -50%) scale(0.3) rotate(-15deg);
-            opacity: 0;
-          }
-          50% { 
-            transform: translate(-50%, -50%) scale(1.2) rotate(5deg);
-            opacity: 1;
-          }
-          100% { 
-            transform: translate(-50%, -50%) scale(1) rotate(0deg);
-            opacity: 1;
-          }
-        }
-        
-        @keyframes epic-message-heartbeat {
-          0%, 100% { 
-            transform: translate(-50%, -50%) scale(1);
-          }
-          50% { 
-            transform: translate(-50%, -50%) scale(1.05);
-          }
-        }
-        
-        @keyframes epic-particle-explosion {
-          0% { 
-            transform: translateY(0px) scale(0.2) rotate(0deg);
-            opacity: 0;
-          }
-          10% { 
-            opacity: 1;
-            transform: translateY(-20px) scale(0.6) rotate(90deg);
-          }
-          50% { 
-            opacity: 1;
-            transform: translateY(-80px) scale(1.2) rotate(270deg);
-          }
-          100% { 
-            transform: translateY(-150px) scale(1.5) rotate(720deg);
-            opacity: 0;
-          }
-        }
-        
-        .epic-celebration-overlay {
-          position: fixed !important;
-          top: 0 !important;
-          left: 0 !important;
-          right: 0 !important;
-          bottom: 0 !important;
-          z-index: 99999 !important;
-          pointer-events: none !important;
-          overflow: hidden !important;
-          font-family: 'Galmuri11', 'Galmuri9', monospace !important;
-        }
-        
-        .epic-flash-bg {
-          position: absolute !important;
-          top: 0 !important;
-          left: 0 !important;
-          width: 100% !important;
-          height: 100% !important;
-          animation: epic-screen-flash 5s ease-in-out !important;
-          pointer-events: none !important;
-        }
-        
-        .epic-message-container {
-          position: absolute !important;
-          top: 50% !important;
-          left: 50% !important;
-          transform: translate(-50%, -50%) !important;
-          pointer-events: none !important;
-          z-index: 100000 !important;
-        }
-        
-        .epic-message-container.phase-1 {
-          animation: epic-message-entrance 1s ease-out !important;
-        }
-        
-        .epic-message-container.phase-2 {
-          animation: epic-message-heartbeat 2s ease-in-out infinite !important;
-        }
-        
-        .epic-message-box {
-          background: linear-gradient(135deg, #FFD700 0%, #FF6B35 50%, #FFD700 100%) !important;
-          color: #000000 !important;
-          border: 6px solid #000000 !important;
-          border-radius: 20px !important;
-          padding: 40px 60px !important;
-          font-size: 28px !important;
-          font-weight: bold !important;
-          text-align: center !important;
-          max-width: 80vw !important;
-          min-width: 400px !important;
-          text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.8) !important;
-          line-height: 1.4 !important;
-          box-shadow: 
-            4px 4px 0px rgba(0, 0, 0, 0.4),
-            inset 2px 2px 0px rgba(255, 255, 255, 0.3),
-            0 0 25px rgba(255, 215, 0, 0.7) !important;
-        }
-        
-        .epic-title {
-          font-size: 36px !important;
-          margin-bottom: 16px !important;
-          display: block !important;
-          text-shadow: 3px 3px 0px rgba(255, 255, 255, 0.9) !important;
-        }
-        
-        .epic-message {
-          font-size: 22px !important;
-          color: #003366 !important;
-          font-weight: bold !important;
-        }
-        
-        .epic-particle {
-          position: absolute !important;
-          font-size: 32px !important;
-          pointer-events: none !important;
-          animation: epic-particle-explosion 5s ease-out forwards !important;
-          z-index: 99998 !important;
-          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5) !important;
-        }
-        
-        .epic-particle.large {
-          font-size: 48px !important;
-        }
-        
-        .epic-particle.medium {
-          font-size: 40px !important;
-        }
-        
-        .epic-particle.small {
-          font-size: 28px !important;
-        }
-        
-        /* 반응형 */
-        @media (max-width: 768px) {
-          .epic-message-box {
-            padding: 30px 40px !important;
-            font-size: 24px !important;
-            min-width: 300px !important;
-          }
-          
-          .epic-title {
-            font-size: 30px !important;
-          }
-          
-          .epic-message {
-            font-size: 18px !important;
-          }
-        }
-      `}</style>
+    <div style={styles.overlay}>
+      {/* 화면 전체 플래시 - showBackground로 독립 제어 */}
+      <div style={styles.flashBg} />
       
-      {/* 압도적인 포켓몬 골드 스타일 축하 오버레이 */}
-      <div className="epic-celebration-overlay">
-        {/* 화면 전체 플래시 */}
-        <div className="epic-flash-bg" />
-        
-        {/* 압도적인 메시지 */}
-        {phase >= 2 && (
-          <div className={`epic-message-container ${phase === 2 ? 'phase-1' : 'phase-2'}`}>
-            <div className="epic-message-box">
-              <div className="epic-title">
-                🎉 대단합니다! 🎉
-              </div>
-              <div className="epic-message">
-                {celebration.message}
-              </div>
+      {/* 압도적인 메시지 - showMessage로 독립 제어 */}
+      <div style={styles.messageContainer}>
+        <div style={styles.messageBox} onClick={handleMessageClick}>
+          <div style={styles.title}>
+            🎉 대단합니다! 🎉
+          </div>
+          <div style={styles.message}>
+            {celebration?.message || '축하합니다!'}
+          </div>
+          {phase >= 3 && (
+            <div style={styles.closeHint}>
+              💡 클릭하거나 ESC를 눌러 닫기
             </div>
-          </div>
-        )}
-        
-        {/* 압도적인 파티클 폭발 효과 */}
-        {particles.map((particle) => (
-          <div
-            key={particle.id}
-            className={`epic-particle ${
-              particle.size > 1.1 ? 'large' : 
-              particle.size > 0.9 ? 'medium' : 'small'
-            }`}
-            style={{
-              left: `${particle.x}%`,
-              top: `${particle.y}%`,
-              animationDelay: `${particle.delay}s`,
-              animationDuration: `${particle.duration}s`
-            }}
-          >
-            {particle.emoji}
-          </div>
-        ))}
+          )}
+        </div>
       </div>
-    </>
+      
+      {/* 압도적인 파티클 폭발 효과 - showParticles로 독립 제어, opacity 깜빡임 제거! */}
+      {particles.map((particle) => (
+        <div
+          key={particle.id}
+          style={{
+            ...styles.particle,
+            left: `${particle.x}%`,
+            top: `${particle.y}%`,
+            animationDelay: `${particle.delay}s`,
+            animationDuration: `${particle.duration}s`,
+            fontSize: particle.size > 1.1 ? '48px' : particle.size > 0.9 ? '40px' : '28px'
+          }}
+        >
+          {particle.emoji}
+        </div>
+      ))}
+    </div>
   );
 };
 

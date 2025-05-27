@@ -20,7 +20,6 @@ export const addLiveFeedNotification = async (type, message, additionalData = {}
     };
 
     await set(newNotificationRef, notificationData);
-    console.log('✅ 실시간 피드 알림 추가:', message);
   } catch (error) {
     console.error('❌ 실시간 피드 알림 추가 실패:', error);
   }
@@ -134,7 +133,6 @@ export const cleanupOldNotifications = async (maxAge = 24 * 60 * 60 * 1000) => {
       
       if (Object.keys(updates).length > 0) {
         await update(liveFeedRef, updates);
-        console.log(`🗑️ ${Object.keys(updates).length}개의 오래된 알림 정리`);
       }
     }
   } catch (error) {

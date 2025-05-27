@@ -18,6 +18,7 @@ import LiveFeedNotifications from './components/LiveFeedNotifications.jsx';
 import DevTools from './components/DevTools.jsx';
 import TimerSection from './components/TimerSection.jsx';
 import FlyingMessageManager from './components/flying-messages/FlyingMessageManager.jsx';
+import FlyingChatMessage from './components/flying-messages/FlyingChatMessage.jsx'; // 테스트용 추가
 import BGMManager from './components/BGMManager.jsx';
 
 // 훅스 imports
@@ -766,6 +767,24 @@ function App() {
 
       {/* 날아가는 메시지 시스템 */}
       <FlyingMessageManager />
+      
+      {/* 🧪 테스트용 강제 메시지 - 개발 확인용 */}
+      {import.meta.env.DEV && (
+        <>
+          <FlyingChatMessage 
+            id={9999} 
+            message="💬 강제 테스트 메시지 - 내 메시지!" 
+            isMyMessage={true} 
+            onComplete={() => console.log('테스트 메시지 완료')} 
+          />
+          <FlyingChatMessage 
+            id={9998} 
+            message="💭 다른 사람 메시지 테스트!" 
+            isMyMessage={false} 
+            onComplete={() => console.log('테스트 메시지 완료')} 
+          />
+        </>
+      )}
       
       {/* 개발자 도구 */}
       <DevTools isVisible={import.meta.env.DEV} />

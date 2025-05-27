@@ -21,14 +21,11 @@ let isFirebaseConnected = false;
 
 // 개발환경에서도 Firebase 활성화 (테스트를 위해)
 try {
-  console.log('🔥 Firebase 연결 시도 중...');
   app = initializeApp(firebaseConfig);
   database = getDatabase(app);
   isFirebaseConnected = true;
-  console.log('✅ Firebase 연결 성공! 실시간 랭킹 시스템 활성화!');
 } catch (error) {
   console.warn('⚠️ Firebase 연결 실패:', error.message);
-  console.log('💻 로컬 모드로 전환합니다. 기본 기능은 정상 작동합니다.');
   isFirebaseConnected = false;
 }
 

@@ -42,8 +42,6 @@ const BGMManager = ({ elapsedTime, compact = false }) => {
   const changeTrack = (newTrack) => {
     if (!newTrack || newTrack.file === currentTrack?.file) return;
     
-    console.log('🎵 BGM 변경:', newTrack.title);
-    
     // 페이드 아웃
     if (audioRef.current && isPlaying) {
       const fadeOut = () => {
@@ -66,20 +64,16 @@ const BGMManager = ({ elapsedTime, compact = false }) => {
   const loadAndPlayTrack = (track) => {
     if (!audioRef.current) return;
     
-    console.log('🎵 트랙 로드 및 재생:', track.title);
-    
     audioRef.current.src = track.file;
     audioRef.current.volume = 0;
     setCurrentTrack(track);
     
     // 로드 완료 후 재생 시도
     const handleCanPlay = () => {
-      console.log('🎵 오디오 로드 완료, 재생 시도');
       const playPromise = audioRef.current.play();
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
-            console.log('🎵 재생 성공!');
             setIsPlaying(true);
             // 페이드 인
             const fadeIn = () => {
@@ -94,7 +88,7 @@ const BGMManager = ({ elapsedTime, compact = false }) => {
             fadeIn();
           })
           .catch(error => {
-            console.log('🎵 자동재생 실패 (사용자 상호작용 필요):', error);
+            // 자동재생 실패 (사용자 상호작용 필요)
             setIsPlaying(false);
           });
       }
@@ -111,7 +105,6 @@ const BGMManager = ({ elapsedTime, compact = false }) => {
       // 약간의 지연 후 재생 시도 (DOM 완전 로드 대기)
       const timer = setTimeout(() => {
         const randomTheme = getRandomTheme();
-        console.log('🎵 초기 테마송 선택:', randomTheme.title);
         changeTrack(randomTheme);
       }, 1000); // 1초 지연
       
@@ -124,7 +117,6 @@ const BGMManager = ({ elapsedTime, compact = false }) => {
     if (elapsedTime > 0) {
       const phaseBGM = getCurrentPhaseBGM();
       if (phaseBGM && (!currentTrack || currentTrack.file !== phaseBGM.file)) {
-        console.log('🎵 단계별 BGM 변경:', phaseBGM.title, `(${Math.floor(elapsedTime/60)}분)`);
         changeTrack(phaseBGM);
       }
     }
@@ -143,7 +135,7 @@ const BGMManager = ({ elapsedTime, compact = false }) => {
         playPromise
           .then(() => setIsPlaying(true))
           .catch(error => {
-            console.log('🎵 재생 실패:', error);
+            // 재생 실패 (사용자 상호작용 필요)
           });
       }
     }
@@ -221,9 +213,9 @@ const BGMManager = ({ elapsedTime, compact = false }) => {
         ref={audioRef}
         loop
         preload="auto"
-        onLoadStart={() => console.log('🎵 BGM 로딩 시작')}
-        onCanPlay={() => console.log('🎵 BGM 재생 준비 완료')}
-        onError={(e) => console.log('🎵 BGM 로딩 실패:', e)}
+        onLoadStart={() => {}}
+        onCanPlay={() => {}}
+        onError={() => {}}
         onEnded={() => setIsPlaying(false)}
       />
     </div>

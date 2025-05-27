@@ -23,7 +23,7 @@ class RankingService {
     this.isFirebaseConnected = isFirebaseConnected;
     this.localRanking = []; // Firebase 연결 실패 시 로컬 랭킹
     
-    console.log('🏆 랭킹 서비스 초기화:', this.isFirebaseConnected ? 'Firebase 모드' : '로컬 모드');
+
   }
 
   // 세션 초기화 (사용자 접속 시)
@@ -68,7 +68,6 @@ class RankingService {
         this.startLocalHeartbeat();
       }
 
-      console.log(`세션 초기화 완료: ${this.anonymousName} (${this.sessionId})`);
       return { sessionId: this.sessionId, anonymousName: this.anonymousName };
 
     } catch (error) {
@@ -416,7 +415,7 @@ class RankingService {
         // 모든 리스너 제거
         this.removeAllListeners();
 
-        console.log(`세션 종료: ${this.anonymousName} (${this.sessionId})`);
+
       }
     } catch (error) {
       console.error('세션 종료 실패:', error);
@@ -496,7 +495,6 @@ class RankingService {
           `${finalNickname}님이 ${this.formatTime(timeInSeconds)}로 ${rank}위 달성! 🏆`
         );
         
-        console.log(`랭킹 제출 완료: ${finalNickname} - ${this.formatTime(timeInSeconds)} (${rank}위 예상)`);
         return true;
       } else {
         // 로컬 모드
@@ -510,7 +508,6 @@ class RankingService {
           stored[sessionIndex].endTime = Date.now();
           
           localStorage.setItem('timewaster_local_ranking', JSON.stringify(stored));
-          console.log(`로컬 랭킹 제출 완료: ${finalNickname} - ${this.formatTime(timeInSeconds)}`);
           return true;
         }
         

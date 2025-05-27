@@ -27,7 +27,6 @@ const FlyingMessageManager = () => {
         
         // 1분(60초)마다 채팅 권한 자동 지급
         if (newTime > 0 && newTime % 60 === 0) {
-          console.log('⏰ 1분 경과! 채팅 권한 1개 자동 지급!');
           setChatTokens(prevTokens => prevTokens + 1);
           addFlyingChatMessage('🎁 1분 체류 보상! 채팅 권한 1개 획득!', false);
         }
@@ -75,7 +74,7 @@ const FlyingMessageManager = () => {
     const rankingRef = ref(database, 'live-feed/ranking-updates');
     const chatRef = ref(database, 'live-feed/global-chat');
 
-    console.log('🔥 Firebase 리스너 설정 중...');
+
 
     // 새 접속자 알림
     const unsubscribeConnection = onValue(connectionsRef, (snapshot) => {
@@ -106,7 +105,6 @@ const FlyingMessageManager = () => {
     // 🔥 강화된 글로벌 채팅 메시지 리스너
     const unsubscribeChat = onValue(chatRef, (snapshot) => {
       const data = snapshot.val();
-      console.log('📨 Firebase 채팅 데이터 수신:', data);
       
       if (data) {
         const messages = Object.entries(data)
@@ -114,14 +112,12 @@ const FlyingMessageManager = () => {
           .sort((a, b) => b.timestamp - a.timestamp);
         
         const latestChat = messages[0];
-        console.log('📨 최신 채팅 메시지:', latestChat);
         
         // 새로운 메시지이고, 10초 이내에 작성된 경우만 표시
         if (latestChat && 
             Date.now() - latestChat.timestamp < 10000 && 
             lastProcessedMessage !== latestChat.key) {
           
-          console.log('🎉 새 글로벌 메시지 표시:', latestChat.message);
           addFlyingChatMessage(latestChat.message, false); // 다른 사람 메시지
           setLastProcessedMessage(latestChat.key);
         }
@@ -129,7 +125,6 @@ const FlyingMessageManager = () => {
     });
 
     return () => {
-      console.log('🔥 Firebase 리스너 정리 중...');
       off(connectionsRef);
       off(rankingRef);
       off(chatRef);
@@ -138,13 +133,11 @@ const FlyingMessageManager = () => {
 
   const addFlyingRankingMessage = (message) => {
     const id = Date.now() + Math.random();
-    console.log('🏆 랭킹 메시지 추가:', message);
     setFlyingRankingMessages(prev => [...prev, { id, message }]);
   };
 
   const addFlyingChatMessage = (message, isMyMessage = false) => {
     const id = Date.now() + Math.random();
-    console.log('💬 채팅 메시지 추가:', message, '내 메시지:', isMyMessage);
     setFlyingChatMessages(prev => [...prev, { id, message, isMyMessage }]);
   };
 
@@ -159,7 +152,6 @@ const FlyingMessageManager = () => {
   // 광고 클릭으로 채팅 권한 득기
   const handleAdClick = () => {
     if (adChatCooldown === 0) {
-      console.log('🎆 광고 클릭! 채팅 권한 획득!');
       setChatTokens(prev => prev + 1); // 채팅 토큰 1개 지급
       setAdChatCooldown(30000); // 30초 쿨다운
       
@@ -168,24 +160,19 @@ const FlyingMessageManager = () => {
     }
   };
   const handleSendChatMessage = (message) => {
-    console.log('💬 메시지 전송 시작:', message);
-    
     // 채팅 토큰 소모
     if (chatTokens > 0) {
       setChatTokens(prev => prev - 1); // 토큰 1개 소모
     }
     
     // 🚀 내 메시지를 즉시 화면에 표시!
-    console.log('✨ 내 메시지 즉시 화면에 표시:', message);
     addFlyingChatMessage(message, true); // isMyMessage = true, 즉시!
     
     if (!database) {
-      console.log('💻 로컬 모드: Firebase 없이 테스트');
       return; // 쿨다운 제거
     }
     
     // Firebase에 전송 (다른 사용자들에게도 보이게)
-    console.log('🔥 Firebase에 메시지 전송 시도');
     const chatRef = ref(database, 'live-feed/global-chat');
     push(chatRef, { 
       message, 
@@ -194,15 +181,10 @@ const FlyingMessageManager = () => {
       isMyMessage: false // 다른 사용자들에게는 내 메시지가 아님
     })
     .then(() => {
-      console.log('✅ Firebase 전송 성공!');
+      // 전송 성공 (로그 제거)
     })
     .catch((error) => {
       console.error('❌ Firebase 전송 실패:', error);
-      console.error('❌ 에러 상세:', {
-        code: error.code,
-        message: error.message,
-        stack: error.stack
-      });
       
       // 에러 상황에서도 피드백
       addFlyingChatMessage('😅 메시지 전송에 실패했지만 로컬에서는 보여요!', false);

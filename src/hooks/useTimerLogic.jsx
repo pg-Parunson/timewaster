@@ -55,7 +55,6 @@ export const useTimerLogic = () => {
       return;
     }
     
-    console.log('🎭 타이핑 효과 시작:', message.slice(0, 20) + '...');
     setIsTyping(true);
     setDisplayMessage("");
     
@@ -71,7 +70,6 @@ export const useTimerLogic = () => {
         // 타이핑 속도를 빠르게 조정 (20-35ms)
         typingRef.current = setTimeout(type, 20 + Math.random() * 15);
       } else {
-        console.log('🎭 타이핑 효과 완료');
         setIsTyping(false);
       }
     };
@@ -178,7 +176,6 @@ export const useTimerLogic = () => {
   useEffect(() => {
     // 첫 로드시에만 실행
     const timer = setTimeout(() => {
-      console.log('🚀 초기 메시지 타이핑 시작:', currentMessage);
       typeMessage(currentMessage);
     }, 100);
     
