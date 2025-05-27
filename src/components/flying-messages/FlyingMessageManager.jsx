@@ -8,7 +8,7 @@ import FlyingRankingMessage from './FlyingRankingMessage';
 import FlyingChatMessage from './FlyingChatMessage';
 import ChatModal from './ChatModal';
 
-const FlyingMessageManager = ({ elapsedTime = 0 }) => { // 🕰️ elapsedTime prop 추가
+const FlyingMessageManager = ({ elapsedTime = 0, onAdCooldownChange }) => { // 🕰️ elapsedTime prop 추가 + 쿨다운 콜백
   const [connectionNotification, setConnectionNotification] = useState(null);
   const [flyingRankingMessages, setFlyingRankingMessages] = useState([]);
   const [flyingChatMessages, setFlyingChatMessages] = useState([]);
@@ -51,15 +51,33 @@ const FlyingMessageManager = ({ elapsedTime = 0 }) => { // 🕰️ elapsedTime p
     return () => clearInterval(interval);
   }, []);
 
-  // 광고 쿨다운 처리
+  // 광고 쿨다운 처리 - 🐛 콜백으로 상태 공유
   useEffect(() => {
     if (adChatCooldown > 0) {
       const timer = setInterval(() => {
-        setAdChatCooldown(prev => Math.max(0, prev - 1000));
+        setAdChatCooldown(prev => {
+          const newValue = Math.max(0, prev - 1000);
+          // 🐛 상위 컴포넌트에 쿨다운 상태 전달
+          if (onAdCooldownChange) {
+            onAdCooldownChange({
+              cooldown: newValue,
+              canGetToken: newValue === 0
+            });
+          }
+          return newValue;
+        });
       }, 1000);
       return () => clearInterval(timer);
+    } else {
+      // 쿨다운이 0일 때도 콜백 수행
+      if (onAdCooldownChange) {
+        onAdCooldownChange({
+          cooldown: 0,
+          canGetToken: true
+        });
+      }
     }
-  }, [adChatCooldown]);
+  }, [adChatCooldown, onAdCooldownChange]);
 
   // Firebase 실시간 리스너들
   useEffect(() => {

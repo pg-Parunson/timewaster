@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Clock, Zap } from 'lucide-react';
 import { getRecommendedProduct, getRandomCoupangProduct } from '../data/coupangProducts'; // 🎯 랜덤 쿠팡 링크 import
 
-// 포켓몬 스타일 광고 영역 컴포넌트
-const AdSection = React.memo(({ showAd, adMessage, extremeMode, elapsedTime, onProductClick }) => {
+// 포켓몬 스타일 광고 영역 컴포넌트 - 🐛 쿨다운 지원 추가
+const AdSection = React.memo(({ showAd, adMessage, extremeMode, elapsedTime, onProductClick, adCooldownInfo = { cooldown: 0, canGetToken: true } }) => {
   const [isBlinking, setIsBlinking] = useState(false);
   const product = getRecommendedProduct(elapsedTime);
 
@@ -40,13 +40,18 @@ const AdSection = React.memo(({ showAd, adMessage, extremeMode, elapsedTime, onP
             <Zap className="w-5 h-5 text-yellow-500 animate-bounce" />
           </div>
           
-          {/* 포켓몬 스타일 상품 버튼 */}
+          {/* 포켓몬 스타일 상품 버튼 - 🐛 쿨다운 지원 */}
           <div className="text-center">
             <button
               onClick={onProductClick}
-              className="pokemon-button w-full"
+              disabled={!adCooldownInfo.canGetToken} // 🐛 쿨다운 중일 때 비활성화
+              className={`pokemon-button w-full transition-all duration-300 ${
+                !adCooldownInfo.canGetToken ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
               style={{
-                background: `linear-gradient(135deg, ${product.color.includes('purple') ? '#9C27B0, #E91E63' : 
+                background: !adCooldownInfo.canGetToken 
+                  ? 'linear-gradient(135deg, #9E9E9E 0%, #757575 100%)' // 쿨다운 중 회색
+                  : `linear-gradient(135deg, ${product.color.includes('purple') ? '#9C27B0, #E91E63' : 
                                                       product.color.includes('blue') ? '#2196F3, #03DAC6' :
                                                       product.color.includes('green') ? '#4CAF50, #8BC34A' :
                                                       'var(--pokemon-gold), var(--pokemon-orange)'})`,
@@ -54,19 +59,27 @@ const AdSection = React.memo(({ showAd, adMessage, extremeMode, elapsedTime, onP
               }}
             >
               <div className="flex flex-col items-center gap-2">
-                <div className="text-2xl">{product.icon}</div>
-                <div className="pokemon-font font-bold text-black">{product.name}</div>
+                <div className="text-2xl">{adCooldownInfo.canGetToken ? product.icon : '⏰'}</div> {/* 🐛 쿨다운 중이면 시계 아이콘 */}
+                <div className="pokemon-font font-bold text-black">
+                  {adCooldownInfo.canGetToken ? product.name : '광고 쿨다운 중'}
+                </div>
                 <div className="pokemon-font text-sm text-black/80 leading-tight">
-                  {product.description}
+                  {adCooldownInfo.canGetToken 
+                    ? product.description 
+                    : `${Math.ceil(adCooldownInfo.cooldown / 1000)}초 후 다시 시도하세요`
+                  }
                 </div>
               </div>
             </button>
           </div>
 
-          {/* 포켓몬 스타일 안내 메시지 */}
+          {/* 포켓몬 스타일 안내 메시지 - 🐛 쿨다운 정보 추가 */}
           <div className="mt-4 p-3 bg-blue-100 border-2 border-blue-400 rounded-lg">
             <div className="pokemon-font text-sm text-blue-800 text-center">
-              💡 시간을 낭비한 만큼 쇼핑도 해보세요!
+              {adCooldownInfo.canGetToken 
+                ? '💡 시간을 낭비한 만큼 쇼핑도 해보세요!' 
+                : `🕰️ 채팅 권한 쿨다운 중! ${Math.ceil(adCooldownInfo.cooldown / 1000)}초 후 다시 시도하세요`
+              }
             </div>
           </div>
         </div>

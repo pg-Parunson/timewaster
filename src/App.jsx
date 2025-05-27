@@ -127,6 +127,9 @@ const getMessageStyle = (messageType) => {
 };
 
 function App() {
+  // 🐛 광고 쿨다운 상태 관리
+  const [adCooldownInfo, setAdCooldownInfo] = useState({ cooldown: 0, canGetToken: true });
+  
   // 회전 부제목 훅
   const { currentSubtitle, isAnimating } = useRotatingSubtitle();
   
@@ -710,13 +713,14 @@ function App() {
 
           {/* 중앙 컬럼: 광고 + 공유 */}
           <div className="space-y-6">
-            {/* 광고 섹션 */}
+            {/* 광고 섹션 - 🐛 쿨다운 정보 전달 */}
             <AdSection 
               showAd={showAd}
               adMessage={adMessage}
               extremeMode={extremeMode}
               elapsedTime={elapsedTime}
               onProductClick={handleProductClick}
+              adCooldownInfo={adCooldownInfo} // 🐛 쿨다운 정보 전달
             />
 
             {/* 공유 섹션 */}
@@ -765,8 +769,11 @@ function App() {
       {/* 이스터 에그 */}
       <EasterEgg elapsedTime={elapsedTime} />
 
-      {/* 날아가는 메시지 시스템 */}
-      <FlyingMessageManager elapsedTime={elapsedTime} />
+      {/* 날아가는 메시지 시스템 - 🐛 쿨다운 콜백 추가 */}
+      <FlyingMessageManager 
+        elapsedTime={elapsedTime} 
+        onAdCooldownChange={setAdCooldownInfo} // 🐛 쿨다운 상태 콜백
+      />
       
       {/* 🧪 테스트용 강제 메시지 - 개발 확인용 */}
       {import.meta.env.DEV && (
