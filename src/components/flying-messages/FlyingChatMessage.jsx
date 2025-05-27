@@ -1,37 +1,51 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', onComplete }) => {
+  // 🔧 안전한 윈도우 크기 확인 함수
+  const getWindowDimensions = () => {
+    // 서버 환경이나 윈도우가 없는 경우 기본값 사용
+    if (typeof window === 'undefined') {
+      return { width: 1920, height: 1080 }; // 기본값
+    }
+    return { 
+      width: window.innerWidth || 1920, 
+      height: window.innerHeight || 1080 
+    };
+  };
+
   // 다양한 시작 위치와 이동 방향 설정
   const [trajectory, setTrajectory] = useState(() => {
+    const { width, height } = getWindowDimensions();
+    
     const trajectories = [
       // 1. 왼쪽에서 오른쪽으로
       {
         startX: -200,
-        endX: window.innerWidth + 200,
+        endX: width + 200,
         y: Math.random() * 300 + 100, // 100~400px
         direction: 'left-to-right'
       },
       // 2. 오른쪽에서 왼쪽으로
       {
-        startX: window.innerWidth + 200,
+        startX: width + 200,
         endX: -200,
         y: Math.random() * 300 + 100,
         direction: 'right-to-left'
       },
       // 3. 위에서 아래로 (대각선)
       {
-        startX: Math.random() * (window.innerWidth - 400) + 200,
-        endX: Math.random() * (window.innerWidth - 400) + 200,
+        startX: Math.random() * (width - 400) + 200,
+        endX: Math.random() * (width - 400) + 200,
         startY: -100,
-        endY: window.innerHeight + 100,
-        y: null, // 동적 바뀐
+        endY: height + 100,
+        y: null, // 동적 바뀜
         direction: 'top-to-bottom'
       },
       // 4. 아래에서 위로 (대각선)
       {
-        startX: Math.random() * (window.innerWidth - 400) + 200,
-        endX: Math.random() * (window.innerWidth - 400) + 200,
-        startY: window.innerHeight + 100,
+        startX: Math.random() * (width - 400) + 200,
+        endX: Math.random() * (width - 400) + 200,
+        startY: height + 100,
         endY: -100,
         y: null,
         direction: 'bottom-to-top'
@@ -50,12 +64,27 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
   const animationRef = useRef(null);
   const hasStarted = useRef(false);
   
+  // 🔄 창 크기 변경 대응
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const handleResize = () => {
+      // 이미 시작된 애니메이션은 그대로 두고 새로운 메시지만 영향
+      // 굶이 리사이즈를 처리하지 않음 (성능상 이유)
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
   useEffect(() => {
     // 중복 실행 방지
     if (hasStarted.current) return;
     hasStarted.current = true;
     
     console.log('🎬 날아가는 메시지 애니메이션 시작:', { message, id, isMyMessage, messageType, trajectory });
+    console.log('🖼️ 초기 position:', position);
+    console.log('🚀 trajectory:', trajectory);
     
     const startTime = Date.now();
     const duration = 8000; // 8초
@@ -80,6 +109,11 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
         newX += Math.sin(progress * Math.PI * 3) * 50;
       }
       
+      // 🔍 디버깅 로그 추가
+      if (elapsed < 2000) { // 처음 2초만 로그
+        console.log(`🎭 애니메이션 진행 [${id}]:`, { progress: Math.round(progress * 100) + '%', newX: Math.round(newX), newY: Math.round(newY) });
+      }
+      
       setPosition({ x: newX, y: newY });
       
       if (progress < 1) {
@@ -93,11 +127,13 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
     
     // 약간의 지연 후 시작 (렌더링 완료 대기)
     setTimeout(() => {
+      console.log('🎯 애니메이션 시작 예약:', id);
       animationRef.current = requestAnimationFrame(animate);
     }, 100);
     
     // 정리 함수
     return () => {
+      console.log('🧹 애니메이션 정리:', id);
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
