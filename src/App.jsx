@@ -130,6 +130,10 @@ function App() {
   // 🐛 광고 쿨다운 상태 관리
   const [adCooldownInfo, setAdCooldownInfo] = useState({ cooldown: 0, canGetToken: true });
   
+  // 🏆 랭킹 테스트를 위한 상태 추가
+  const [isRankingTestMode, setIsRankingTestMode] = useState(false);
+  const [testElapsedTime, setTestElapsedTime] = useState(300); // 테스트용 시간 상태
+  
   // 회전 부제목 훅
   const { currentSubtitle, isAnimating } = useRotatingSubtitle();
   
@@ -178,6 +182,24 @@ function App() {
     currentUser
   });
   
+  // 🏆 랭킹 테스트 함수 추가 - 시간 매개변수 추가
+  const handleRankingTest = (customTime = 300) => {
+    console.log(`🏆 랭킹 테스트 모드 활성화! 시간: ${customTime}초 (${Math.floor(customTime/60)}분)`);
+    setIsRankingTestMode(true);
+    // 테스트용 시간 저장
+    setTestElapsedTime(customTime);
+  };
+  
+  const handleRankingTestClose = () => {
+    setIsRankingTestMode(false);
+  };
+  
+  const handleRankingTestConfirm = () => {
+    console.log('🏆 랭킹 테스트 완료!');
+    setIsRankingTestMode(false);
+    // 다른 입력이 없으면 그냥 종료
+  };
+
   // 축하 시스템 초기화 (범위 제한)
   const { showCelebration, currentCelebration, handleCelebrationComplete } = useCelebrationSystem(elapsedTime);
 
@@ -793,8 +815,11 @@ function App() {
         </>
       )}
       
-      {/* 개발자 도구 */}
-      <DevTools isVisible={import.meta.env.DEV} />
+      {/* 개발자 도구 - 🏆 랭킹 테스트 버튼 추가 */}
+      <DevTools 
+        isVisible={import.meta.env.DEV} 
+        onOpenRankingTest={handleRankingTest} // 🏆 랭킹 테스트 콜백
+      />
 
       {/* 🎉 축하 이펙트 - 포켓몬 스타일 */}
       <CelebrationEffect 
@@ -814,6 +839,19 @@ function App() {
         totalTimeWasted={totalTimeWasted}
         visits={visits}
         adClicks={adClicks}
+      />
+      
+      {/* 🏆 랭킹 테스트 모달 추가 - 동적 시간 */}
+      <RankingRegistrationModal
+        isOpen={isRankingTestMode}
+        onClose={handleRankingTestClose}
+        onConfirm={handleRankingTestConfirm}
+        onExit={handleRankingTestClose}
+        elapsedTime={testElapsedTime} // 🏆 동적 테스트 시간
+        currentUser={currentUser}
+        totalTimeWasted={testElapsedTime * 3} // 테스트용 (3배)
+        visits={Math.floor(testElapsedTime / 60) + 10} // 테스트용 (분 + 10)
+        adClicks={Math.floor(testElapsedTime / 180) + 2} // 테스트용 (3분마다 1개 + 2)
       />
 
       <ModernModal
