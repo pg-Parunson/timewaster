@@ -99,12 +99,27 @@ const EpicPokemonCelebrationEffect = ({ isActive, celebration, onComplete }) => 
           }
         }
         
-        @keyframes epic-message-pulse {
+        @keyframes epic-message-heartbeat {
           0%, 100% { 
-            transform: translate(-50%, -50%) scale(1) rotate(0deg);
+            transform: translate(-50%, -50%) scale(1);
           }
           50% { 
-            transform: translate(-50%, -50%) scale(1.02) rotate(0deg);
+            transform: translate(-50%, -50%) scale(1.05);
+          }
+        }
+        
+        @keyframes epic-message-glow {
+          0%, 100% {
+            box-shadow: 
+              4px 4px 0px rgba(0, 0, 0, 0.4),
+              inset 2px 2px 0px rgba(255, 255, 255, 0.3),
+              0 0 20px rgba(255, 215, 0, 0.6);
+          }
+          50% {
+            box-shadow: 
+              4px 4px 0px rgba(0, 0, 0, 0.4),
+              inset 2px 2px 0px rgba(255, 255, 255, 0.3),
+              0 0 30px rgba(255, 215, 0, 0.8);
           }
         }
         
@@ -124,22 +139,6 @@ const EpicPokemonCelebrationEffect = ({ isActive, celebration, onComplete }) => 
           100% { 
             transform: translateY(-150px) scale(1.5) rotate(720deg);
             opacity: 0;
-          }
-        }
-        
-        @keyframes epic-border-glow {
-          0%, 100% {
-            box-shadow: 
-              4px 4px 0px rgba(0, 0, 0, 0.4),
-              inset 2px 2px 0px rgba(255, 255, 255, 0.3),
-              0 0 20px rgba(255, 215, 0, 0.5);
-          }
-          50% {
-            box-shadow: 
-              4px 4px 0px rgba(0, 0, 0, 0.4),
-              inset 2px 2px 0px rgba(255, 255, 255, 0.3),
-              0 0 40px rgba(255, 215, 0, 0.8),
-              0 0 60px rgba(255, 107, 53, 0.6);
           }
         }
         
@@ -179,7 +178,7 @@ const EpicPokemonCelebrationEffect = ({ isActive, celebration, onComplete }) => 
         }
         
         .epic-message-container.phase-2 {
-          animation: epic-message-pulse 3s ease-in-out infinite !important;
+          animation: epic-message-heartbeat 2s ease-in-out infinite !important;
         }
         
         .epic-message-box {
@@ -195,7 +194,7 @@ const EpicPokemonCelebrationEffect = ({ isActive, celebration, onComplete }) => 
           min-width: 400px !important;
           text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.8) !important;
           line-height: 1.4 !important;
-          animation: epic-border-glow 2s ease-in-out infinite !important;
+          animation: epic-message-glow 3s ease-in-out infinite !important;
         }
         
         .epic-title {
