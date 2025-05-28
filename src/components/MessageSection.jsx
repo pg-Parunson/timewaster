@@ -13,14 +13,6 @@ const MessageSection = ({
   onActivitySelect = () => {},
   compact = false
 }) => {
-  // 🔍 디버그: props 값들 확인
-  console.log('MessageSection props:', {
-    displayMessage: displayMessage || 'EMPTY!',
-    messageData,
-    isTyping,
-    compact,
-    displayMessageLength: displayMessage?.length || 0
-  });
   const messageRef = useRef(null);
   const [refreshButtonText, setRefreshButtonText] = useState(BUTTON_TEXTS[0]);
   const [isRefreshing, setIsRefreshing] = useState(false);

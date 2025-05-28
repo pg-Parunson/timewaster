@@ -49,7 +49,7 @@ export const DB_PATHS = {
   WEEKLY: 'rankings/weekly', 
   MONTHLY: 'rankings/monthly',
   ALL_TIME: 'rankings/allTime',
-  LIVE_FEED: 'liveFeed'
+  LIVE_FEED: 'live-feed' // 하이픈으로 변경
 };
 
 // 랭킹 기간 타입

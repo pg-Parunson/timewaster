@@ -82,10 +82,6 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
     if (hasStarted.current) return;
     hasStarted.current = true;
     
-    console.log('🎬 날아가는 메시지 애니메이션 시작:', { message, id, isMyMessage, messageType, trajectory });
-    console.log('🖼️ 초기 position:', position);
-    console.log('🚀 trajectory:', trajectory);
-    
     const startTime = Date.now();
     const duration = 8000; // 8초
     
@@ -109,17 +105,11 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
         newX += Math.sin(progress * Math.PI * 3) * 50;
       }
       
-      // 🔍 디버깅 로그 추가
-      if (elapsed < 2000) { // 처음 2초만 로그
-        console.log(`🎭 애니메이션 진행 [${id}]:`, { progress: Math.round(progress * 100) + '%', newX: Math.round(newX), newY: Math.round(newY) });
-      }
-      
       setPosition({ x: newX, y: newY });
       
       if (progress < 1) {
         animationRef.current = requestAnimationFrame(animate);
       } else {
-        console.log('✅ 메시지 애니메이션 완료:', id);
         setIsVisible(false);
         setTimeout(() => onComplete(id), 100);
       }
@@ -127,13 +117,11 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
     
     // 약간의 지연 후 시작 (렌더링 완료 대기)
     setTimeout(() => {
-      console.log('🎯 애니메이션 시작 예약:', id);
       animationRef.current = requestAnimationFrame(animate);
     }, 100);
     
     // 정리 함수
     return () => {
-      console.log('🧹 애니메이션 정리:', id);
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }

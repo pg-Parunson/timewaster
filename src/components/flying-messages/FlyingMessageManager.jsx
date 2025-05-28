@@ -34,11 +34,9 @@ const FlyingMessageManager = ({ elapsedTime = 0, onAdCooldownChange }) => { // �
           setChatTokens(prevTokens => {
             // 이미 채팅 권한이 있으면 추가하지 않음 (도배 방지)
             if (prevTokens > 0) {
-              console.log('🚫 채팅 권한이 이미 있어서 추가 지급하지 않음');
               return prevTokens; // 그대로 유지
             }
             
-            console.log('🎁 1분 체류 보상! 일반 채팅 권한 1개 지급');
             addFlyingChatMessage('🎁 1분 체류 보상! 일반 채팅 권한 획득!', false);
             return 1; // 정확히 1개만
           });
@@ -105,8 +103,6 @@ const FlyingMessageManager = ({ elapsedTime = 0, onAdCooldownChange }) => { // �
     const rankingRef = ref(database, 'live-feed/ranking-updates');
     const chatRef = ref(database, 'live-feed/global-chat');
 
-
-
     // 새 접속자 알림
     const unsubscribeConnection = onValue(connectionsRef, (snapshot) => {
       const data = snapshot.val();
@@ -133,7 +129,7 @@ const FlyingMessageManager = ({ elapsedTime = 0, onAdCooldownChange }) => { // �
       }
     });
 
-  // 🔥 강화된 글로벌 채팅 메시지 리스너
+    // 🔥 강화된 글로벌 채팅 메시지 리스너
     const unsubscribeChat = onValue(chatRef, (snapshot) => {
       try {
         const data = snapshot.val();
@@ -152,7 +148,6 @@ const FlyingMessageManager = ({ elapsedTime = 0, onAdCooldownChange }) => { // �
               lastProcessedMessage !== latestChat.key &&
               !mySentMessagesRef.current.has(latestChat.messageId)) { // useRef로 변경 - 실시간 참조
             
-            console.log('📨 새 메시지 수신:', latestChat);
             addFlyingChatMessage(latestChat.message, false, latestChat.messageType || 'basic'); // 메시지 타입 전달
             setLastProcessedMessage(latestChat.key);
           }
@@ -188,13 +183,11 @@ const FlyingMessageManager = ({ elapsedTime = 0, onAdCooldownChange }) => { // �
     }
   };
 
-  // 🎯 광고 클릭으로 채팕 권한 얻기 - 랜덤 쿠팡 링크 연결
+  // 🎯 광고 클릭으로 채팅 권한 얻기 - 랜덤 쿠팡 링크 연결
   const handleAdClick = () => {
     if (adChatCooldown === 0) {
       // 🎯 랜덤 쿠팡 상품 선택
       const randomProduct = getRandomCoupangProduct();
-      
-      console.log('🎆 광고 클릭 - 랜덤 상품:', randomProduct.name);
       
       // 쿠팡 링크 열기
       window.open(randomProduct.url, '_blank');
@@ -204,16 +197,13 @@ const FlyingMessageManager = ({ elapsedTime = 0, onAdCooldownChange }) => { // �
       setAdChatCooldown(30000); // 30초 쿨다운
       
       // 성공 메시지 표시
-      addFlyingChatMessage(`🎆 ${randomProduct.name} 광고 시청! 프리미엄 채팡 권한 1개 획득!`, false);
+      addFlyingChatMessage(`🎆 ${randomProduct.name} 광고 시청! 프리미엄 채팅 권한 1개 획득!`, false);
     }
   };
+  
   const handleSendChatMessage = (message) => {
-    console.log('🚀 메시지 전송 시작:', message);
-    console.log('📊 현재 상태:', { chatTokens, premiumTokens, database: !!database });
-    
-    // 최근 전솠한 메시지와 같으면 중복 전송 방지
+    // 최근 전송한 메시지와 같으면 중복 전송 방지
     if (recentlySentMessage === message) {
-      console.warn('🚫 동일한 메시지 중복 전송 방지');
       return;
     }
     
@@ -221,18 +211,11 @@ const FlyingMessageManager = ({ elapsedTime = 0, onAdCooldownChange }) => { // �
     let messageType = 'none';
     if (premiumTokens > 0) {
       messageType = 'premium';
-      setPremiumTokens(prev => {
-        console.log('🎆 프리미엄 토큰 소모:', prev, '→', prev - 1);
-        return prev - 1;
-      });
+      setPremiumTokens(prev => prev - 1);
     } else if (chatTokens > 0) {
       messageType = 'basic';
-      setChatTokens(prev => {
-        console.log('💬 일반 토큰 소모:', prev, '→', prev - 1);
-        return prev - 1;
-      });
+      setChatTokens(prev => prev - 1);
     } else {
-      console.warn('⚠️ 채팅 권한이 없음');
       return;
     }
     
@@ -244,10 +227,8 @@ const FlyingMessageManager = ({ elapsedTime = 0, onAdCooldownChange }) => { // �
     
     // 내가 보낸 메시지로 기록 (useRef로 즉시 반영)
     mySentMessagesRef.current.add(messageId);
-    console.log('📝 내 메시지 기록:', messageId, '총 개수:', mySentMessagesRef.current.size);
     
     // 🚀 내 메시지를 즉시 화면에 표시! (메시지 타입 전달)
-    console.log('✨ 날아가는 메시지 추가 중... 타입:', messageType);
     addFlyingChatMessage(message, true, messageType); // messageType 추가
     
     // 3초 후 동일 메시지 전송 허용
@@ -256,12 +237,10 @@ const FlyingMessageManager = ({ elapsedTime = 0, onAdCooldownChange }) => { // �
     }, 3000);
     
     if (!database) {
-      console.warn('⚠️ Firebase 연결 없음 - 로컬에서만 표시');
       return;
     }
     
     // Firebase에 전송 (다른 사용자들에게만 보이게)
-    console.log('📡 Firebase 전송 시작...');
     const chatRef = ref(database, 'live-feed/global-chat');
     const messageData = { 
       message, 
@@ -274,7 +253,7 @@ const FlyingMessageManager = ({ elapsedTime = 0, onAdCooldownChange }) => { // �
     
     push(chatRef, messageData)
     .then(() => {
-      console.log('✅ Firebase 전송 성공!');
+      // 성공 시 로그 없음
     })
     .catch((error) => {
       console.error('❌ Firebase 전송 실패:', error);
@@ -344,14 +323,8 @@ const FlyingMessageManager = ({ elapsedTime = 0, onAdCooldownChange }) => { // �
         {import.meta.env.DEV && (
           <button
             onClick={() => {
-              setChatTokens(prev => {
-                console.log('🎁 일반 토큰 지급:', prev, '→', prev + 2);
-                return prev + 2;
-              });
-              setPremiumTokens(prev => {
-                console.log('🎆 프리미엄 토큰 지급:', prev, '→', prev + 3);
-                return prev + 3;
-              });
+              setChatTokens(prev => prev + 2);
+              setPremiumTokens(prev => prev + 3);
               addFlyingChatMessage('🎁 테스트 토큰 지급! 일반 2개 + 프리미엄 3개', false);
               // 강제 테스트 메시지도 추가
               setTimeout(() => {
