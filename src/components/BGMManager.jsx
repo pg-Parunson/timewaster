@@ -207,7 +207,7 @@ const BGMManager = ({ elapsedTime, compact = false }) => {
           title="볼륨 조절 (최대 50%)"
         />
         <span className="text-xs text-white/70 min-w-[30px]">
-          {Math.round(volume * 100)}%
+          {Math.round(volume * 200)}% {/* 0.5 최대를 100%로 표시 */}
         </span>
       </div>
       

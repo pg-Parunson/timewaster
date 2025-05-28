@@ -150,18 +150,14 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
 
   return (
     <div 
-      style={{ 
-        position: 'fixed',
-        left: position.x,
-        top: position.y,
-        transform: 'translate(-50%, -50%)',
-        zIndex: 99999,
-        pointerEvents: 'none',
-        // 🔍 디버그용 배경 (개발 환경에서만)
-        ...(import.meta.env.DEV && {
-          border: '2px dashed red',
-          backgroundColor: 'rgba(255, 0, 0, 0.1)'
-        })
+      style={{
+      position: 'fixed',
+      left: position.x,
+      top: position.y,
+      transform: 'translate(-50%, -50%)',
+      zIndex: 99999,
+      pointerEvents: 'none'
+      // 개발용 디버그 UI 제거
       }}
     >
       {/* 메시지 타입에 따른 다른 스타일 */}
@@ -260,22 +256,7 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
           <span>{message}</span>
         </div>
         
-        {/* 🔍 디버그 정보 표시 (개발 환경에서만) */}
-        {import.meta.env.DEV && (
-          <div style={{
-            position: 'absolute',
-            top: '-20px',
-            left: '0',
-            fontSize: '10px',
-            color: 'red',
-            backgroundColor: 'white',
-            padding: '2px 4px',
-            borderRadius: '2px',
-            border: '1px solid red'
-          }}>
-            ID: {id}
-          </div>
-        )}
+        {/* 개발용 ID 표시 제거 */}
       </div>
     </div>
   );
