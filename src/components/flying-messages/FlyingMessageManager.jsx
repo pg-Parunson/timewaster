@@ -256,7 +256,10 @@ const FlyingMessageManager = ({ elapsedTime = 0, onAdCooldownChange }) => { // �
       // 성공 시 로그 없음
     })
     .catch((error) => {
-      console.error('❌ Firebase 전송 실패:', error);
+      // 운영 환경에서는 에러 로그를 줄이고 사용자 피드백에 집중
+      if (import.meta.env.DEV) {
+        console.error('❌ Firebase 전송 실패:', error);
+      }
       
       // 오류 상황에서도 피드백 - 종류에 따라 다른 메시지
       if (error.code === 'PERMISSION_DENIED') {

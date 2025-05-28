@@ -76,13 +76,16 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
     if (hasStarted.current) return;
     hasStarted.current = true;
     
-    console.log('🚀 메시지 애니메이션 시작:', { 
-      id, 
-      message: message.substring(0, 20) + '...', 
-      trajectory,
-      startPos: { x: trajectory.startX, y: trajectory.startY },
-      endPos: { x: trajectory.endX, y: trajectory.endY }
-    });
+    // 개발 환경에서만 상세 로그 표시
+    if (import.meta.env.DEV) {
+      console.log('🚀 메시지 애니메이션 시작:', { 
+        id, 
+        message: message.substring(0, 20) + '...', 
+        trajectory,
+        startPos: { x: trajectory.startX, y: trajectory.startY },
+        endPos: { x: trajectory.endX, y: trajectory.endY }
+      });
+    }
     
     const startTime = Date.now();
     const duration = 6000; // 6초로 단축 (더 빠르게)
@@ -101,8 +104,8 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
       
       setPosition({ x: newX, y: finalY });
       
-      // 자주 로그 출력 (개발 환경에서만)
-      if (import.meta.env.DEV && elapsed % 500 < 50) { // 0.5초마다
+      // 진행률 로그 (개발 환경에서만 그리고 자주 안 함)
+      if (import.meta.env.DEV && elapsed % 2000 < 50) { // 2초마다
         console.log(`📍 메시지 위치 ${id}:`, { 
           progress: Math.floor(progress * 100), 
           x: Math.floor(newX), 
@@ -114,7 +117,9 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
       if (progress < 1) {
         animationRef.current = requestAnimationFrame(animate);
       } else {
-        console.log('✅ 메시지 애니메이션 완료:', id);
+        if (import.meta.env.DEV) {
+          console.log('✅ 메시지 애니메이션 완료:', id);
+        }
         setIsVisible(false);
         setTimeout(() => onComplete(id), 100);
       }
@@ -122,7 +127,9 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
     
     // 🔥 브라우저 호환성 체크 & 폴백
     if (typeof requestAnimationFrame === 'undefined') {
-      console.error('❌ requestAnimationFrame 미지원 - setInterval 폴백 사용');
+      if (import.meta.env.DEV) {
+        console.error('❌ requestAnimationFrame 미지원 - setInterval 폴백 사용');
+      }
       
       const interval = setInterval(() => {
         const elapsed = Date.now() - startTime;
