@@ -26,11 +26,16 @@ class StatsService {
     try {
       if (this.isFirebaseConnected) {
         const visitsRef = ref(database, 'global-stats/totalVisits');
-        await set(visitsRef, increment(1));
         
-        // 현재 값 반환
+        // 먼저 값을 읽어서 현재 값 확인
         const snapshot = await get(visitsRef);
-        return snapshot.val() || 1;
+        const currentValue = snapshot.val() || 0;
+        
+        // 직접 수치를 설정 (귛등 문제 방지)
+        const newValue = currentValue + 1;
+        await set(visitsRef, newValue);
+        
+        return newValue;
       } else {
         // 로컬 모드
         this.localStats.totalVisits += 1;
@@ -38,8 +43,9 @@ class StatsService {
         return this.localStats.totalVisits;
       }
     } catch (error) {
-      console.error('방문 횟수 증가 실패:', error);
-      return 1;
+      console.warn('😨 방문 횟수 증가 실패 (계속 진행):', error.code || error.message);
+      // 실패해도 기본값 반환
+      return this.localStats.totalVisits || 1;
     }
   }
 
@@ -125,13 +131,15 @@ class StatsService {
         const snapshot = await get(statsRef);
         
         if (!snapshot.exists()) {
-          // 초기값 설정
+          // 초기값 설정 - 더 안전하게
           const initialStats = {
             totalVisits: 1,
             totalTimeWasted: 0,
-            lastUpdated: serverTimestamp()
+            lastUpdated: Date.now() // serverTimestamp 대신 일반 타임스탬프
           };
-          await set(statsRef, initialStats);
+          await set(statsRef, initialStats).catch(err => {
+            console.warn('초기 통계 설정 실패:', err);
+          });
           return { ...initialStats, activeSessions: 1 };
         }
 
@@ -161,7 +169,7 @@ class StatsService {
         };
       }
     } catch (error) {
-      console.error('전체 통계 조회 실패:', error);
+      console.warn('😨 전체 통계 조회 실패 (기본값 사용):', error.code || error.message);
       return {
         totalVisits: 1,
         totalTimeWasted: 0,

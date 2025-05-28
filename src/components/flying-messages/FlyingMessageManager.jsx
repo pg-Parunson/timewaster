@@ -133,28 +133,33 @@ const FlyingMessageManager = ({ elapsedTime = 0, onAdCooldownChange }) => { // �
       }
     });
 
-    // 🔥 강화된 글로벌 채팅 메시지 리스너
+  // 🔥 강화된 글로벌 채팅 메시지 리스너
     const unsubscribeChat = onValue(chatRef, (snapshot) => {
-      const data = snapshot.val();
-      
-      if (data) {
-        const messages = Object.entries(data)
-          .map(([key, value]) => ({ ...value, key }))
-          .sort((a, b) => b.timestamp - a.timestamp);
+      try {
+        const data = snapshot.val();
         
-        const latestChat = messages[0];
-        
-        // 새로운 메시지이고, 10초 이내에 작성된 경우만 표시
-        // 그리고 내가 방금 보낸 메시지가 아니어야 함
-        if (latestChat && 
-            Date.now() - latestChat.timestamp < 10000 && 
-            lastProcessedMessage !== latestChat.key &&
-            !mySentMessagesRef.current.has(latestChat.messageId)) { // useRef로 변경 - 실시간 참조
+        if (data) {
+          const messages = Object.entries(data)
+            .map(([key, value]) => ({ ...value, key }))
+            .sort((a, b) => b.timestamp - a.timestamp);
           
-          console.log('📨 새 메시지 수신:', latestChat);
-          addFlyingChatMessage(latestChat.message, false, latestChat.messageType || 'basic'); // 메시지 타입 전달
-          setLastProcessedMessage(latestChat.key);
+          const latestChat = messages[0];
+          
+          // 새로운 메시지이고, 10초 이내에 작성된 경우만 표시
+          // 그리고 내가 방금 보낸 메시지가 아니어야 함
+          if (latestChat && 
+              Date.now() - latestChat.timestamp < 10000 && 
+              lastProcessedMessage !== latestChat.key &&
+              !mySentMessagesRef.current.has(latestChat.messageId)) { // useRef로 변경 - 실시간 참조
+            
+            console.log('📨 새 메시지 수신:', latestChat);
+            addFlyingChatMessage(latestChat.message, false, latestChat.messageType || 'basic'); // 메시지 타입 전달
+            setLastProcessedMessage(latestChat.key);
+          }
         }
+      } catch (error) {
+        console.warn('😨 채팅 리스너 오류 (계속 진행):', error);
+        // 오류가 발생해도 Firebase 리스너를 유지
       }
     });
 
@@ -274,8 +279,14 @@ const FlyingMessageManager = ({ elapsedTime = 0, onAdCooldownChange }) => { // �
     .catch((error) => {
       console.error('❌ Firebase 전송 실패:', error);
       
-      // 에러 상황에서도 피드백
-      addFlyingChatMessage('😅 메시지 전송에 실패했지만 로컬에서는 보여요!', false);
+      // 오류 상황에서도 피드백 - 종류에 따라 다른 메시지
+      if (error.code === 'PERMISSION_DENIED') {
+        addFlyingChatMessage('😔 서버 연결 문제로 메시지가 다른 사람들에게 전송되지 않았어요', false);
+      } else if (error.code === 'NETWORK_ERROR') {
+        addFlyingChatMessage('🌐 네트워크 연결을 확인해 주세요', false);
+      } else {
+        addFlyingChatMessage('😅 메시지 전송에 실패했지만 로컬에서는 보여요!', false);
+      }
     });
   };
 

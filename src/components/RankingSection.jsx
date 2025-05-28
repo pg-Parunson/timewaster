@@ -200,10 +200,17 @@ const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null,
                         </span>
                       )}
                     </div>
-                    {/* 🐛 소감 표시 추가 */}
+                    {/* 🐛 소감 표시 추가 + 길이 제한 */}
                     {user.comment && (
-                      <div className="pokemon-font text-xs text-gray-500 mt-0.5 truncate">
-                        📝 {user.comment}
+                      <div className="pokemon-font text-xs text-gray-500 mt-0.5" 
+                           style={{ 
+                             maxWidth: '180px', 
+                             wordBreak: 'break-all',
+                             overflow: 'hidden',
+                             textOverflow: 'ellipsis',
+                             whiteSpace: 'nowrap'
+                           }}>
+                        📝 {user.comment.length > 20 ? user.comment.slice(0, 20) + '...' : user.comment}
                       </div>
                     )}
                   </div>
@@ -264,10 +271,17 @@ const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null,
                               </span>
                             )}
                           </div>
-                          {/* 🐛 확장 랭킹에도 소감 표시 */}
+                          {/* 🐛 확장 랭킹에도 소감 표시 + 길이 제한 */}
                           {user.comment && (
-                            <div className="pokemon-font text-xs text-gray-400 truncate">
-                              📝 {user.comment}
+                            <div className="pokemon-font text-xs text-gray-400" 
+                                 style={{ 
+                                   maxWidth: '150px', 
+                                   wordBreak: 'break-all',
+                                   overflow: 'hidden',
+                                   textOverflow: 'ellipsis',
+                                   whiteSpace: 'nowrap'
+                                 }}>
+                              📝 {user.comment.length > 15 ? user.comment.slice(0, 15) + '...' : user.comment}
                             </div>
                           )}
                         </div>

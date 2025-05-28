@@ -170,14 +170,14 @@ const RankingRegistrationModal = ({
               </label>
               <textarea
                 value={customComment}
-                onChange={(e) => setCustomComment(e.target.value.slice(0, 50))}
+                onChange={(e) => setCustomComment(e.target.value.slice(0, 30))}
                 placeholder="시간낭비에 대한 소감을 남겨보세요..."
                 className="w-full px-3 py-2 bg-white border-2 border-gray-300 rounded-lg pokemon-font text-sm text-gray-800 placeholder-gray-500 focus:outline-none focus:border-blue-400 transition-all resize-none"
                 rows="2"
-                maxLength="50"
+                maxLength="30"
               />
               <p className="pokemon-font text-xs text-gray-500 mt-1">
-                {customComment.length}/50자
+                {customComment.length}/30자 (짧고 임팩트 있게!)
               </p>
             </div>
 
