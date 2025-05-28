@@ -3,9 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', onComplete }) => {
   // 🔧 안전한 윈도우 크기 확인 함수
   const getWindowDimensions = () => {
-    // 서버 환경이나 윈도우가 없는 경우 기본값 사용
     if (typeof window === 'undefined') {
-      return { width: 1920, height: 1080 }; // 기본값
+      return { width: 1920, height: 1080 };
     }
     return { 
       width: window.innerWidth || 1920, 
@@ -13,41 +12,49 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
     };
   };
 
-  // 다양한 시작 위치와 이동 방향 설정
+  // 🎯 더 간단하고 확실한 궤도 설정
   const [trajectory, setTrajectory] = useState(() => {
     const { width, height } = getWindowDimensions();
     
+    // 화면 중앙 영역에서 시작해서 확실히 보이게 만들기
+    const safeZone = {
+      minX: 100,
+      maxX: width - 100,
+      minY: 100,
+      maxY: height - 200
+    };
+    
     const trajectories = [
-      // 1. 왼쪽에서 오른쪽으로
+      // 1. 왼쪽에서 오른쪽으로 - 화면 안에서 시작
       {
-        startX: -200,
-        endX: width + 200,
-        y: Math.random() * 300 + 100, // 100~400px
+        startX: safeZone.minX,
+        endX: safeZone.maxX,
+        startY: Math.random() * (safeZone.maxY - safeZone.minY) + safeZone.minY,
+        endY: Math.random() * (safeZone.maxY - safeZone.minY) + safeZone.minY,
         direction: 'left-to-right'
       },
-      // 2. 오른쪽에서 왼쪽으로
+      // 2. 오른쪽에서 왼쪽으로 - 화면 안에서 시작
       {
-        startX: width + 200,
-        endX: -200,
-        y: Math.random() * 300 + 100,
+        startX: safeZone.maxX,
+        endX: safeZone.minX,
+        startY: Math.random() * (safeZone.maxY - safeZone.minY) + safeZone.minY,
+        endY: Math.random() * (safeZone.maxY - safeZone.minY) + safeZone.minY,
         direction: 'right-to-left'
       },
-      // 3. 위에서 아래로 (대각선)
+      // 3. 위에서 아래로 - 화면 안에서 시작
       {
-        startX: Math.random() * (width - 400) + 200,
-        endX: Math.random() * (width - 400) + 200,
-        startY: -100,
-        endY: height + 100,
-        y: null, // 동적 바뀜
+        startX: Math.random() * (safeZone.maxX - safeZone.minX) + safeZone.minX,
+        endX: Math.random() * (safeZone.maxX - safeZone.minX) + safeZone.minX,
+        startY: safeZone.minY,
+        endY: safeZone.maxY,
         direction: 'top-to-bottom'
       },
-      // 4. 아래에서 위로 (대각선)
+      // 4. 아래에서 위로 - 화면 안에서 시작
       {
-        startX: Math.random() * (width - 400) + 200,
-        endX: Math.random() * (width - 400) + 200,
-        startY: height + 100,
-        endY: -100,
-        y: null,
+        startX: Math.random() * (safeZone.maxX - safeZone.minX) + safeZone.minX,
+        endX: Math.random() * (safeZone.maxX - safeZone.minX) + safeZone.minX,
+        startY: safeZone.maxY,
+        endY: safeZone.minY,
         direction: 'bottom-to-top'
       }
     ];
@@ -57,68 +64,88 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
   
   const [position, setPosition] = useState(() => ({
     x: trajectory.startX,
-    y: trajectory.y || trajectory.startY
+    y: trajectory.startY
   }));
   
   const [isVisible, setIsVisible] = useState(true);
   const animationRef = useRef(null);
   const hasStarted = useRef(false);
   
-  // 🔄 창 크기 변경 대응
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    const handleResize = () => {
-      // 이미 시작된 애니메이션은 그대로 두고 새로운 메시지만 영향
-      // 굶이 리사이즈를 처리하지 않음 (성능상 이유)
-    };
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-  
   useEffect(() => {
     // 중복 실행 방지
     if (hasStarted.current) return;
     hasStarted.current = true;
     
+    console.log('🚀 메시지 애니메이션 시작:', { 
+      id, 
+      message: message.substring(0, 20) + '...', 
+      trajectory,
+      startPos: { x: trajectory.startX, y: trajectory.startY },
+      endPos: { x: trajectory.endX, y: trajectory.endY }
+    });
+    
     const startTime = Date.now();
-    const duration = 8000; // 8초
+    const duration = 6000; // 6초로 단축 (더 빠르게)
     
     const animate = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
       
-      let newX, newY;
+      // 🎯 단순한 선형 이동
+      const newX = trajectory.startX + (trajectory.endX - trajectory.startX) * progress;
+      const newY = trajectory.startY + (trajectory.endY - trajectory.startY) * progress;
       
-      // 방향에 따른 위치 계산
-      if (trajectory.direction === 'left-to-right' || trajectory.direction === 'right-to-left') {
-        // 수평 이동
-        newX = trajectory.startX + (trajectory.endX - trajectory.startX) * progress;
-        newY = trajectory.y + Math.sin(progress * Math.PI * 2) * 30; // 물결 효과
-      } else {
-        // 수직 이동 (대각선)
-        newX = trajectory.startX + (trajectory.endX - trajectory.startX) * progress;
-        newY = trajectory.startY + (trajectory.endY - trajectory.startY) * progress;
-        
-        // 좌우 흔들림 추가
-        newX += Math.sin(progress * Math.PI * 3) * 50;
+      // 약간의 파동 효과 추가 (선택적)
+      const waveOffset = Math.sin(progress * Math.PI * 2) * 20;
+      const finalY = newY + waveOffset;
+      
+      setPosition({ x: newX, y: finalY });
+      
+      // 자주 로그 출력 (개발 환경에서만)
+      if (import.meta.env.DEV && elapsed % 500 < 50) { // 0.5초마다
+        console.log(`📍 메시지 위치 ${id}:`, { 
+          progress: Math.floor(progress * 100), 
+          x: Math.floor(newX), 
+          y: Math.floor(finalY),
+          visible: isVisible
+        });
       }
-      
-      setPosition({ x: newX, y: newY });
       
       if (progress < 1) {
         animationRef.current = requestAnimationFrame(animate);
       } else {
+        console.log('✅ 메시지 애니메이션 완료:', id);
         setIsVisible(false);
         setTimeout(() => onComplete(id), 100);
       }
     };
     
-    // 약간의 지연 후 시작 (렌더링 완료 대기)
-    setTimeout(() => {
-      animationRef.current = requestAnimationFrame(animate);
-    }, 100);
+    // 🔥 브라우저 호환성 체크 & 폴백
+    if (typeof requestAnimationFrame === 'undefined') {
+      console.error('❌ requestAnimationFrame 미지원 - setInterval 폴백 사용');
+      
+      const interval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        const newX = trajectory.startX + (trajectory.endX - trajectory.startX) * progress;
+        const newY = trajectory.startY + (trajectory.endY - trajectory.startY) * progress;
+        const waveOffset = Math.sin(progress * Math.PI * 2) * 20;
+        
+        setPosition({ x: newX, y: newY + waveOffset });
+        
+        if (progress >= 1) {
+          clearInterval(interval);
+          setIsVisible(false);
+          setTimeout(() => onComplete(id), 100);
+        }
+      }, 32); // ~30fps (낮은 성능 환경 고려)
+      
+      return () => clearInterval(interval);
+    }
+    
+    // 🚀 즉시 시작 (지연 없음)
+    animationRef.current = requestAnimationFrame(animate);
     
     // 정리 함수
     return () => {
@@ -126,7 +153,7 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [id, onComplete, message, isMyMessage, messageType, trajectory]);
+  }, [id, onComplete, trajectory, isVisible]);
 
   // 보이지 않으면 렌더링하지 않음
   if (!isVisible) return null;
@@ -137,9 +164,14 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
         position: 'fixed',
         left: position.x,
         top: position.y,
-        transform: 'translate(-50%, -50%)', // 중앙 정렬
-        zIndex: 99999, // 최고 우선순위
-        pointerEvents: 'none'
+        transform: 'translate(-50%, -50%)',
+        zIndex: 99999,
+        pointerEvents: 'none',
+        // 🔍 디버그용 배경 (개발 환경에서만)
+        ...(import.meta.env.DEV && {
+          border: '2px dashed red',
+          backgroundColor: 'rgba(255, 0, 0, 0.1)'
+        })
       }}
     >
       {/* 메시지 타입에 따른 다른 스타일 */}
@@ -151,39 +183,36 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
             ? (isMyMessage 
                 ? 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)' // 내 프리미엄: 골드
                 : 'linear-gradient(135deg, #98FB98 0%, #32CD32 100%)') // 다른 사람 프리미엄: 초록
-            : 'rgba(255, 255, 255, 0.75)', // 일반 메시지: 하얗고 연한 배경
+            : 'rgba(255, 255, 255, 0.9)', // 일반 메시지: 더 진한 배경
           
-          color: messageType === 'premium' ? '#000000' : '#555555', // 프리미엄은 진한 검정, 일반은 연한 검정
+          color: messageType === 'premium' ? '#000000' : '#333333',
           
           border: messageType === 'premium' 
-            ? '4px solid #000000' // 프리미엄: 두꺼운 테두리
-            : '1px solid rgba(180, 180, 180, 0.4)', // 일반: 연한 테두리
+            ? '4px solid #000000'
+            : '2px solid rgba(100, 100, 100, 0.5)', // 더 진한 테두리
           
           borderRadius: '20px',
-          padding: messageType === 'premium' ? '12px 20px' : '8px 12px', // 프리미엄이 더 큰 패딩
-          fontSize: messageType === 'premium' ? '16px' : '13px', // 프리미엄이 더 큰 폰트
+          padding: messageType === 'premium' ? '12px 20px' : '10px 15px',
+          fontSize: messageType === 'premium' ? '16px' : '14px',
           fontWeight: messageType === 'premium' ? 'bold' : 'normal',
           
           textShadow: messageType === 'premium' 
-            ? '2px 2px 0px rgba(255, 255, 255, 0.9)' // 프리미엄: 강한 그림자
-            : '0.5px 0.5px 0px rgba(255, 255, 255, 0.6)', // 일반: 아주 연한 그림자
+            ? '2px 2px 0px rgba(255, 255, 255, 0.9)'
+            : '1px 1px 0px rgba(255, 255, 255, 0.8)',
           
           boxShadow: messageType === 'premium' 
-            ? [ // 프리미엄: 화려한 효과
+            ? [
                 '4px 4px 0px rgba(0, 0, 0, 0.5)',
                 'inset 2px 2px 0px rgba(255, 255, 255, 0.3)',
                 '0 0 20px rgba(255, 215, 0, 0.6)'
               ].join(', ')
-            : '1px 1px 4px rgba(0, 0, 0, 0.1)', // 일반: 아주 연한 그림자
+            : '2px 2px 8px rgba(0, 0, 0, 0.3)',
           
           position: 'relative',
-          maxWidth: '400px',
-          minWidth: 'auto',
+          maxWidth: '350px',
           width: 'fit-content',
           whiteSpace: 'pre-wrap',
           wordWrap: 'break-word',
-          overflow: 'visible',
-          textOverflow: 'clip',
           
           // 애니메이션: 프리미엄만 반짝반짝
           animation: messageType === 'premium' 
@@ -227,8 +256,12 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
         )}
         
         {/* 메시지 내용 */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: messageType === 'premium' ? '6px' : '4px' }}>
-          <span style={{ fontSize: messageType === 'premium' ? '20px' : '14px' }}>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: messageType === 'premium' ? '8px' : '6px' 
+        }}>
+          <span style={{ fontSize: messageType === 'premium' ? '20px' : '16px' }}>
             {messageType === 'premium' 
               ? (isMyMessage ? '😊' : '💭')
               : (isMyMessage ? '😐' : '💬')
@@ -236,6 +269,23 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
           </span>
           <span>{message}</span>
         </div>
+        
+        {/* 🔍 디버그 정보 표시 (개발 환경에서만) */}
+        {import.meta.env.DEV && (
+          <div style={{
+            position: 'absolute',
+            top: '-20px',
+            left: '0',
+            fontSize: '10px',
+            color: 'red',
+            backgroundColor: 'white',
+            padding: '2px 4px',
+            borderRadius: '2px',
+            border: '1px solid red'
+          }}>
+            ID: {id}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -245,10 +295,19 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
 const style = document.createElement('style');
 style.textContent = `
   @keyframes glow {
-    from { box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.5), inset 2px 2px 0px rgba(255, 255, 255, 0.3), 0 0 20px rgba(255, 215, 0, 0.6); }
-    to { box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.5), inset 2px 2px 0px rgba(255, 255, 255, 0.3), 0 0 30px rgba(255, 215, 0, 0.8); }
+    from { 
+      box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.5), 
+                  inset 2px 2px 0px rgba(255, 255, 255, 0.3), 
+                  0 0 20px rgba(255, 215, 0, 0.6); 
+    }
+    to { 
+      box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.5), 
+                  inset 2px 2px 0px rgba(255, 255, 255, 0.3), 
+                  0 0 30px rgba(255, 215, 0, 0.8); 
+    }
   }
 `;
+
 if (!document.head.querySelector('[data-flying-message-styles]')) {
   style.setAttribute('data-flying-message-styles', 'true');
   document.head.appendChild(style);
