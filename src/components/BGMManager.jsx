@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Volume2, VolumeX, Music } from 'lucide-react';
 
 const BGMManager = ({ elapsedTime, compact = false }) => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -141,10 +140,9 @@ const BGMManager = ({ elapsedTime, compact = false }) => {
     }
   };
   
-  // 볼륨 변경
+  // 볼륨 변경 - 최대 50%로 제한
   const handleVolumeChange = (newVolume) => {
-    // 최대 볼륨을 50%로 제한
-    const limitedVolume = Math.min(newVolume, 0.5);
+    const limitedVolume = Math.min(newVolume, 0.5); // 최대 50%로 제한
     setVolume(limitedVolume);
     if (audioRef.current && !isMuted) {
       audioRef.current.volume = limitedVolume;
@@ -159,53 +157,58 @@ const BGMManager = ({ elapsedTime, compact = false }) => {
     }
   };
   
+  // 🎵 유튜브 스타일 심플 UI
   return (
-    <div className={compact ? "" : "fixed top-4 right-4 z-40"}>
-      <div className={`${compact ? 'bg-white/80 backdrop-blur-sm p-2 rounded-lg border-2 border-gray-300' : 'pokemon-dialog p-3 bg-white/90 backdrop-blur-sm'}`}>
-        {/* 현재 재생중인 트랙 - compact 모드에서는 숨김 */}
-        {!compact && (
-          <div className="flex items-center gap-2 mb-2">
-            <Music className="w-4 h-4 text-purple-600" />
-            <span className="pokemon-font text-xs text-gray-700">
-              {currentTrack ? currentTrack.title : 'BGM 로딩 중...'}
-            </span>
+    <div className="flex items-center gap-2 bg-black/70 text-white px-3 py-1 rounded-full backdrop-blur-sm">
+      {/* 재생/일시정지 버튼 */}
+      <button
+        onClick={togglePlay}
+        className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/20 transition-colors"
+        title={isPlaying ? '일시정지' : '재생'}
+      >
+        {isPlaying ? (
+          <div className="flex gap-0.5">
+            <div className="w-1 h-3 bg-white"></div>
+            <div className="w-1 h-3 bg-white"></div>
           </div>
+        ) : (
+          <div className="w-0 h-0 border-l-[6px] border-l-white border-t-[3px] border-t-transparent border-b-[3px] border-b-transparent ml-0.5"></div>
         )}
-        
-        {/* 컨트롤 버튼들 */}
-        <div className={`flex items-center ${compact ? 'gap-1' : 'gap-2'}`}>
-          {/* 재생/일시정지 */} 
-          <button
-            onClick={togglePlay}
-            className={`${compact ? 'p-1 min-h-6 text-xs' : 'p-2 min-h-8'} pokemon-button`}
-            title={isPlaying ? '일시정지' : '재생'}
-          >
-            {isPlaying ? '⏸️' : '▶️'}
-          </button>
-          
-          {/* 음소거 */}
-          <button
-            onClick={toggleMute}
-            className={`${compact ? 'p-1 min-h-6 text-xs' : 'p-2 min-h-8'} pokemon-button`}
-            title={isMuted ? '음소거 해제' : '음소거'}
-          >
-            {isMuted ? <VolumeX className={compact ? "w-3 h-3" : "w-4 h-4"} /> : <Volume2 className={compact ? "w-3 h-3" : "w-4 h-4"} />}
-          </button>
-          
-          {/* 볼륨 슬라이더 - compact 모드에서는 숨김 */}
-          {!compact && (
-            <input
-              type="range"
-              min="0"
-              max="0.5"
-              step="0.05"
-              value={volume}
-              onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-              className="w-16 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-              title="볼륨 조절 (최대 50%)"
-            />
-          )}
-        </div>
+      </button>
+      
+      {/* 음소거 버튼 */}
+      <button
+        onClick={toggleMute}
+        className="flex items-center justify-center w-6 h-6 rounded hover:bg-white/20 transition-colors"
+        title={isMuted ? '음소거 해제' : '음소거'}
+      >
+        {isMuted ? (
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.817L4.067 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.067l4.316-3.817zm2.617 0a1 1 0 011 1v12a1 1 0 01-1 1 1 1 0 01-.707-.293L9.586 15H7a1 1 0 01-1-1V6a1 1 0 011-1h2.586l1.707-1.707A1 1 0 0112 4z" clipRule="evenodd" />
+            <path d="M15.536 6.464a1 1 0 10-1.414 1.414L15.536 9.29 13.12 11.707a1 1 0 101.414 1.414L16.95 10.707 19.36 13.12a1 1 0 001.414-1.414L18.36 9.293l2.414-2.414a1 1 0 00-1.414-1.414L16.95 7.88l-1.414-1.414z"/>
+          </svg>
+        ) : (
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.817L4.067 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.067l4.316-3.817A1 1 0 019.383 3.076zM15.657 6.343a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-1.929 3.657 1 1 0 11-1.414-1.414A7.971 7.971 0 0017 10c0-.995-.102-1.951-.343-2.657a1 1 0 010-1.414zM13.657 8.343a1 1 0 011.414 0A5.98 5.98 0 0116 10a5.98 5.98 0 01-.929 1.657 1 1 0 11-1.414-1.414A3.98 3.98 0 0014 10c0-.229-.027-.453-.086-.657a1 1 0 010-1.414z" clipRule="evenodd" />
+          </svg>
+        )}
+      </button>
+      
+      {/* 볼륨 슬라이더 */}
+      <div className="flex items-center gap-1">
+        <input
+          type="range"
+          min="0"
+          max="0.5"
+          step="0.05"
+          value={volume}
+          onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+          className="w-16 h-1 bg-white/30 rounded-full appearance-none cursor-pointer slider"
+          title="볼륨 조절 (최대 50%)"
+        />
+        <span className="text-xs text-white/70 min-w-[30px]">
+          {Math.round(volume * 100)}%
+        </span>
       </div>
       
       {/* 오디오 엘리먼트 */}
@@ -218,6 +221,26 @@ const BGMManager = ({ elapsedTime, compact = false }) => {
         onError={() => {}}
         onEnded={() => setIsPlaying(false)}
       />
+      
+      <style jsx>{`
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: white;
+          cursor: pointer;
+        }
+        
+        .slider::-moz-range-thumb {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: white;
+          cursor: pointer;
+          border: none;
+        }
+      `}</style>
     </div>
   );
 };

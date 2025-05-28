@@ -12,54 +12,42 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
     };
   };
 
-  // 🎯 더 간단하고 확실한 궤도 설정
+  // 🎯 운영환경에서 확실히 작동하는 간단한 궤도 설정
   const [trajectory, setTrajectory] = useState(() => {
     const { width, height } = getWindowDimensions();
     
-    // 화면 중앙 영역에서 시작해서 확실히 보이게 만들기
-    const safeZone = {
-      minX: 100,
-      maxX: width - 100,
-      minY: 100,
-      maxY: height - 200
-    };
+    // 더 안전하고 간단한 방식 - 화면 중앙에서 시작
+    const centerX = width / 2;
+    const centerY = height / 2;
     
-    const trajectories = [
-      // 1. 왼쪽에서 오른쪽으로 - 화면 안에서 시작
+    const simpleTrajectories = [
+      // 1. 왼쪽에서 오른쪽으로 (가로 직선)
       {
-        startX: safeZone.minX,
-        endX: safeZone.maxX,
-        startY: Math.random() * (safeZone.maxY - safeZone.minY) + safeZone.minY,
-        endY: Math.random() * (safeZone.maxY - safeZone.minY) + safeZone.minY,
-        direction: 'left-to-right'
+        startX: 50,
+        endX: width - 50,
+        startY: 200,
+        endY: 200,
+        direction: 'horizontal'
       },
-      // 2. 오른쪽에서 왼쪽으로 - 화면 안에서 시작
+      // 2. 오른쪽에서 왼쪽으로 (가로 직선)
       {
-        startX: safeZone.maxX,
-        endX: safeZone.minX,
-        startY: Math.random() * (safeZone.maxY - safeZone.minY) + safeZone.minY,
-        endY: Math.random() * (safeZone.maxY - safeZone.minY) + safeZone.minY,
-        direction: 'right-to-left'
+        startX: width - 50,
+        endX: 50,
+        startY: 300,
+        endY: 300,
+        direction: 'horizontal-reverse'
       },
-      // 3. 위에서 아래로 - 화면 안에서 시작
+      // 3. 위에서 아래로 (세로 직선)
       {
-        startX: Math.random() * (safeZone.maxX - safeZone.minX) + safeZone.minX,
-        endX: Math.random() * (safeZone.maxX - safeZone.minX) + safeZone.minX,
-        startY: safeZone.minY,
-        endY: safeZone.maxY,
-        direction: 'top-to-bottom'
-      },
-      // 4. 아래에서 위로 - 화면 안에서 시작
-      {
-        startX: Math.random() * (safeZone.maxX - safeZone.minX) + safeZone.minX,
-        endX: Math.random() * (safeZone.maxX - safeZone.minX) + safeZone.minX,
-        startY: safeZone.maxY,
-        endY: safeZone.minY,
-        direction: 'bottom-to-top'
+        startX: centerX,
+        endX: centerX,
+        startY: 100,
+        endY: height - 100,
+        direction: 'vertical'
       }
     ];
     
-    return trajectories[Math.floor(Math.random() * trajectories.length)];
+    return simpleTrajectories[Math.floor(Math.random() * simpleTrajectories.length)];
   });
   
   const [position, setPosition] = useState(() => ({
@@ -88,28 +76,24 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
     }
     
     const startTime = Date.now();
-    const duration = 6000; // 6초로 단축 (더 빠르게)
+    const duration = 4000; // 4초로 단축 (및른 속도)
     
     const animate = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
       
-      // 🎯 단순한 선형 이동
+      // 🎯 아주 간단한 선형 이동 (복잡한 수식 제거)
       const newX = trajectory.startX + (trajectory.endX - trajectory.startX) * progress;
       const newY = trajectory.startY + (trajectory.endY - trajectory.startY) * progress;
       
-      // 약간의 파동 효과 추가 (선택적)
-      const waveOffset = Math.sin(progress * Math.PI * 2) * 20;
-      const finalY = newY + waveOffset;
-      
-      setPosition({ x: newX, y: finalY });
+      setPosition({ x: newX, y: newY });
       
       // 진행률 로그 (개발 환경에서만 그리고 자주 안 함)
       if (import.meta.env.DEV && elapsed % 2000 < 50) { // 2초마다
         console.log(`📍 메시지 위치 ${id}:`, { 
           progress: Math.floor(progress * 100), 
           x: Math.floor(newX), 
-          y: Math.floor(finalY),
+          y: Math.floor(newY),
           visible: isVisible
         });
       }
@@ -137,16 +121,15 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
         
         const newX = trajectory.startX + (trajectory.endX - trajectory.startX) * progress;
         const newY = trajectory.startY + (trajectory.endY - trajectory.startY) * progress;
-        const waveOffset = Math.sin(progress * Math.PI * 2) * 20;
         
-        setPosition({ x: newX, y: newY + waveOffset });
+        setPosition({ x: newX, y: newY });
         
         if (progress >= 1) {
           clearInterval(interval);
           setIsVisible(false);
           setTimeout(() => onComplete(id), 100);
         }
-      }, 32); // ~30fps (낮은 성능 환경 고려)
+      }, 16); // ~60fps
       
       return () => clearInterval(interval);
     }
