@@ -61,13 +61,45 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
         endY: safeHeight + 50,
         direction: 'vertical-right'
       },
-      // 6. 대각선 이동
+      // 6. 아래에서 위로 (세로 직선) - 중앙
+      {
+        startX: safeWidth / 2,
+        endX: safeWidth / 2,
+        startY: safeHeight + 50,
+        endY: -50,
+        direction: 'vertical-up'
+      },
+      // 🎯 7. 대각선 이동 - 왼쪽 위에서 오른쪽 아래로
       {
         startX: -100,
         endX: safeWidth + 100,
         startY: 100,
         endY: safeHeight - 100,
-        direction: 'diagonal'
+        direction: 'diagonal-down-right'
+      },
+      // 🎯 8. 대각선 이동 - 오른쪽 위에서 왼쪽 아래로
+      {
+        startX: safeWidth + 100,
+        endX: -100,
+        startY: 100,
+        endY: safeHeight - 100,
+        direction: 'diagonal-down-left'
+      },
+      // 🎯 9. 대각선 이동 - 왼쪽 아래에서 오른쪽 위로
+      {
+        startX: -100,
+        endX: safeWidth + 100,
+        startY: safeHeight - 100,
+        endY: 100,
+        direction: 'diagonal-up-right'
+      },
+      // 🎯 10. 대각선 이동 - 오른쪽 아래에서 왼쪽 위로
+      {
+        startX: safeWidth + 100,
+        endX: -100,
+        startY: safeHeight - 100,
+        endY: 100,
+        direction: 'diagonal-up-left'
       }
     ];
     

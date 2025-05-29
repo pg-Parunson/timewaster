@@ -71,7 +71,7 @@ class StatsService {
     }
   }
 
-  // 📊 활성 세션 수 계산 (동시 접속자)
+  // 📊 활성 세션 수 계산 (동시 접속자) - 🔥 정확한 필터링
   async getActiveSessions() {
     try {
       if (this.isFirebaseConnected) {
@@ -79,29 +79,29 @@ class StatsService {
         const snapshot = await get(sessionsRef);
         
         if (!snapshot.exists()) {
-          return 1;
+          return 1; // 기본값
         }
 
         const sessions = Object.values(snapshot.val());
         const now = Date.now();
-        const fiveMinutesAgo = now - (5 * 60 * 1000); // 5분 전
+        const fiveSecondsAgo = now - (5 * 1000); // 🔥 5초로 설정 (실시간에 가깝게)
 
-        // 5분 이내에 활동한 세션 수
+        // 5초 이내에 활동한 세션 수
         const activeSessions = sessions.filter(session => {
           if (!session.isActive) return false;
           
-          // lastHeartbeat가 5분 이내인지 확인
+          // lastHeartbeat가 5초 이내인지 확인
           const lastHeartbeat = session.lastHeartbeat;
           if (typeof lastHeartbeat === 'object' && lastHeartbeat.seconds) {
-            return (lastHeartbeat.seconds * 1000) > fiveMinutesAgo;
+            return (lastHeartbeat.seconds * 1000) > fiveSecondsAgo;
           } else if (typeof lastHeartbeat === 'number') {
-            return lastHeartbeat > fiveMinutesAgo;
+            return lastHeartbeat > fiveSecondsAgo;
           }
           
-          return false;
+          return false; // lastHeartbeat가 없으면 비활성으로 처리
         }).length;
 
-        return Math.max(1, activeSessions);
+        return Math.max(1, activeSessions); // 최소 1명
       } else {
         // 로컬 모드 - 시뮬레이션
         const hour = new Date().getHours();
@@ -241,8 +241,8 @@ class StatsService {
       // 초기 로드
       updateActiveSessions();
       
-      // 25초마다 업데이트 (기존과 동일)
-      const intervalId = setInterval(updateActiveSessions, 25000);
+      // 🔥 2초마다 업데이트 (실시간에 가깝게)
+      const intervalId = setInterval(updateActiveSessions, 2000);
       
       this.listeners.set('activeSessions', intervalId);
       return () => {

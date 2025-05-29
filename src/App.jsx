@@ -578,24 +578,7 @@ function App() {
         animation: float 3s ease-in-out infinite;
       }
       
-      /* 키보드 단축키 표시 */
-      .pokemon-shortcut {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        background: var(--pokemon-black);
-        color: var(--pokemon-white);
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        font-family: 'Galmuri9', monospace;
-        opacity: 0.7;
-        transition: opacity 0.2s ease;
-      }
-      
-      .pokemon-shortcut:hover {
-        opacity: 1;
-      }
+
     `;
     
     const styleElement = document.createElement('style');
@@ -650,13 +633,13 @@ function App() {
         {/* 통계 바 */}
         <div className="pokemon-stats">
           <div className="pokemon-font">
-            동시 접속자: <span className="text-yellow-300">{concurrentUsers || 1}명</span>
+            동시 접속자: <span className="text-yellow-300">{concurrentUsers}명</span>
           </div>
           <div className="pokemon-font">
-            총 방문 횟수: <span className="text-yellow-300">{visits}회</span>
+            전체 방문 횟수: <span className="text-yellow-300">{visits}회</span>
           </div>
           <div className="pokemon-font">
-            누적 시간낭비: <span className="text-yellow-300">{Math.floor(totalTimeWasted / 60)}시간</span>
+            누적 낭비시간: <span className="text-yellow-300">{Math.floor(totalTimeWasted)}시간</span>
           </div>
         </div>
 
@@ -667,7 +650,6 @@ function App() {
           <div className="space-y-6">
             {/* 타이머 섹션 */}
             <div className="pokemon-dialog pokemon-hover relative">
-              <div className="pokemon-shortcut">SPACE</div>
               <div className="text-center mb-4">
                 <div className="pokemon-font text-xl text-gray-700 mb-2">
                   현재 낭비 시간
@@ -692,7 +674,7 @@ function App() {
             </div>
 
             {/* 비난 메시지 섹션 */}
-            <div className="pokemon-dialog pokemon-hover">
+            <div className="pokemon-dialog pokemon-hover relative">
               <div className="pokemon-font text-lg mb-4 text-gray-800">
                 메시지:
               </div>
@@ -713,7 +695,6 @@ function App() {
 
             {/* 현실로 돌아가기 - 메시지 섹션 아래로 이동! */}
             <div className="pokemon-dialog pokemon-hover text-center bg-red-50 border-red-300">
-              <div className="pokemon-shortcut bg-red-600 text-white font-bold">ESC</div>
               <div className="pokemon-font text-xl mb-4 text-red-800 font-bold">
                 🚨 현실로 돌아가기 🚨
               </div>

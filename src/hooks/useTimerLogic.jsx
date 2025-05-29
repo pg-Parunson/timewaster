@@ -161,9 +161,9 @@ export const useTimerLogic = () => {
           setTotalTimeWasted(Math.floor(stats.totalTimeWasted / 60));
         });
         
-        // 📊 동시 접속자 리스너 등록
+        // 📊 동시 접속자 리스너 등록 - 🔥 실시간급 업데이트
         const unsubscribeSessions = statsService.onActiveSessionsChange((activeSessions) => {
-          setConcurrentUsers(activeSessions);
+        setConcurrentUsers(activeSessions);
         });
         
         analytics.trackSessionStart(newVisits, globalStats.totalTimeWasted);

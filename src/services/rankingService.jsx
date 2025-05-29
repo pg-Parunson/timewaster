@@ -10,7 +10,8 @@ import {
   query,
   orderByChild,
   limitToLast,
-  remove
+  remove,
+  onDisconnect // 🔥 누락된 부분 추가!
 } from 'firebase/database';
 import { database, ANONYMOUS_NAMES, DB_PATHS, RANKING_PERIODS, isFirebaseConnected } from '../config/firebase.js';
 
@@ -26,17 +27,36 @@ class RankingService {
 
   }
 
-  // 세션 초기화 (사용자 접속 시)
+  // 세션 초기화 (사용자 접속 시) - 🔥 중복 세션 방지 추가
   async initializeSession() {
     try {
+      // 🔥 브라우저 세션 ID 생성 (탭 단위로 고유)
+      const tabId = sessionStorage.getItem('timewaster_tab_id') || `tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      sessionStorage.setItem('timewaster_tab_id', tabId);
+      
       // 고유 세션 ID 생성
-      this.sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      this.sessionId = `session_${tabId}_${Date.now()}`;
       
       // 랜덤 익명 닉네임 선택
       this.anonymousName = ANONYMOUS_NAMES[Math.floor(Math.random() * ANONYMOUS_NAMES.length)];
       
       if (this.isFirebaseConnected) {
-        // Firebase 모드
+        // 🔥 기존 동일 탭의 세션 정리 (새로고침 대비)
+        const existingSessionRef = ref(database, DB_PATHS.SESSIONS);
+        const existingSnapshot = await get(existingSessionRef);
+        
+        if (existingSnapshot.exists()) {
+          const sessions = Object.entries(existingSnapshot.val());
+          for (const [sessionKey, sessionData] of sessions) {
+            if (sessionData.sessionId && sessionData.sessionId.includes(tabId)) {
+              // 동일 탭의 이전 세션 비활성화
+              await set(ref(database, `${DB_PATHS.SESSIONS}/${sessionKey}/isActive`), false);
+              await set(ref(database, `${DB_PATHS.SESSIONS}/${sessionKey}/endTime`), serverTimestamp());
+            }
+          }
+        }
+        
+        // Firebase 모드 - 새 세션 생성
         const sessionData = {
           sessionId: this.sessionId,
           anonymousName: this.anonymousName,
@@ -49,6 +69,11 @@ class RankingService {
 
         const sessionRef = ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}`);
         await set(sessionRef, sessionData);
+        
+        // 🔥 중요: 브라우저 닫힘/새로고침 시 세션 자동 정리
+        await onDisconnect(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/isActive`)).set(false);
+        await onDisconnect(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/endTime`)).set(serverTimestamp());
+        
         this.startHeartbeat();
         await this.addLiveFeedEvent('join', `${this.anonymousName}님이 접속했습니다`);
       } else {
@@ -76,7 +101,7 @@ class RankingService {
     }
   }
 
-  // 하트비트 시작 (Firebase 모드)
+  // 하트비트 시작 (Firebase 모드) - 🔥 실시간급 처리
   startHeartbeat() {
     if (!this.isFirebaseConnected) return;
     
@@ -89,10 +114,10 @@ class RankingService {
           console.error('하트비트 실패:', error);
         }
       }
-    }, 30000); // 30초마다
+    }, 2000); // 🔥 2초마다 (실시간에 가깝게, 하지만 Firebase 요금 고려)
   }
 
-  // 로컬 하트비트 시작 (로컬 모드)
+  // 로컬 하트비트 시작 (로컬 모드) - 🔥 실시간급 처리
   startLocalHeartbeat() {
     this.heartbeatInterval = setInterval(() => {
       if (this.sessionId) {
@@ -109,7 +134,7 @@ class RankingService {
           console.error('로컬 하트비트 실패:', error);
         }
       }
-    }, 30000); // 30초마다
+    }, 1000); // 🔥 1초마다 (로컬은 제한 없으니 진짜 실시간)
   }
 
   // 시간 업데이트 (매초 호출)
@@ -216,12 +241,12 @@ class RankingService {
           return [];
         }
 
-        // 세션 데이터를 기간별로 필터링 - 🐛 랭킹 제출된 세션도 포함
+        // 세션 데이터를 기간별로 필터링 - 🔥 랭킹과 동시접속자를 분리해서 처리
         const sessions = Object.values(sessionsSnapshot.val())
           .filter(session => {
-            // 활성 세션이거나 랭킹에 제출된 세션 포함
+            // 랭킹용: 유효한 시간이 있는 모든 세션 포함 (활성 상태 무관)
             const hasValidTime = (session.currentTime > 0) || (session.finalTime > 0);
-            return (session.isActive || session.submittedToRanking) && hasValidTime;
+            return hasValidTime;
           })
           .filter(session => this.isSessionInPeriod(session, period))
           .sort((a, b) => {
@@ -244,12 +269,12 @@ class RankingService {
         // 로컬 모드
         const stored = JSON.parse(localStorage.getItem('timewaster_local_ranking') || '[]');
         
-        // 로컬 랭킹 생성 (기간별 필터링) - 🐛 랭킹 제출된 세션도 포함
+        // 로컬 랭킹 생성 (기간별 필터링) - 🔥 랭킹용으로 모든 유효 세션 포함
         const sessions = stored
           .filter(session => {
-            // 활성 세션이거나 랭킹에 제출된 세션 포함
+            // 랭킹용: 유효한 시간이 있는 모든 세션 포함 (활성 상태 무관)
             const hasValidTime = (session.currentTime > 0) || (session.finalTime > 0);
-            return (session.isActive || session.submittedToRanking) && hasValidTime;
+            return hasValidTime;
           })
           .filter(session => this.isSessionInPeriod(session, period))
           .sort((a, b) => {
