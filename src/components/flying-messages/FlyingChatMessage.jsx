@@ -12,42 +12,66 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
     };
   };
 
-  // 🎯 운영환경에서 확실히 작동하는 간단한 궤도 설정
+  // 🎯 더 안전하고 다양한 궤도 설정
   const [trajectory, setTrajectory] = useState(() => {
     const { width, height } = getWindowDimensions();
     
-    // 더 안전하고 간단한 방식 - 화면 중앙에서 시작
-    const centerX = width / 2;
-    const centerY = height / 2;
+    // 화면이 너무 작은 경우 기본값 사용
+    const safeWidth = Math.max(width, 800);
+    const safeHeight = Math.max(height, 600);
     
-    const simpleTrajectories = [
-      // 1. 왼쪽에서 오른쪽으로 (가로 직선)
+    const trajectories = [
+      // 1. 왼쪽에서 오른쪽으로 (가로 직선) - 상단
       {
-        startX: 50,
-        endX: width - 50,
-        startY: 200,
-        endY: 200,
-        direction: 'horizontal'
+        startX: -100, // 화면 밖에서 시작
+        endX: safeWidth + 100, // 화면 밖으로 종료
+        startY: 150,
+        endY: 150,
+        direction: 'horizontal-top'
       },
-      // 2. 오른쪽에서 왼쪽으로 (가로 직선)
+      // 2. 오른쪽에서 왼쪽으로 (가로 직선) - 중단
       {
-        startX: width - 50,
-        endX: 50,
-        startY: 300,
-        endY: 300,
+        startX: safeWidth + 100,
+        endX: -100,
+        startY: 250,
+        endY: 250,
         direction: 'horizontal-reverse'
       },
-      // 3. 위에서 아래로 (세로 직선)
+      // 3. 왼쪽에서 오른쪽으로 (가로 직선) - 하단
       {
-        startX: centerX,
-        endX: centerX,
+        startX: -100,
+        endX: safeWidth + 100,
+        startY: 350,
+        endY: 350,
+        direction: 'horizontal-bottom'
+      },
+      // 4. 위에서 아래로 (세로 직선) - 왼쪽
+      {
+        startX: 200,
+        endX: 200,
+        startY: -50,
+        endY: safeHeight + 50,
+        direction: 'vertical-left'
+      },
+      // 5. 위에서 아래로 (세로 직선) - 오른쪽
+      {
+        startX: safeWidth - 200,
+        endX: safeWidth - 200,
+        startY: -50,
+        endY: safeHeight + 50,
+        direction: 'vertical-right'
+      },
+      // 6. 대각선 이동
+      {
+        startX: -100,
+        endX: safeWidth + 100,
         startY: 100,
-        endY: height - 100,
-        direction: 'vertical'
+        endY: safeHeight - 100,
+        direction: 'diagonal'
       }
     ];
     
-    return simpleTrajectories[Math.floor(Math.random() * simpleTrajectories.length)];
+    return trajectories[Math.floor(Math.random() * trajectories.length)];
   });
   
   const [position, setPosition] = useState(() => ({
@@ -57,66 +81,43 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
   
   const [isVisible, setIsVisible] = useState(true);
   const animationRef = useRef(null);
-  const hasStarted = useRef(false);
+  const startTimeRef = useRef(null);
   
+  // 🔥 핵심: 깔끔한 애니메이션 로직
   useEffect(() => {
-    // 중복 실행 방지
-    if (hasStarted.current) return;
-    hasStarted.current = true;
+    startTimeRef.current = Date.now();
     
-    // 개발 환경에서만 상세 로그 표시
-    if (import.meta.env.DEV) {
-      console.log('🚀 메시지 애니메이션 시작:', { 
-        id, 
-        message: message.substring(0, 20) + '...', 
-        trajectory,
-        startPos: { x: trajectory.startX, y: trajectory.startY },
-        endPos: { x: trajectory.endX, y: trajectory.endY }
-      });
-    }
-    
-    const startTime = Date.now();
-    const duration = 4000; // 4초로 단축 (및른 속도)
+    const duration = 5000; // 5초 동안 이동
     
     const animate = () => {
-      const elapsed = Date.now() - startTime;
+      const now = Date.now();
+      const elapsed = now - startTimeRef.current;
       const progress = Math.min(elapsed / duration, 1);
       
-      // 🎯 아주 간단한 선형 이동 (복잡한 수식 제거)
+      // 🎯 선형 이동 계산
       const newX = trajectory.startX + (trajectory.endX - trajectory.startX) * progress;
       const newY = trajectory.startY + (trajectory.endY - trajectory.startY) * progress;
       
       setPosition({ x: newX, y: newY });
       
-      // 진행률 로그 (개발 환경에서만 그리고 자주 안 함)
-      if (import.meta.env.DEV && elapsed % 2000 < 50) { // 2초마다
-        console.log(`📍 메시지 위치 ${id}:`, { 
-          progress: Math.floor(progress * 100), 
-          x: Math.floor(newX), 
-          y: Math.floor(newY),
-          visible: isVisible
-        });
-      }
-      
-      if (progress < 1) {
+      // 🔄 애니메이션 계속 진행 또는 완료
+      if (progress < 1 && isVisible) {
         animationRef.current = requestAnimationFrame(animate);
       } else {
-        if (import.meta.env.DEV) {
-          console.log('✅ 메시지 애니메이션 완료:', id);
-        }
+        // 애니메이션 완료
         setIsVisible(false);
-        setTimeout(() => onComplete(id), 100);
+        setTimeout(() => {
+          if (onComplete) {
+            onComplete(id);
+          }
+        }, 200);
       }
     };
     
     // 🔥 브라우저 호환성 체크 & 폴백
     if (typeof requestAnimationFrame === 'undefined') {
-      if (import.meta.env.DEV) {
-        console.error('❌ requestAnimationFrame 미지원 - setInterval 폴백 사용');
-      }
-      
       const interval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
+        const elapsed = Date.now() - startTimeRef.current;
         const progress = Math.min(elapsed / duration, 1);
         
         const newX = trajectory.startX + (trajectory.endX - trajectory.startX) * progress;
@@ -127,23 +128,44 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
         if (progress >= 1) {
           clearInterval(interval);
           setIsVisible(false);
-          setTimeout(() => onComplete(id), 100);
+          setTimeout(() => onComplete && onComplete(id), 200);
         }
       }, 16); // ~60fps
       
       return () => clearInterval(interval);
     }
     
-    // 🚀 즉시 시작 (지연 없음)
+    // 🚀 애니메이션 시작
     animationRef.current = requestAnimationFrame(animate);
+    
+    // 🛡️ 안전장치: 최대 실행 시간 제한 (7초)
+    const safetyTimeout = setTimeout(() => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+      setIsVisible(false);
+      setTimeout(() => onComplete && onComplete(id), 100);
+    }, 7000);
     
     // 정리 함수
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+      clearTimeout(safetyTimeout);
+    };
+  }, [id]);
+
+  // 🎯 컴포넌트 언마운트 시 정리
+  useEffect(() => {
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [id, onComplete, trajectory, isVisible]);
+  }, []);
 
   // 보이지 않으면 렌더링하지 않음
   if (!isVisible) return null;
@@ -151,13 +173,12 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
   return (
     <div 
       style={{
-      position: 'fixed',
-      left: position.x,
-      top: position.y,
-      transform: 'translate(-50%, -50%)',
-      zIndex: 99999,
-      pointerEvents: 'none'
-      // 개발용 디버그 UI 제거
+        position: 'fixed',
+        left: position.x,
+        top: position.y,
+        transform: 'translate(-50%, -50%)',
+        zIndex: 99999,
+        pointerEvents: 'none'
       }}
     >
       {/* 메시지 타입에 따른 다른 스타일 */}
@@ -255,8 +276,6 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
           </span>
           <span>{message}</span>
         </div>
-        
-        {/* 개발용 ID 표시 제거 */}
       </div>
     </div>
   );
@@ -279,7 +298,7 @@ style.textContent = `
   }
 `;
 
-if (!document.head.querySelector('[data-flying-message-styles]')) {
+if (!document.head.querySelector('[data-flying-message-styles]') && document.head) {
   style.setAttribute('data-flying-message-styles', 'true');
   document.head.appendChild(style);
 }
