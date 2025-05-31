@@ -20,9 +20,9 @@ export const useTimerLogic = () => {
   // 기본 상태들
   const [startTime] = useState(Date.now());
   const [elapsedTime, setElapsedTime] = useState(0);
-  const [currentMessage, setCurrentMessage] = useState("당신의 소중한 시간이 흘러가고 있습니다...");
+  const [currentMessage, setCurrentMessage] = useState("와... 진짜 여기 오셨네요? 시간낭비 시작!");
   const [currentMessageData, setCurrentMessageData] = useState(null);
-  const [displayMessage, setDisplayMessage] = useState("당신의 소중한 시간이 흘러가고 있습니다..."); // 초기값 설정
+  const [displayMessage, setDisplayMessage] = useState("와... 진짜 여기 오셨네요? 시간낭비 시작!"); // 초기값 설정
   const [userHistory, setUserHistory] = useState({ visits: 1, patterns: {} });
   const [buttonText, setButtonText] = useState(BUTTON_TEXTS[0]);
   const [showAd, setShowAd] = useState(false);
@@ -105,7 +105,7 @@ export const useTimerLogic = () => {
   // 메시지 새로고침
   const refreshMessage = useCallback(() => {
     if (elapsedTime < 10) {
-      const newMessage = "시간 낭비의 여정이 시작되었습니다.";
+      const newMessage = "드디어 시작이네요! 시간낭비의 대장정에 오신 걸 환영합니다 ㅋㅋ";
       setCurrentMessage(newMessage);
       setCurrentMessageData(null);
       typeMessage(newMessage);
@@ -308,7 +308,7 @@ export const useTimerLogic = () => {
         // 📊 Firebase 통계에도 시간 추가
         statsService.updateOnSessionEnd(elapsedTime);
         
-        const message = '정말로 나가시겠어요? 이제 막 재미있어지려고 했는데...';
+        const message = '아 진짜 나가세요? 이제 막 재밌어지려고 했는데... ㅋㅋ 아까워요!';
         e.preventDefault();
         e.returnValue = message;
         return message;

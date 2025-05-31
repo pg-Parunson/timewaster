@@ -173,7 +173,7 @@ export const TIME_OF_DAY_OPTIMIZATION = {
 export const PERSONALIZED_RECOMMENDATIONS = {
   // 반복 방문자 (3회 이상)
   frequentVisitor: {
-    message: "또 오셨네요! 이제 패턴이 보여요...",
+    message: "자주 오시네요! 이제 습관이 된 건가요? ㅋㅋ",
     suggestions: [
       "알림 설정으로 시간 관리 시작하기",
       "하루 30분 생산성 챌린지",
@@ -184,7 +184,7 @@ export const PERSONALIZED_RECOMMENDATIONS = {
 
   // 장시간 사용자 (30분 이상)
   longTimeUser: {
-    message: "정말 대단한 집중력이시네요... 다른 곳에 써보시면?",
+    message: "와... 진짜 집중력 대단하네요! 이거 다른 곳에 써보세요",
     suggestions: [
       "이 집중력으로 온라인 강의 수강",
       "새로운 기술 스킬 마스터하기", 
