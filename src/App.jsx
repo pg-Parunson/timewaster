@@ -795,7 +795,7 @@ function App() {
             {/* 비난 메시지 섹션 */}
             <div className="pokemon-dialog pokemon-hover relative">
               <div className="pokemon-font text-lg mb-4 text-gray-800">
-                메시지:
+                당신을 위한 잔소리..아니 조언 해드립니다
               </div>
               
               <div className={`pokemon-message text-black text-lg font-bold leading-relaxed mb-6 p-4 rounded-lg border-2 ${getMessageStyle(currentMessageData?.type || 'default')} ${isTyping ? 'pokemon-typing' : ''}`}>
@@ -807,7 +807,7 @@ function App() {
                   onClick={refreshMessage}
                   className="pokemon-button"
                 >
-                  다른 메시지 듣기
+                  다른 조언 듣기
                 </button>
               </div>
             </div>
