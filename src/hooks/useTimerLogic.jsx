@@ -149,7 +149,7 @@ export const useTimerLogic = () => {
         
         // 📊 전체 통계 가져오기
         const globalStats = await statsService.getGlobalStats();
-        setTotalTimeWasted(Math.floor(globalStats.totalTimeWasted / 60)); // 분 단위로 표시
+        setTotalTimeWasted(globalStats.totalTimeWasted); // 초 단위 그대로 사용
         
         // 로컬 광고 클릭 수는 여전히 로컬에서 관리
         const storedData = storage.getAllData();
@@ -158,7 +158,7 @@ export const useTimerLogic = () => {
         // 📊 실시간 통계 리스너 등록
         const unsubscribeStats = statsService.onStatsChange((stats) => {
           setVisits(stats.totalVisits);
-          setTotalTimeWasted(Math.floor(stats.totalTimeWasted / 60));
+          setTotalTimeWasted(stats.totalTimeWasted); // 초 단위 그대로 사용
         });
         
         // 📊 동시 접속자 리스너 등록 - 🔥 실시간급 업데이트
