@@ -785,7 +785,7 @@ function App() {
             전체 방문 횟수: <span className="text-yellow-300">{visits}회</span>
           </div>
           <div className="pokemon-font">
-            누적 낭비시간: <span className="text-yellow-300">{Math.floor(totalTimeWasted)}시간</span>
+            누적 낭비시간: <span className="text-yellow-300">{Math.floor(totalTimeWasted / 3600)}시간 {Math.floor((totalTimeWasted % 3600) / 60)}분</span>
           </div>
         </div>
 
