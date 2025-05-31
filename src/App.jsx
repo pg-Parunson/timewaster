@@ -30,9 +30,6 @@ import { useModalLogic } from './hooks/useModalLogic.jsx';
 
 // 유틸리티 imports
 import { formatTime } from './utils/helpers';
-import { concurrentUsersDebugger } from './utils/concurrentUsersDebugger.js';
-import { emergencyPermissionTest } from './utils/emergencyTest.js';
-import { statsServiceDebugger } from './utils/statsServiceDebugger.js';
 
 // 시간에 따른 타이머 색상 계산 함수
 const getTimerColor = (elapsedTime) => {
@@ -231,34 +228,6 @@ function App() {
 
   // 축하 시스템 초기화 (범위 제한)
   const { showCelebration, currentCelebration, handleCelebrationComplete } = useCelebrationSystem(elapsedTime);
-
-  // 🔍 동시접속자 디버깅 (개발 모드에서만)
-  useEffect(() => {
-    if (import.meta.env.DEV) {
-      // 5초 후 긴급 권한 테스트
-      const emergencyTimer = setTimeout(async () => {
-        console.log('🚑 긴급 Firebase 권한 테스트...');
-        await emergencyPermissionTest();
-        
-        // 🔥 StatsService 권한 테스트 추가
-        console.log('🔥 StatsService 권한 테스트...');
-        await statsServiceDebugger.testGlobalStatsPermissions();
-        await statsServiceDebugger.testStatsServiceMethods();
-      }, 5000);
-      
-      // 20초 후 세션 분석 시작
-      const debugTimer = setTimeout(async () => {
-        console.log('🔍 동시접속자 디버깅 시작...');
-        await concurrentUsersDebugger.analyzeAllSessions();
-        await concurrentUsersDebugger.testStatsServiceLogic();
-      }, 20000);
-      
-      return () => {
-        clearTimeout(emergencyTimer);
-        clearTimeout(debugTimer);
-      };
-    }
-  }, []);
 
   // 포켓몬 골드 버전 스타일 주입
   useEffect(() => {
