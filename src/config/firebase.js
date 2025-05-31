@@ -2,16 +2,16 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase, connectDatabaseEmulator } from 'firebase/database';
 
-// 실제 Firebase 프로젝트 설정
+// 환경변수에서 Firebase 설정 로드
 const firebaseConfig = {
-  apiKey: "AIzaSyBIiVYzJyoe5l_Sx9ctjXHSfWFa1iK4d2Q",
-  authDomain: "timewaster-ranking.firebaseapp.com",
-  databaseURL: "https://timewaster-ranking-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "timewaster-ranking",
-  storageBucket: "timewaster-ranking.firebasestorage.app",
-  messagingSenderId: "43389524361",
-  appId: "1:43389524361:web:2bb4cb052bc6e5a8e4e958",
-  measurementId: "G-6850FF04H6"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Firebase 앱 초기화 (안전한 방식)
