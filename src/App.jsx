@@ -631,7 +631,7 @@ function App() {
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(255, 255, 255, 0.7); /* 흰색 반투명 오버레이 */
+        background: rgba(0, 0, 0, 0.4); /* 검은색 반투명 오버레이 (가독성 향상) */
         z-index: 1;
       }
       
@@ -642,24 +642,29 @@ function App() {
       
       /* 다크한 이미지일 경우를 위한 대체 스타일 (클래스 추가로 전환 가능) */
       .header-with-background.dark-image::before {
-        background: rgba(0, 0, 0, 0.3); /* 검은색 반투명 오버레이 */
+        background: rgba(0, 0, 0, 0.6); /* 더 진한 검은색 오버레이 */
       }
       
-      .header-with-background.dark-image .pokemon-title {
-        color: var(--pokemon-white);
+      .header-with-background .pokemon-title {
+        color: var(--pokemon-white); /* 흰색 텍스트로 변경 */
         text-shadow: 
           3px 3px 0px var(--pokemon-black),
-          -1px -1px 0px rgba(255, 255, 255, 0.2);
+          -1px -1px 0px rgba(255, 255, 255, 0.2),
+          2px 2px 8px rgba(0, 0, 0, 0.8); /* 추가 그림자 */
       }
       
-      .header-with-background.dark-image .pokemon-subtitle {
-        color: var(--pokemon-white);
-        text-shadow: 2px 2px 0px var(--pokemon-black);
+      .header-with-background .pokemon-subtitle {
+        color: var(--pokemon-white); /* 흰색 텍스트로 변경 */
+        text-shadow: 
+          2px 2px 0px var(--pokemon-black),
+          1px 1px 4px rgba(0, 0, 0, 0.9); /* 강한 그림자 */
       }
       
-      .header-with-background.dark-image .pokemon-font {
-        color: var(--pokemon-white);
-        text-shadow: 1px 1px 0px var(--pokemon-black);
+      .header-with-background .pokemon-font {
+        color: var(--pokemon-white); /* 흰색 텍스트로 변경 */
+        text-shadow: 
+          1px 1px 0px var(--pokemon-black),
+          1px 1px 3px rgba(0, 0, 0, 0.8); /* 선명한 그림자 */
       }
       
       /* 🎵 플로팅 BGM 컴트롤러 스타일 */
@@ -696,6 +701,18 @@ function App() {
       
       .animate-bounce-in {
         animation: bounce-in 0.5s ease-out;
+      }
+      
+      /* 헤더 배경이 있을 때 키보드 단축키 강조 */
+      .header-with-background kbd {
+        background: var(--pokemon-black) !important;
+        color: var(--pokemon-white) !important;
+        border: 2px solid var(--pokemon-white) !important;
+        box-shadow: 
+          2px 2px 0px rgba(0, 0, 0, 0.8),
+          0 0 8px rgba(255, 255, 255, 0.3) !important;
+        font-weight: bold !important;
+        font-size: 0.75rem !important;
       }
       
 
@@ -741,9 +758,9 @@ function App() {
           </p>
           
           {/* 키보드 단축키 안내 */}
-          <div className="mt-4 pokemon-font text-sm text-gray-600">
-            🔄 <kbd className="px-2 py-1 bg-gray-200 border border-gray-400 rounded text-xs">SPACE</kbd> 메시지 새로고침 | 
-            💫 <kbd className="px-2 py-1 bg-gray-200 border border-gray-400 rounded text-xs ml-2">ESC</kbd> 게임 종료
+          <div className="mt-4 pokemon-font text-sm">
+            🔄 <kbd className="px-2 py-1 bg-black text-white border-2 border-white rounded text-xs font-bold shadow-lg">SPACE</kbd> 메시지 새로고침 | 
+            💫 <kbd className="px-2 py-1 bg-black text-white border-2 border-white rounded text-xs font-bold shadow-lg ml-2">ESC</kbd> 게임 종료
           </div>
         </div>
 
