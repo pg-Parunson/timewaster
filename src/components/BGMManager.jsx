@@ -157,7 +157,92 @@ const BGMManager = ({ elapsedTime, compact = false }) => {
     }
   };
   
-  // 🎵 유튜브 스타일 심플 UI
+  // 🎵 유튜브 스타일 심플 UI - 컴팩트 모드 (초소형)
+  if (compact) {
+    return (
+      <div className="flex items-center gap-1 bg-black/90 text-white px-1.5 py-1 rounded-full backdrop-blur-sm shadow-lg border border-white/20">
+        {/* 재생/일시정지 버튼 */}
+        <button
+          onClick={togglePlay}
+          className="flex items-center justify-center w-5 h-5 rounded-full hover:bg-white/20 transition-colors"
+          title={isPlaying ? '일시정지' : '재생'}
+        >
+          {isPlaying ? (
+            <div className="flex gap-0.5">
+              <div className="w-0.5 h-2 bg-white"></div>
+              <div className="w-0.5 h-2 bg-white"></div>
+            </div>
+          ) : (
+            <div className="w-0 h-0 border-l-[4px] border-l-white border-t-[2px] border-t-transparent border-b-[2px] border-b-transparent ml-0.5"></div>
+          )}
+        </button>
+        
+        {/* 음소거 버튼 */}
+        <button
+          onClick={toggleMute}
+          className="flex items-center justify-center w-4 h-4 rounded-full hover:bg-white/20 transition-colors"
+          title={isMuted ? '음소거 해제' : '음소거'}
+        >
+          {isMuted ? (
+            <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 4a1 1 0 00-1.707-.707L4.586 7H2a1 1 0 000 2v2a1 1 0 000 2h2.586l3.707 3.707A1 1 0 0010 16V4z"/>
+              <path d="M17.293 6.293a1 1 0 00-1.414 1.414L17.586 9.5 15.879 11.207a1 1 0 101.414 1.414L19 10.914l1.707 1.707a1 1 0 001.414-1.414L20.414 9.5l1.707-1.707a1 1 0 00-1.414-1.414L19 7.086l-1.707-1.707z"/>
+            </svg>
+          ) : (
+            <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.817L4.067 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.067l4.316-3.817A1 1 0 019.383 3.076z" clipRule="evenodd" />
+              <path d="M12.828 7.172a4 4 0 010 5.656 1 1 0 01-1.414-1.414 2 2 0 000-2.828 1 1 0 011.414-1.414z"/>
+            </svg>
+          )}
+        </button>
+        
+        {/* 작은 볼륨 슬라이더 */}
+        <input
+          type="range"
+          min="0"
+          max="0.5"
+          step="0.05"
+          value={volume}
+          onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+          className="w-10 h-1 bg-white/30 rounded-full appearance-none cursor-pointer slider"
+          title="볼륨 조절"
+        />
+        
+        {/* 오디오 엘리먼트 */}
+        <audio
+          ref={audioRef}
+          loop
+          preload="auto"
+          onLoadStart={() => {}}
+          onCanPlay={() => {}}
+          onError={() => {}}
+          onEnded={() => setIsPlaying(false)}
+        />
+        
+        <style jsx>{`
+          .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+          }
+          
+          .slider::-moz-range-thumb {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            border: none;
+          }
+        `}</style>
+      </div>
+    );
+  }
+  
+  // 일반 모드 (기존 코드)
   return (
     <div className="flex items-center gap-2 bg-black/70 text-white px-3 py-1 rounded-full backdrop-blur-sm">
       {/* 재생/일시정지 버튼 */}
@@ -222,25 +307,7 @@ const BGMManager = ({ elapsedTime, compact = false }) => {
         onEnded={() => setIsPlaying(false)}
       />
       
-      <style jsx>{`
-        .slider::-webkit-slider-thumb {
-          appearance: none;
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          background: white;
-          cursor: pointer;
-        }
-        
-        .slider::-moz-range-thumb {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          background: white;
-          cursor: pointer;
-          border: none;
-        }
-      `}</style>
+      
     </div>
   );
 };

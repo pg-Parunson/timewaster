@@ -343,22 +343,6 @@ function App() {
         animation: pokemon-ad-blink 2.2s infinite;
       }
       
-      /* 위기 번쩍거림 효과 */
-      @keyframes pokemon-danger-blink {
-        0%, 50% { 
-          background-color: rgba(59, 130, 246, 0.2); /* 부드러운 파란색 */
-          border-color: #3B82F6; /* 파란색 경계선 */
-        }
-        51%, 100% { 
-          background-color: transparent;
-          border-color: var(--pokemon-black);
-        }
-      }
-      
-      .pokemon-danger {
-        animation: pokemon-danger-blink 1.5s infinite; /* 살짝 느리게 */
-      }
-      
       /* 레트로 타이핑 효과 */
       @keyframes pokemon-typing {
         0%, 50% { opacity: 1; }
@@ -596,6 +580,73 @@ function App() {
         position: relative;
       }
       
+      /* 🎨 헤더 배경 이미지 스타일 */
+      .header-with-background {
+        background-image: url('/images/header-background.jpeg'); /* 메인 이미지 */
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        position: relative;
+        overflow: hidden;
+        
+        /* 이미지가 없을 경우를 위한 fallback 배경 */
+        background-color: var(--pokemon-white);
+        
+        /* 이미지 위에 반투명 오버레이 (텍스트 가독성을 위해) */
+      }
+      
+      .header-with-background::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.7); /* 흰색 반투명 오버레이 */
+        z-index: 1;
+      }
+      
+      .header-with-background > * {
+        position: relative;
+        z-index: 2; /* 오버레이 위에 텍스트가 보이도록 */
+      }
+      
+      /* 다크한 이미지일 경우를 위한 대체 스타일 (클래스 추가로 전환 가능) */
+      .header-with-background.dark-image::before {
+        background: rgba(0, 0, 0, 0.3); /* 검은색 반투명 오버레이 */
+      }
+      
+      .header-with-background.dark-image .pokemon-title {
+        color: var(--pokemon-white);
+        text-shadow: 
+          3px 3px 0px var(--pokemon-black),
+          -1px -1px 0px rgba(255, 255, 255, 0.2);
+      }
+      
+      .header-with-background.dark-image .pokemon-subtitle {
+        color: var(--pokemon-white);
+        text-shadow: 2px 2px 0px var(--pokemon-black);
+      }
+      
+      .header-with-background.dark-image .pokemon-font {
+        color: var(--pokemon-white);
+        text-shadow: 1px 1px 0px var(--pokemon-black);
+      }
+      
+      /* 🎵 플로팅 BGM 컴트롤러 스타일 */
+      .floating-bgm-controller {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 50;
+        transition: all 0.3s ease;
+      }
+      
+      .floating-bgm-controller:hover {
+        transform: scale(1.05);
+        bottom: 22px;
+      }
+      
 
     `;
     
@@ -627,8 +678,8 @@ function App() {
       {/* 포켓몬 스타일 메인 윈도우 */}
       <div className="pokemon-window max-w-[1500px] mx-auto my-8 relative">
         
-        {/* 🎮 시간 낭비 마스터 헤더 */}
-        <div className="text-center py-6 border-b-4 border-black relative">
+        {/* 🎮 시간 낭비 마스터 헤더 - 배경 이미지 적용 */}
+        <div className="text-center py-6 border-b-4 border-black relative header-with-background">
           <h1 className="pokemon-title mb-3">
             시간 낭비 <span className="text-yellow-500">마스터</span>
           </h1>
@@ -636,15 +687,10 @@ function App() {
             {currentSubtitle}
           </p>
           
-          {/* 키보드 단축키 안내 - 잘 보이는 곳으로 이동! */}
+          {/* 키보드 단축키 안내 */}
           <div className="mt-4 pokemon-font text-sm text-gray-600">
             🔄 <kbd className="px-2 py-1 bg-gray-200 border border-gray-400 rounded text-xs">SPACE</kbd> 메시지 새로고침 | 
             💫 <kbd className="px-2 py-1 bg-gray-200 border border-gray-400 rounded text-xs ml-2">ESC</kbd> 게임 종료
-          </div>
-          
-          {/* BGM 컴트롤 - 헤더 오른쪽 구석에 간략하게 */}
-          <div className="absolute top-4 right-4">
-            <BGMManager elapsedTime={elapsedTime} compact={true} />
           </div>
         </div>
 
@@ -788,6 +834,11 @@ function App() {
         {/* 푸터 */}
         <Footer />
 
+      </div>
+
+      {/* 🎵 독립적인 플로팅 BGM 컨트롤러 */}
+      <div className="floating-bgm-controller">
+        <BGMManager elapsedTime={elapsedTime} compact={true} />
       </div>
 
       {/* 이스터 에그 */}
