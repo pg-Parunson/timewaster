@@ -42,6 +42,13 @@ class RankingService {
       // 랜덤 익명 닉네임 선택
       this.anonymousName = ANONYMOUS_NAMES[Math.floor(Math.random() * ANONYMOUS_NAMES.length)];
       
+      logger.critical('🚨 세션 초기화 시작:', {
+        sessionId: this.sessionId,
+        tabId: tabId,
+        anonymousName: this.anonymousName,
+        firebaseConnected: this.isFirebaseConnected
+      });
+      
       if (this.isFirebaseConnected) {
         // 🔥 기존 동일 탭의 세션 정리 (새로고침 대비)
         const existingSessionRef = ref(database, DB_PATHS.SESSIONS);
@@ -58,26 +65,52 @@ class RankingService {
           }
         }
         
-        // Firebase 모드 - 새 세션 생성
-        const sessionData = {
-          sessionId: this.sessionId,
-          anonymousName: this.anonymousName,
-          startTime: serverTimestamp(),
-          currentTime: 0,
-          isActive: true,
-          lastHeartbeat: serverTimestamp(),
-          userAgent: navigator.userAgent.substring(0, 100)
-        };
+        try {
+          const sessionData = {
+            sessionId: this.sessionId,
+            anonymousName: this.anonymousName,
+            startTime: serverTimestamp(),
+            currentTime: 0,
+            isActive: true,
+            lastHeartbeat: serverTimestamp(),
+            userAgent: navigator.userAgent.substring(0, 100)
+          };
 
-        const sessionRef = ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}`);
-        await set(sessionRef, sessionData);
-        
-        // 🔥 중요: 브라우저 닫힘/새로고침 시 세션 자동 정리
-        await onDisconnect(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/isActive`)).set(false);
-        await onDisconnect(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/endTime`)).set(serverTimestamp());
-        
-        this.startHeartbeat();
-        await this.addLiveFeedEvent('join', `${this.anonymousName}님이 접속했습니다`);
+          const sessionRef = ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}`);
+          
+          logger.critical('🚨 Firebase에 세션 저장 시도:', {
+            sessionData: sessionData,
+            path: `${DB_PATHS.SESSIONS}/${this.sessionId}`,
+            database: !!database
+          });
+          
+          await set(sessionRef, sessionData);
+          
+          logger.critical('✅ Firebase 세션 저장 성공!', {
+            sessionId: this.sessionId,
+            path: `${DB_PATHS.SESSIONS}/${this.sessionId}`
+          });
+          
+          // 🔥 중요: 브라우저 닫힘/새로고침 시 세션 자동 정리
+          await onDisconnect(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/isActive`)).set(false);
+          await onDisconnect(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/endTime`)).set(serverTimestamp());
+          
+          logger.critical('🔥 Firebase 세션 생성 완료:', {
+            sessionId: this.sessionId,
+            생성된세션수: 1,
+            하트비트시작: '✅'
+          });
+          
+          this.startHeartbeat();
+          await this.addLiveFeedEvent('join', `${this.anonymousName}님이 접속했습니다`);
+        } catch (firebaseError) {
+          logger.critical('❌ Firebase 세션 저장 실패:', {
+            error: firebaseError,
+            message: firebaseError.message,
+            code: firebaseError.code
+          });
+          throw firebaseError;
+        }
       } else {
         // 로컬 모드
         const sessionData = {
@@ -88,6 +121,11 @@ class RankingService {
           isActive: true,
           lastHeartbeat: Date.now()
         };
+        
+        logger.critical('🏠 로컬 세션 생성 완료:', {
+          sessionId: this.sessionId,
+          모드: '로컬 시뮬레이션'
+        });
         
         // 로컬 스토리지에 저장
         this.localRanking = [sessionData];

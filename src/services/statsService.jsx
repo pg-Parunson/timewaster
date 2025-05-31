@@ -79,29 +79,56 @@ class StatsService {
         const snapshot = await get(sessionsRef);
         
         if (!snapshot.exists()) {
+          logger.critical('🚨 Firebase 세션 데이터 없음');
           return 1; // 기본값
         }
 
         const sessions = Object.values(snapshot.val());
         const now = Date.now();
         const fiveSecondsAgo = now - (5 * 1000); // 🔥 5초로 설정 (실시간에 가깝게)
+        
+        logger.critical('🚨 전체 세션 분석:', {
+          전체세션수: sessions.length,
+          현재시간: new Date().toLocaleTimeString(),
+          기준시간: new Date(fiveSecondsAgo).toLocaleTimeString()
+        });
 
         // 5초 이내에 활동한 세션 수
-        const activeSessions = sessions.filter(session => {
-          if (!session.isActive) return false;
+        const activeSessions = sessions.filter((session, index) => {
+          if (!session.isActive) {
+            logger.critical(`세션 ${index}: 비활성 (isActive: false)`);
+            return false;
+          }
           
           // lastHeartbeat가 5초 이내인지 확인
           const lastHeartbeat = session.lastHeartbeat;
+          let heartbeatTime = 0;
+          
           if (typeof lastHeartbeat === 'object' && lastHeartbeat.seconds) {
-            return (lastHeartbeat.seconds * 1000) > fiveSecondsAgo;
+            heartbeatTime = lastHeartbeat.seconds * 1000;
           } else if (typeof lastHeartbeat === 'number') {
-            return lastHeartbeat > fiveSecondsAgo;
+            heartbeatTime = lastHeartbeat;
           }
           
-          return false; // lastHeartbeat가 없으면 비활성으로 처리
-        }).length;
+          const isRecent = heartbeatTime > fiveSecondsAgo;
+          
+          logger.critical(`세션 ${index} (${session.anonymousName}):`, {
+            isActive: session.isActive,
+            하트비트: new Date(heartbeatTime).toLocaleTimeString(),
+            최근활동: isRecent ? '✅' : '❌',
+            차이: Math.round((now - heartbeatTime) / 1000) + '초 전'
+          });
+          
+          return isRecent;
+        });
+        
+        logger.critical('👥 활성 세션 최종 결과:', {
+          활성세션수: activeSessions.length,
+          전체세션수: sessions.length,
+          반환값: Math.max(1, activeSessions.length)
+        });
 
-        return Math.max(1, activeSessions); // 최소 1명
+        return Math.max(1, activeSessions.length); // 최소 1명
       } else {
         // 로컬 모드 - 시뮬레이션
         const hour = new Date().getHours();

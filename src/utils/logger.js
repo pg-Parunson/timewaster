@@ -3,16 +3,26 @@
 
 const isDev = import.meta.env.DEV || import.meta.env.MODE === 'development';
 
+// 🎯 중요 로그만 출력하는 필터링 시스템
+const IMPORTANT_ONLY = true; // 중요한 로그만 출력
+
 // 개발 모드에서만 로그 출력
 export const logger = {
-  debug: (...args) => {
+  // 🎯 최우선 디버그 로그 (항상 출력)
+  critical: (...args) => {
     if (isDev) {
+      console.log('🚨 [CRITICAL]', ...args);
+    }
+  },
+  
+  debug: (...args) => {
+    if (isDev && !IMPORTANT_ONLY) {
       console.log('🐛 [DEBUG]', ...args);
     }
   },
   
   info: (...args) => {
-    if (isDev) {
+    if (isDev && !IMPORTANT_ONLY) {
       console.info('ℹ️ [INFO]', ...args);
     }
   },
@@ -29,24 +39,28 @@ export const logger = {
     }
   },
   
+  // 🎯 Firebase 중요 로그만
   firebase: (...args) => {
     if (isDev) {
       console.log('🔥 [Firebase]', ...args);
     }
   },
   
+  // 🎯 랭킹 중요 로그만
   ranking: (...args) => {
     if (isDev) {
       console.log('🏆 [Ranking]', ...args);
     }
   },
   
+  // 🎯 채팅 중요 로그만
   chat: (...args) => {
-    if (isDev) {
+    if (isDev && !IMPORTANT_ONLY) {
       console.log('💬 [Chat]', ...args);
     }
   },
   
+  // 🎯 통계 핵심 로그만
   stats: (...args) => {
     if (isDev) {
       console.log('📊 [Stats]', ...args);
@@ -57,13 +71,13 @@ export const logger = {
 // 성능 측정 도구 (개발 모드 전용)
 export const performance = {
   start: (label) => {
-    if (isDev) {
+    if (isDev && !IMPORTANT_ONLY) {
       console.time(`⏱️ ${label}`);
     }
   },
   
   end: (label) => {
-    if (isDev) {
+    if (isDev && !IMPORTANT_ONLY) {
       console.timeEnd(`⏱️ ${label}`);
     }
   }

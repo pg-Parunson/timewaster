@@ -18,18 +18,23 @@ const DevTools = ({ isVisible, onOpenRankingTest }) => {
   
   // 🔍 Firebase 디버깅 기능 추가
   const handleCheckFirebaseStatus = () => {
-    logger.firebase('Firebase 상태 상세 확인:', {
+    logger.critical('🔥 Firebase 연결 상태 상세:', {
       isConnected: rankingService.isFirebaseConnected,
       sessionId: rankingService.sessionId,
       anonymousName: rankingService.anonymousName,
-      databaseURL: 'https://timewaster-ranking-default-rtdb.asia-southeast1.firebasedatabase.app'
+      databaseURL: 'https://timewaster-ranking-default-rtdb.asia-southeast1.firebasedatabase.app',
+      heartbeatInterval: rankingService.heartbeatInterval ? '✅ 활성' : '❌ 중지',
+      브라우저탭ID: sessionStorage.getItem('timewaster_tab_id')
     });
     
-    // 동시 접속자 수 강제 업데이트 테스트
+    // Firebase 실제 연결 테스트
     if (rankingService.isFirebaseConnected) {
-      logger.firebase('🔥 Firebase 모드: 동시 접속자 수 실시간 추적');
-    } else {
-      logger.firebase('🏠 로컬 모드: 시뮬레이션 동시 접속자 수');
+      import('../config/firebase.js').then(firebase => {
+        logger.critical('🌍 Firebase 실제 연결 테스트:', {
+          database객체: !!firebase.database,
+          연결상태: firebase.isFirebaseConnected
+        });
+      });
     }
   };
   
@@ -139,27 +144,114 @@ const DevTools = ({ isVisible, onOpenRankingTest }) => {
           
           <div className="space-y-1">
             <button
-              onClick={handleCheckFirebaseStatus}
+              onClick={() => {
+                logger.critical('🔥 Firebase 연결 상태:', {
+                  connected: rankingService.isFirebaseConnected,
+                  sessionId: rankingService.sessionId ? '✅ 있음' : '❌ 없음',
+                  anonymousName: rankingService.anonymousName
+                });
+              }}
               className="bg-cyan-600 hover:bg-cyan-500 px-2 py-1 rounded text-xs
                          transition-colors duration-200 w-full"
             >
-              🔥 Firebase 상태 확인
+              🚨 Firebase 상태 (중요)
             </button>
             
             <button
-              onClick={handleCheckRankingData}
-              className="bg-purple-600 hover:bg-purple-500 px-2 py-1 rounded text-xs
+              onClick={async () => {
+                const stats = await import('../services/statsService.jsx');
+                const activeSessions = await stats.statsService.getActiveSessions();
+                logger.critical('👥 동시 접속자 수 체크:', {
+                  현재수: activeSessions,
+                  Firebase모드: rankingService.isFirebaseConnected ? '✅' : '❌ 로컬모드',
+                  시간: new Date().toLocaleTimeString()
+                });
+              }}
+              className="bg-green-600 hover:bg-green-500 px-2 py-1 rounded text-xs
                          transition-colors duration-200 w-full"
             >
-              🏆 랭킹 데이터 확인
+              🚨 동시접속자 체크
             </button>
             
             <button
-              onClick={() => window.location.reload()}
+              onClick={async () => {
+                // Firebase 세션 데이터 직접 조회
+                const { database, DB_PATHS } = await import('../config/firebase.js');
+                const { ref, get } = await import('firebase/database');
+                
+                try {
+                  const sessionsRef = ref(database, DB_PATHS.SESSIONS);
+                  const snapshot = await get(sessionsRef);
+                  
+                  if (snapshot.exists()) {
+                    const sessions = Object.entries(snapshot.val());
+                    logger.critical('🚨 Firebase 세션 데이터 직접 조회:', {
+                      전체세션수: sessions.length,
+                      세션목록: sessions.map(([key, session]) => ({
+                        key: key.substring(0, 15) + '...',
+                        이름: session.anonymousName,
+                        활성: session.isActive ? '✅' : '❌',
+                        마지막하트비트: session.lastHeartbeat ? 
+                          (typeof session.lastHeartbeat === 'object' ? 
+                            new Date(session.lastHeartbeat.seconds * 1000).toLocaleTimeString() :
+                            new Date(session.lastHeartbeat).toLocaleTimeString()) : '없음'
+                      }))
+                    });
+                  } else {
+                    logger.critical('🚨 Firebase 세션 데이터 없음!');
+                  }
+                } catch (error) {
+                  logger.critical('🚨 Firebase 세션 조회 실패:', error);
+                }
+              }}
+              className="bg-yellow-600 hover:bg-yellow-500 px-2 py-1 rounded text-xs
+                         transition-colors duration-200 w-full"
+            >
+              🚨 Firebase 세션 데이터
+            </button>
+            
+            <button
+              onClick={async () => {
+                // Firebase 방화벽 및 권한 테스트
+                const { database, DB_PATHS } = await import('../config/firebase.js');
+                const { ref, set, get } = await import('firebase/database');
+                
+                try {
+                  // 테스트 데이터 쓰기 시도
+                  const testRef = ref(database, 'test-connection');
+                  const testData = {
+                    timestamp: Date.now(),
+                    test: '연결 테스트'
+                  };
+                  
+                  logger.critical('🚨 Firebase 쓰기 권한 테스트 시작...');
+                  await set(testRef, testData);
+                  logger.critical('✅ Firebase 쓰기 성공!');
+                  
+                  // 테스트 데이터 읽기 시도
+                  const snapshot = await get(testRef);
+                  logger.critical('✅ Firebase 읽기 성공:', snapshot.val());
+                  
+                  // 세션 경로 쓰기 테스트
+                  const sessionTestRef = ref(database, `${DB_PATHS.SESSIONS}/test-session`);
+                  await set(sessionTestRef, {
+                    test: true,
+                    timestamp: Date.now()
+                  });
+                  logger.critical('✅ 세션 경로 쓰기 성공!');
+                  
+                } catch (error) {
+                  logger.critical('❌ Firebase 권한 테스트 실패:', {
+                    error: error.message,
+                    code: error.code,
+                    상세: error
+                  });
+                }
+              }}
               className="bg-red-600 hover:bg-red-500 px-2 py-1 rounded text-xs
                          transition-colors duration-200 w-full"
             >
-              🔄 페이지 새로고침
+              🚨 Firebase 권한 테스트
             </button>
           </div>
         </div>
