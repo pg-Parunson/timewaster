@@ -32,6 +32,7 @@ import { useModalLogic } from './hooks/useModalLogic.jsx';
 import { formatTime } from './utils/helpers';
 import { concurrentUsersDebugger } from './utils/concurrentUsersDebugger.js';
 import { emergencyPermissionTest } from './utils/emergencyTest.js';
+import { statsServiceDebugger } from './utils/statsServiceDebugger.js';
 
 // 시간에 따른 타이머 색상 계산 함수
 const getTimerColor = (elapsedTime) => {
@@ -238,14 +239,19 @@ function App() {
       const emergencyTimer = setTimeout(async () => {
         console.log('🚑 긴급 Firebase 권한 테스트...');
         await emergencyPermissionTest();
+        
+        // 🔥 StatsService 권한 테스트 추가
+        console.log('🔥 StatsService 권한 테스트...');
+        await statsServiceDebugger.testGlobalStatsPermissions();
+        await statsServiceDebugger.testStatsServiceMethods();
       }, 5000);
       
-      // 15초 후 세션 분석 시작
+      // 20초 후 세션 분석 시작
       const debugTimer = setTimeout(async () => {
         console.log('🔍 동시접속자 디버깅 시작...');
         await concurrentUsersDebugger.analyzeAllSessions();
         await concurrentUsersDebugger.testStatsServiceLogic();
-      }, 15000);
+      }, 20000);
       
       return () => {
         clearTimeout(emergencyTimer);
