@@ -4,7 +4,7 @@
 const isDev = import.meta.env.DEV || import.meta.env.MODE === 'development';
 
 // 🎯 중요 로그만 출력하는 필터링 시스템
-const IMPORTANT_ONLY = true; // 중요한 로그만 출력
+const IMPORTANT_ONLY = false; // 🔧 버그 수정 테스트를 위해 임시로 false
 
 // 개발 모드에서만 로그 출력
 export const logger = {

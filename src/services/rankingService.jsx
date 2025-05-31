@@ -46,7 +46,8 @@ class RankingService {
         sessionId: this.sessionId,
         tabId: tabId,
         anonymousName: this.anonymousName,
-        firebaseConnected: this.isFirebaseConnected
+        firebaseConnected: this.isFirebaseConnected,
+        timestamp: new Date().toISOString()
       });
       
       if (this.isFirebaseConnected) {
@@ -277,29 +278,38 @@ class RankingService {
 
         const allSessions = Object.values(sessionsSnapshot.val());
 
-        // 랭킹용 세션 필터링 (더 관대하게)
+        // 랭킹용 세션 필터링 - 🔥 활성 세션도 포함하도록 개선
         const validSessions = allSessions.filter(session => {
           const hasValidTime = (session.finalTime > 0) || (session.currentTime > 0);
           const hasValidNickname = session.finalNickname || session.anonymousName;
-          const isSubmitted = session.submittedToRanking === true;
+          // 🔥 제출된 세션 또는 현재 활성 세션(10초 이상)도 포함
+          const isEligible = session.submittedToRanking === true || 
+            (session.isActive && session.currentTime >= 10);
           
           logger.debug('랭킹 세션 필터링:', {
-            sessionId: session.sessionId,
+            sessionId: session.sessionId?.slice(-8) || 'unknown',
             hasValidTime,
             hasValidNickname,
-            isSubmitted,
+            isEligible,
+            isSubmitted: session.submittedToRanking === true,
+            isActive: session.isActive,
+            currentTime: session.currentTime,
             finalTime: session.finalTime,
-            currentTime: session.currentTime
+            startTime: session.startTime
           });
           
-          return hasValidTime && hasValidNickname && isSubmitted;
+          return hasValidTime && hasValidNickname && isEligible;
         });
+        
+        logger.ranking(`전체 세션: ${allSessions.length}개, 유효 세션: ${validSessions.length}개`);
         
         logger.ranking('유효한 랭킹 세션:', validSessions.length, '개');
 
-        // 시간순 정렬
-        const sessions = validSessions
-          .filter(session => this.isSessionInPeriod(session, period))
+        // 기간별 필터링 및 시간순 정렬
+        const periodFilteredSessions = validSessions.filter(session => this.isSessionInPeriod(session, period));
+        logger.ranking(`${period} 기간 필터링 결과: ${periodFilteredSessions.length}개`);
+        
+        const sessions = periodFilteredSessions
           .sort((a, b) => {
             // finalTime이 있으면 우선, 없으면 currentTime 사용
             const timeA = a.finalTime || a.currentTime || 0;
@@ -322,14 +332,22 @@ class RankingService {
         // 로컬 모드
         const stored = JSON.parse(localStorage.getItem('timewaster_local_ranking') || '[]');
         
-        // 로컬 랭킹 생성 (기간별 필터링) - 🔥 랭킹용으로 모든 유효 세션 포함
-        const sessions = stored
-          .filter(session => {
-            // 랭킹용: 유효한 시간이 있는 모든 세션 포함 (활성 상태 무관)
-            const hasValidTime = (session.currentTime > 0) || (session.finalTime > 0);
-            return hasValidTime;
-          })
-          .filter(session => this.isSessionInPeriod(session, period))
+        // 로컬 랭킹 생성 (기간별 필터링) - 🔥 활성 세션도 포함하도록 개선
+        const validLocalSessions = stored.filter(session => {
+          // 랭킹용: 제출된 세션 또는 활성 세션(10초 이상)
+          const hasValidTime = (session.currentTime > 0) || (session.finalTime > 0);
+          const hasValidNickname = session.finalNickname || session.anonymousName;
+          const isEligible = session.submittedToRanking === true || 
+            (session.isActive && session.currentTime >= 10);
+          return hasValidTime && hasValidNickname && isEligible;
+        });
+        
+        logger.ranking(`로컬 모드 - 전체 세션: ${stored.length}개, 유효 세션: ${validLocalSessions.length}개`);
+        
+        const periodFilteredLocal = validLocalSessions.filter(session => this.isSessionInPeriod(session, period));
+        logger.ranking(`로컬 ${period} 기간 필터링 결과: ${periodFilteredLocal.length}개`);
+        
+        const sessions = periodFilteredLocal
           .sort((a, b) => {
             // finalTime이 있으면 우선, 없으면 currentTime 사용
             const timeA = a.finalTime || a.currentTime || 0;
@@ -354,39 +372,95 @@ class RankingService {
     }
   }
 
-  // 세션이 해당 기간에 포함되는지 확인
+  // 세션이 해당 기간에 포함되는지 확인 - 🔥 타임존 문제 개선
   isSessionInPeriod(session, period) {
     const sessionTime = session.startTime;
     const now = Date.now();
     
-    // Firebase timestamp 처리
-    const sessionDate = typeof sessionTime === 'object' && sessionTime.seconds 
-      ? new Date(sessionTime.seconds * 1000)
-      : new Date(sessionTime);
+    // Firebase timestamp 처리 개선
+    let sessionDate;
+    if (typeof sessionTime === 'object' && sessionTime.seconds) {
+      // Firebase serverTimestamp 형식
+      sessionDate = new Date(sessionTime.seconds * 1000);
+    } else if (typeof sessionTime === 'number') {
+      // 일반 timestamp
+      sessionDate = new Date(sessionTime);
+    } else {
+      // 잘못된 형식인 경우 현재 시간으로 대체
+      logger.warning('잘못된 sessionTime 형식:', sessionTime);
+      sessionDate = new Date(now);
+    }
     
     const currentDate = new Date(now);
     
+    // 🔥 UTC 기준으로 통일
+    const sessionUTC = new Date(sessionDate.getTime() - sessionDate.getTimezoneOffset() * 60000);
+    const currentUTC = new Date(currentDate.getTime() - currentDate.getTimezoneOffset() * 60000);
+    
+    // 디버깅을 위한 로그
+    logger.debug(`기간 필터링 확인 (${period}):`, {
+      sessionDate: sessionDate.toISOString(),
+      currentDate: currentDate.toISOString(),
+      sessionUTC: sessionUTC.toISOString(),
+      currentUTC: currentUTC.toISOString(),
+      sessionDateString: sessionDate.toDateString(),
+      currentDateString: currentDate.toDateString()
+    });
+    
     switch (period) {
       case RANKING_PERIODS.DAILY:
-        // 오늘 날짜와 같은지 확인
-        return sessionDate.toDateString() === currentDate.toDateString();
+        // 오늘 날짜와 같은지 확인 (🔥 더 유연하게)
+        const todayStart = new Date(currentDate);
+        todayStart.setHours(0, 0, 0, 0);
+        const todayEnd = new Date(currentDate);
+        todayEnd.setHours(23, 59, 59, 999);
+        
+        const isDailyEligible = sessionDate >= todayStart && sessionDate <= todayEnd;
+        logger.debug(`일간 필터 결과: ${isDailyEligible}`, {
+          todayStart: todayStart.toISOString(),
+          todayEnd: todayEnd.toISOString()
+        });
+        return isDailyEligible;
         
       case RANKING_PERIODS.WEEKLY:
         // 이번 주에 포함되는지 확인 (월요일 기준)
         const startOfWeek = this.getStartOfWeek(currentDate);
         const endOfWeek = this.getEndOfWeek(currentDate);
-        return sessionDate >= startOfWeek && sessionDate <= endOfWeek;
+        const isThisWeek = sessionDate >= startOfWeek && sessionDate <= endOfWeek;
+        logger.debug(`주간 필터 결과: ${isThisWeek}`, {
+          startOfWeek: startOfWeek.toISOString(),
+          endOfWeek: endOfWeek.toISOString()
+        });
+        return isThisWeek;
         
       case RANKING_PERIODS.MONTHLY:
-        // 이번 달에 포함되는지 확인
-        return sessionDate.getMonth() === currentDate.getMonth() && 
-               sessionDate.getFullYear() === currentDate.getFullYear();
+        // 이번 달에 포함되는지 확인 - 🔥 유연한 월간 필터링
+        // 월 초반(15일 이하)에는 이전 달도 포함하여 충분한 데이터 보장
+        const isEarlyMonth = currentDate.getDate() <= 15;
+        const monthlyStartDate = isEarlyMonth 
+          ? new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1) // 이전 달 1일부터
+          : new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);     // 이번 달 1일부터
+        
+        const monthlyEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59, 999);
+        
+        const isMonthlyEligible = sessionDate >= monthlyStartDate && sessionDate <= monthlyEndDate;
+        
+        logger.debug(`월간 필터 결과 (${isEarlyMonth ? '이전달 포함' : '이번달만'}): ${isMonthlyEligible}`, {
+          현재일: currentDate.getDate(),
+          월초반여부: isEarlyMonth,
+          monthlyStartDate: monthlyStartDate.toISOString(),
+          monthlyEndDate: monthlyEndDate.toISOString(),
+          sessionDate: sessionDate.toISOString()
+        });
+        return isMonthlyEligible;
                
       case RANKING_PERIODS.ALL_TIME:
         // 전체 기간 (모든 세션 포함)
+        logger.debug('전체 기간 필터: true');
         return true;
         
       default:
+        logger.debug('기본 필터: true');
         return true;
     }
   }
@@ -527,39 +601,94 @@ class RankingService {
     return `${minutes}분 ${remainingSeconds.toString().padStart(2, '0')}초`;
   }
 
-  // 예상 랭킹 순위 확인
-  async getExpectedRank(timeInSeconds) {
+  // 예상 랭킹 순위 확인 (period 매개변수 추가 + 디버깅 강화)
+  async getExpectedRank(timeInSeconds, period = RANKING_PERIODS.DAILY) {
     try {
+      logger.critical('🏆 예상 순위 계산 시작:', {
+        timeInSeconds,
+        period,
+        sessionId: this.sessionId?.slice(-8) || 'unknown',
+        anonymousName: this.anonymousName
+      });
+      
       if (this.isFirebaseConnected) {
         // Firebase 모드
         const sessionsRef = ref(database, DB_PATHS.SESSIONS);
-        const sessionsSnapshot = await get(query(
-          sessionsRef,
-          orderByChild('isActive'),
-          limitToLast(100)
-        ));
+        const sessionsSnapshot = await get(sessionsRef);
 
         if (!sessionsSnapshot.exists()) {
+          logger.critical('🏆 세션 데이터 없음 - 1위 반환');
           return 1; // 첫 번째 기록
         }
 
-        const sessions = Object.values(sessionsSnapshot.val())
-          .filter(session => session.isActive && session.currentTime > 0)
-          .filter(session => this.isSessionInPeriod(session, RANKING_PERIODS.DAILY))
-          .sort((a, b) => b.currentTime - a.currentTime);
+        const allSessions = Object.values(sessionsSnapshot.val());
+        
+        // 🔥 현재 활성 세션들만 비교 (제출된 세션 + 활성 세션)
+        const comparableSessions = allSessions
+          .filter(session => {
+            // 제출된 세션 또는 현재 활성 세션
+            const isEligible = session.submittedToRanking === true || 
+              (session.isActive && session.currentTime >= 10);
+            const hasValidTime = (session.finalTime > 0) || (session.currentTime > 0);
+            
+            return isEligible && hasValidTime;
+          })
+          .filter(session => this.isSessionInPeriod(session, period))
+          .map(session => ({
+            ...session,
+            compareTime: session.finalTime || session.currentTime || 0
+          }))
+          .sort((a, b) => b.compareTime - a.compareTime);
+        
+        logger.critical('🏆 비교 가능 세션 분석:', {
+          전체세션: allSessions.length,
+          비교가능세션: comparableSessions.length,
+          내시간: timeInSeconds,
+          상위세션: comparableSessions.slice(0, 3).map(s => ({
+            닉네임: s.anonymousName,
+            시간: s.compareTime,
+            제출여부: s.submittedToRanking,
+            활성여부: s.isActive
+          }))
+        });
 
         // 현재 시간보다 높은 기록의 개수 + 1
-        const higherScores = sessions.filter(session => session.currentTime > timeInSeconds).length;
-        return higherScores + 1;
+        const higherScores = comparableSessions.filter(session => 
+          session.compareTime > timeInSeconds
+        ).length;
+        
+        const expectedRank = higherScores + 1;
+        
+        logger.critical('🏆 예상 순위 결과:', {
+          높은점수개수: higherScores,
+          예상순위: expectedRank,
+          내시간: timeInSeconds
+        });
+        
+        return expectedRank;
       } else {
         // 로컬 모드
         const stored = JSON.parse(localStorage.getItem('timewaster_local_ranking') || '[]');
         const sessions = stored
-          .filter(session => session.isActive && session.currentTime > 0)
-          .filter(session => this.isSessionInPeriod(session, RANKING_PERIODS.DAILY))
-          .sort((a, b) => b.currentTime - a.currentTime);
+          .filter(session => {
+            const isEligible = session.submittedToRanking === true || 
+              (session.isActive && session.currentTime >= 10);
+            const hasValidTime = (session.currentTime > 0) || (session.finalTime > 0);
+            return isEligible && hasValidTime;
+          })
+          .filter(session => this.isSessionInPeriod(session, period))
+          .sort((a, b) => (b.finalTime || b.currentTime || 0) - (a.finalTime || a.currentTime || 0));
 
-        const higherScores = sessions.filter(session => session.currentTime > timeInSeconds).length;
+        const higherScores = sessions.filter(session => 
+          (session.finalTime || session.currentTime || 0) > timeInSeconds
+        ).length;
+        
+        logger.critical('🏆 로컬 모드 예상 순위:', {
+          비교세션: sessions.length,
+          높은점수: higherScores,
+          예상순위: higherScores + 1
+        });
+        
         return higherScores + 1;
       }
     } catch (error) {

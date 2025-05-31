@@ -9,6 +9,8 @@ import {
   increment
 } from 'firebase/database';
 import { database, DB_PATHS, isFirebaseConnected } from '../config/firebase.js';
+import { logger } from '../utils/logger.js';
+import { errorReporter } from '../utils/errorReporter.js';
 
 class StatsService {
   constructor() {
@@ -80,27 +82,31 @@ class StatsService {
         
         if (!snapshot.exists()) {
           logger.critical('🚨 Firebase 세션 데이터 없음');
+          errorReporter.reportBug('concurrent-users', 'Firebase 세션 데이터가 없습니다', { 
+            timestamp: new Date().toISOString() 
+          });
           return 1; // 기본값
         }
 
         const sessions = Object.values(snapshot.val());
         const now = Date.now();
-        const fiveSecondsAgo = now - (5 * 1000); // 🔥 5초로 설정 (실시간에 가깝게)
+        const tenSecondsAgo = now - (10 * 1000); // 🔥 10초로 변경 (더 안정적)
         
-        logger.critical('🚨 전체 세션 분석:', {
+        logger.critical('🚨 동시접속자 분석:', {
           전체세션수: sessions.length,
           현재시간: new Date().toLocaleTimeString(),
-          기준시간: new Date(fiveSecondsAgo).toLocaleTimeString()
+          기준시간: new Date(tenSecondsAgo).toLocaleTimeString(),
+          서비스상태: 'Firebase 연결됨'
         });
 
-        // 5초 이내에 활동한 세션 수
+        // 10초 이내에 활동한 세션 수
         const activeSessions = sessions.filter((session, index) => {
           if (!session.isActive) {
             logger.critical(`세션 ${index}: 비활성 (isActive: false)`);
             return false;
           }
           
-          // lastHeartbeat가 5초 이내인지 확인
+          // lastHeartbeat가 10초 이내인지 확인
           const lastHeartbeat = session.lastHeartbeat;
           let heartbeatTime = 0;
           
@@ -110,7 +116,7 @@ class StatsService {
             heartbeatTime = lastHeartbeat;
           }
           
-          const isRecent = heartbeatTime > fiveSecondsAgo;
+          const isRecent = heartbeatTime > tenSecondsAgo;
           
           logger.critical(`세션 ${index} (${session.anonymousName}):`, {
             isActive: session.isActive,

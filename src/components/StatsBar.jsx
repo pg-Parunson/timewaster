@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Users, MousePointer, Clock } from 'lucide-react';
-import { database, DB_PATHS } from '../config/firebase';
-import { ref, onValue, off, set, get, runTransaction } from 'firebase/database';
+import { statsService } from '../services/statsService.jsx';
 
 const StatsBar = ({ visits, totalTimeWasted, extremeMode, currentElapsedTime }) => {
   const [realConcurrentUsers, setRealConcurrentUsers] = useState(1);
@@ -14,80 +13,32 @@ const StatsBar = ({ visits, totalTimeWasted, extremeMode, currentElapsedTime }) 
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Firebase에서 실제 데이터 가져오기
+  // statsService를 사용하여 데이터 가져오기
   useEffect(() => {
-    if (!database) {
-      // Firebase 연결 안되면 기본값 사용
-      setRealConcurrentUsers(Math.floor(Math.random() * 5) + 2);
-      setTotalSiteVisits(1234 + visits); // 기본값
-      return;
-    }
-
-    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const onlineUsersRef = ref(database, 'online_users');
-    const totalVisitsRef = ref(database, 'site_stats/total_visits');
-    const userSessionRef = ref(database, `online_users/${sessionId}`);
+    let unsubscribeActiveSessions = null;
+    let unsubscribeStats = null;
     
-    // 현재 세션 등록
-    const registerSession = async () => {
-      try {
-        await set(userSessionRef, {
-          timestamp: Date.now(),
-          lastSeen: Date.now()
-        });
-        
-        // 총 방문자 수 증가
-        await runTransaction(totalVisitsRef, (currentTotal) => {
-          return (currentTotal || 0) + 1;
-        });
-      } catch (error) {
-        console.error('세션 등록 실패:', error);
-      }
-    };
-    
-    registerSession();
-    
-    // 동시 접속자 수 실시간 감시
-    const unsubscribeOnline = onValue(onlineUsersRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const users = snapshot.val();
-        const now = Date.now();
-        const activeUsers = Object.values(users).filter(
-          user => (now - user.lastSeen) < 60000 // 1분 이내 활동
-        ).length;
-        setRealConcurrentUsers(Math.max(1, activeUsers));
-      } else {
-        setRealConcurrentUsers(1);
-      }
+    // 활성 세션 수 (동시접속자) 리스너 등록
+    unsubscribeActiveSessions = statsService.onActiveSessionsChange((activeSessions) => {
+      setRealConcurrentUsers(activeSessions);
     });
     
-    // 총 방문자 수 감시
-    const unsubscribeVisits = onValue(totalVisitsRef, (snapshot) => {
-      setTotalSiteVisits(snapshot.val() || 0);
+    // 전체 통계 리스너 등록
+    unsubscribeStats = statsService.onStatsChange((stats) => {
+      setTotalSiteVisits(stats.totalVisits);
+      setRealConcurrentUsers(stats.activeSessions);
     });
-    
-    // 주기적으로 마지막 접속 시간 업데이트
-    const heartbeatInterval = setInterval(async () => {
-      try {
-        await set(userSessionRef, {
-          timestamp: Date.now(), 
-          lastSeen: Date.now()
-        });
-      } catch (error) {
-        console.error('하트비트 실패:', error);
-      }
-    }, 30000); // 30초마다
     
     // 정리 함수
     return () => {
-      off(onlineUsersRef);
-      off(totalVisitsRef);
-      clearInterval(heartbeatInterval);
-      
-      // 세션 제거
-      set(userSessionRef, null).catch(console.error);
+      if (unsubscribeActiveSessions) {
+        unsubscribeActiveSessions();
+      }
+      if (unsubscribeStats) {
+        unsubscribeStats();
+      }
     };
-  }, [visits]);
+  }, []);
 
   return (
     <div className="flex items-center justify-between mb-6 p-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl">

@@ -181,12 +181,12 @@ const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null,
     setCurrentUser(user);
   }, [propCurrentUser]);
 
-  // 내 현재 순위 계산
+  // 내 현재 순위 계산 - activePeriod 전달
   useEffect(() => {
     if (elapsedTime > 0 && currentUser) {
       const calculateMyRank = async () => {
         try {
-          const expectedRank = await rankingService.getExpectedRank(elapsedTime);
+          const expectedRank = await rankingService.getExpectedRank(elapsedTime, activePeriod);
           setMyRank({
             rank: expectedRank,
             time: elapsedTime,
@@ -201,7 +201,7 @@ const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null,
       };
       calculateMyRank();
     }
-  }, [elapsedTime, currentUser]);
+  }, [elapsedTime, currentUser, activePeriod]); // activePeriod 의존성 추가
 
   useEffect(() => {
     // 기존 리스너 정리
@@ -244,11 +244,16 @@ const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null,
         </h3>
       </div>
 
-      {/* 포켓몬 스타일 탭 메뉴 */}
+      {/* 포켓몬 스타일 탭 메뉴 + 기간 정보 */}
       <div className="flex flex-wrap gap-1 mb-4 p-1 bg-gray-100 rounded-lg border-2 border-gray-300">
         {Object.values(RANKING_PERIODS).map((period) => {
           const label = RANKING_LABELS[period];
           const isActive = activePeriod === period;
+          
+          // 📅 월간 탭은 항상 "월간"으로만 표시 (복잡한 설명 제거)
+          const getDisplayLabel = () => {
+            return label.label; // 항상 기본 라벨 사용
+          };
           
           return (
             <button
@@ -261,8 +266,9 @@ const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null,
                   : 'text-gray-700 hover:bg-gray-200 border-2 border-transparent'
                 }
               `}
+              title={label.description || label.label}
             >
-              {label.label}
+              {getDisplayLabel()}
             </button>
           );
         })}
