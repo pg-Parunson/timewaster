@@ -372,536 +372,397 @@ body {
   }
 }
 
-/* ========== 명예의 전당 개선된 티어 이펙트 ========== */
+/* ========== 포켓몬 레트로 스타일 명예의 전당 이펙트 ========== */
 
-/* 🏆 **챌린저 (Challenger - 1위)** */
+/* 🏆 **1위 - 레전더리 (Legendary)** 
+   최고 등급 - 무지개빛 그라데이션 */
 .tier-legendary {
   position: relative;
   overflow: hidden;
-  animation: challenger-pulse 1.5s ease-in-out infinite;
+  /* 레전더리 색상: 무지개빛 그라데이션 */
+  background: linear-gradient(135deg, #FFD700 0%, #FF6B35 25%, #DC2626 50%, #8B5CF6 75%, #FFD700 100%) !important;
+  border: 4px solid #000000 !important;
+  /* 레트로 픽셀 스타일 그림자 */
+  box-shadow: 
+    4px 4px 0px #800000,
+    -2px -2px 0px rgba(255, 255, 255, 0.3) inset !important;
+  animation: pokemon-legendary-pulse 2s ease-in-out infinite;
 }
 
-/* 챌린저 - 강력한 붉은색 아우라 (맥박처럼 퍼져 나감) */
-@keyframes challenger-pulse {
+/* 레전더리 - 강력한 맥박 효과 */
+@keyframes pokemon-legendary-pulse {
   0%, 100% {
+    transform: scale(1);
     box-shadow: 
-      0 0 20px rgba(220, 38, 38, 0.8),
-      0 0 40px rgba(220, 38, 38, 0.6),
-      0 0 60px rgba(220, 38, 38, 0.4),
-      inset 0 0 20px rgba(255, 255, 255, 0.2);
+      4px 4px 0px #800000,
+      -2px -2px 0px rgba(255, 255, 255, 0.3) inset,
+      0 0 15px rgba(255, 215, 0, 0.8);
   }
   50% {
+    transform: scale(1.03);
     box-shadow: 
-      0 0 30px rgba(220, 38, 38, 1),
-      0 0 60px rgba(220, 38, 38, 0.8),
-      0 0 90px rgba(220, 38, 38, 0.6),
-      inset 0 0 30px rgba(255, 255, 255, 0.3);
+      6px 6px 0px #800000,
+      -2px -2px 0px rgba(255, 255, 255, 0.3) inset,
+      0 0 25px rgba(255, 215, 0, 1),
+      0 0 35px rgba(139, 92, 246, 0.5);
   }
 }
 
-/* 챌린저 - 무지개색 전기 테두리 */
+/* 레전더리 - 전설의 번개 이팩트 */
 .tier-legendary::before {
-  content: '';
+  content: '★';
   position: absolute;
-  top: -2px; left: -2px; right: -2px; bottom: -2px;
-  background: linear-gradient(45deg, 
-    #ff0000, #ff7f00, #ffff00, #00ff00, 
-    #0000ff, #4b0082, #9400d3, #ff0000);
-  background-size: 400% 400%;
-  animation: challenger-electric-border 2s linear infinite;
-  border-radius: inherit;
-  z-index: -1;
+  top: 8px;
+  right: 8px;
+  color: #FFFFFF;
+  font-size: 14px;
+  text-shadow: 2px 2px 0px #000000;
+  animation: pokemon-legendary-star 1.5s ease-in-out infinite;
+  pointer-events: none;
 }
 
-@keyframes challenger-electric-border {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
+@keyframes pokemon-legendary-star {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.2); }
 }
 
-/* 챌린저 - 폭발하는 입자들 */
+/* 포켓몬 게임 특유의 깜빡이는 효과 (1위만) */
 .tier-legendary::after {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-image: 
-    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.8) 1px, transparent 2px),
-    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.6) 1.5px, transparent 3px),
-    radial-gradient(circle at 30% 80%, rgba(255, 255, 255, 0.9) 1px, transparent 2px),
-    radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.7) 1px, transparent 2px),
-    radial-gradient(circle at 15% 60%, rgba(255, 255, 255, 0.5) 1px, transparent 2px),
-    radial-gradient(circle at 85% 40%, rgba(255, 255, 255, 0.8) 1px, transparent 2px);
-  animation: challenger-particle-explosion 1.8s ease-out infinite;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.1);
+  animation: pokemon-champion-blink 4s ease-in-out infinite;
   pointer-events: none;
   border-radius: inherit;
 }
 
-@keyframes challenger-particle-explosion {
-  0% {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-  30% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  70% {
-    opacity: 0.8;
-    transform: scale(1.2);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.5);
-  }
+@keyframes pokemon-champion-blink {
+  0%, 95%, 100% { opacity: 0; }
+  97% { opacity: 1; }
 }
 
-/* 챌린저 - 번개 섬광 효과 */
-.tier-legendary {
-  animation: 
-    challenger-pulse 1.5s ease-in-out infinite,
-    challenger-lightning-flash 3s ease-in-out infinite;
-}
-
-@keyframes challenger-lightning-flash {
-  0%, 90%, 100% {
-    filter: brightness(1) contrast(1);
-  }
-  92%, 94%, 96% {
-    filter: brightness(1.3) contrast(1.2) hue-rotate(60deg);
-  }
-  93%, 95% {
-    filter: brightness(0.9) contrast(0.9);
-  }
-}
-
-/* 🏆 **그랜드마스터 (Grandmaster - 2위)** */
+/* 🥈 **2위 - 챌린저 (Challenger)** 
+   최고 등급 바로 아래 - 빨강 + 금색 */
 .tier-master {
   position: relative;
   overflow: hidden;
-  animation: grandmaster-mystical 2.5s ease-in-out infinite;
+  /* 챌린저 색상: 빨강 + 금색 */
+  background: linear-gradient(135deg, #FFD700 0%, #FF4444 50%, #CC0000 100%) !important;
+  border: 4px solid #000000 !important;
+  box-shadow: 
+    4px 4px 0px #800000,
+    -1px -1px 0px rgba(255, 255, 255, 0.4) inset !important;
+  animation: pokemon-challenger-glow 2.5s ease-in-out infinite;
 }
 
-/* 그랜드마스터 - 움직이는 빛 테두리 (보라색과 청록색) - 2위답게 화려하게! */
-@keyframes grandmaster-mystical {
+@keyframes pokemon-challenger-glow {
   0%, 100% {
     box-shadow: 
-      0 0 18px rgba(147, 51, 234, 0.8),
-      0 0 36px rgba(6, 182, 212, 0.6),
-      0 0 54px rgba(147, 51, 234, 0.4),
-      inset 0 0 20px rgba(255, 255, 255, 0.3);
+      4px 4px 0px #800000,
+      -1px -1px 0px rgba(255, 255, 255, 0.4) inset,
+      0 0 12px rgba(255, 68, 68, 0.6);
   }
   50% {
     box-shadow: 
-      0 0 25px rgba(6, 182, 212, 0.9),
-      0 0 50px rgba(147, 51, 234, 0.7),
-      0 0 75px rgba(6, 182, 212, 0.5),
-      inset 0 0 30px rgba(255, 255, 255, 0.4);
+      5px 5px 0px #800000,
+      -1px -1px 0px rgba(255, 255, 255, 0.4) inset,
+      0 0 20px rgba(255, 68, 68, 0.8);
   }
 }
 
-/* 그랜드마스터 - 움직이는 테두리 빛 */
+/* 챌린저 - 화염 이팩트 */
 .tier-master::before {
-  content: '';
+  content: '🔥';
   position: absolute;
-  top: -2px; left: -2px; right: -2px; bottom: -2px;
-  background: linear-gradient(90deg, 
-    rgba(147, 51, 234, 0.9), 
-    rgba(6, 182, 212, 0.9), 
-    rgba(147, 51, 234, 0.9));
-  background-size: 200% 100%;
-  animation: grandmaster-border-flow 2.5s ease-in-out infinite;
-  border-radius: inherit;
-  z-index: -1;
-}
-
-@keyframes grandmaster-border-flow {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-/* 그랜드마스터 - 에테르 선 + 은은한 별빛 */
-.tier-master::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-image: 
-    linear-gradient(45deg, transparent 35%, rgba(255, 255, 255, 0.2) 50%, transparent 65%),
-    linear-gradient(-45deg, transparent 35%, rgba(255, 255, 255, 0.2) 50%, transparent 65%),
-    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.4) 1px, transparent 3px),
-    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.3) 1px, transparent 3px),
-    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.35) 1px, transparent 3px),
-    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.3) 1px, transparent 3px);
-  animation: grandmaster-ether-stars 5s ease-in-out infinite;
-  border-radius: inherit;
+  top: 8px;
+  right: 8px;
+  font-size: 12px;
+  animation: pokemon-fire-flicker 2s ease-in-out infinite;
   pointer-events: none;
 }
 
-@keyframes grandmaster-ether-stars {
-  0%, 100% {
-    opacity: 0.4;
-    transform: translateX(0) translateY(0);
-  }
-  33% {
-    opacity: 0.7;
-    transform: translateX(3px) translateY(-3px);
-  }
-  66% {
-    opacity: 0.5;
-    transform: translateX(-3px) translateY(3px);
-  }
+@keyframes pokemon-fire-flicker {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.1); }
 }
 
-/* 🏆 **마스터 (Master - 3위)** */
+/* 🥉 **3위 - 체육관 관장 (Gym Leader)** 
+   포켓몬 체육관 관장을 모티브로 한 청록색 */
 .tier-diamond {
   position: relative;
   overflow: hidden;
-  animation: master-glow 2s ease-in-out infinite;
+  /* 체육관 관장 색상: 청록 + 파랑 */
+  background: linear-gradient(135deg, #DBEAFE 0%, #06B6D4 50%, #3B82F6 100%) !important;
+  border: 3px solid #000000 !important;
+  box-shadow: 
+    3px 3px 0px #1E40AF,
+    -1px -1px 0px rgba(255, 255, 255, 0.4) inset !important;
+  animation: pokemon-gym-shine 3s ease-in-out infinite;
 }
 
-/* 마스터 - 불꽃 오브들이 모서리에서 움직임 */
-@keyframes master-glow {
+@keyframes pokemon-gym-shine {
   0%, 100% {
     box-shadow: 
-      0 0 15px rgba(251, 146, 60, 0.8),
-      0 0 30px rgba(251, 146, 60, 0.6),
-      0 0 45px rgba(251, 146, 60, 0.4),
-      inset 0 0 15px rgba(255, 255, 255, 0.2);
+      3px 3px 0px #1E40AF,
+      -1px -1px 0px rgba(255, 255, 255, 0.4) inset;
   }
   50% {
     box-shadow: 
-      0 0 25px rgba(251, 146, 60, 1),
-      0 0 50px rgba(251, 146, 60, 0.8),
-      0 0 75px rgba(251, 146, 60, 0.6),
-      inset 0 0 25px rgba(255, 255, 255, 0.3);
+      4px 4px 0px #1E40AF,
+      -1px -1px 0px rgba(255, 255, 255, 0.4) inset,
+      0 0 12px rgba(6, 182, 212, 0.6);
   }
 }
 
-/* 마스터 - 내부 빛나는 그림자 */
+/* 체육관 관장 - 포켓볼 아이콘 */
 .tier-diamond::before {
-  content: '';
+  content: '●';
   position: absolute;
-  top: 2px; left: 2px; right: 2px; bottom: 2px;
-  background: linear-gradient(135deg, 
-    rgba(251, 146, 60, 0.3) 0%, 
-    transparent 50%, 
-    rgba(251, 146, 60, 0.3) 100%);
-  border-radius: inherit;
-  animation: master-inner-glow 3s ease-in-out infinite;
+  top: 8px;
+  right: 8px;
+  color: #DC2626;
+  font-size: 8px;
+  text-shadow: 1px 1px 0px #000000;
+  animation: pokemon-pokeball-bounce 2s ease-in-out infinite;
   pointer-events: none;
 }
 
-@keyframes master-inner-glow {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.6; }
+@keyframes pokemon-pokeball-bounce {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-2px); }
 }
 
-/* 마스터 - 소용돌이치는 에너지 + 활활 타오르는 화염 */
-.tier-diamond::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: 
-    radial-gradient(ellipse at center, 
-      rgba(255, 255, 255, 0.1) 20%, 
-      rgba(251, 146, 60, 0.2) 40%, 
-      rgba(220, 38, 38, 0.1) 60%, 
-      transparent 80%);
-  animation: master-energy-swirl 4s linear infinite;
-  border-radius: inherit;
-  pointer-events: none;
-}
-
-@keyframes master-energy-swirl {
-  0% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(180deg) scale(1.05); }
-  100% { transform: rotate(360deg) scale(1); }
-}
-
-/* 🏆 **다이아몬드 (Diamond - 4위)** */
+/* 🏅 **4위 - 트레이너 (Trainer)** 
+   일반 트레이너를 모티브로 한 초록색 */
 .tier-platinum {
   position: relative;
   overflow: hidden;
-  animation: diamond-sparkle 2s ease-in-out infinite;
+  /* 트레이너 색상: 초록 */
+  background: linear-gradient(135deg, #F0FDF4 0%, #22C55E 50%, #16A34A 100%) !important;
+  border: 2px solid #000000 !important;
+  box-shadow: 
+    2px 2px 0px #166534,
+    -1px -1px 0px rgba(255, 255, 255, 0.3) inset !important;
+  animation: pokemon-trainer-flash 4s ease-in-out infinite;
 }
 
-/* 다이아몬드 - 크리스탈 글린트 + 뭉게뭉게 구름/안개 */
-@keyframes diamond-sparkle {
-  0%, 100% {
+@keyframes pokemon-trainer-flash {
+  0%, 90%, 100% {
     box-shadow: 
-      0 0 10px rgba(59, 130, 246, 0.6),
-      0 0 20px rgba(59, 130, 246, 0.4),
-      0 0 30px rgba(59, 130, 246, 0.2);
+      2px 2px 0px #166534,
+      -1px -1px 0px rgba(255, 255, 255, 0.3) inset;
   }
-  50% {
+  95% {
     box-shadow: 
-      0 0 15px rgba(59, 130, 246, 0.8),
-      0 0 30px rgba(59, 130, 246, 0.6),
-      0 0 45px rgba(59, 130, 246, 0.4);
+      3px 3px 0px #166534,
+      -1px -1px 0px rgba(255, 255, 255, 0.3) inset,
+      0 0 8px rgba(34, 197, 94, 0.5);
   }
 }
 
-/* 다이아몬드 - 크리스탈 글린트 효과 */
-.tier-platinum::before {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.6) 30%, 
-    rgba(255, 255, 255, 0.8) 50%, 
-    rgba(255, 255, 255, 0.6) 70%, 
-    transparent);
-  animation: diamond-glint 3s ease-in-out infinite;
-  border-radius: inherit;
-}
-
-@keyframes diamond-glint {
-  0% { left: -100%; }
-  50% { left: 100%; }
-  100% { left: -100%; }
-}
-
-/* 다이아몬드 - 구름/안개 효과 */
-.tier-platinum::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: 
-    radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.2) 20%, transparent 60%),
-    radial-gradient(ellipse at 70% 80%, rgba(255, 255, 255, 0.15) 25%, transparent 65%),
-    radial-gradient(ellipse at 20% 70%, rgba(255, 255, 255, 0.1) 30%, transparent 70%);
-  animation: diamond-clouds 8s ease-in-out infinite;
-  border-radius: inherit;
-  pointer-events: none;
-}
-
-@keyframes diamond-clouds {
-  0%, 100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 0.3;
-  }
-  33% {
-    transform: scale(1.05) rotate(1deg);
-    opacity: 0.5;
-  }
-  66% {
-    transform: scale(0.95) rotate(-1deg);
-    opacity: 0.4;
-  }
-}
-
-/* 🏆 **플래티넘 (Platinum - 5위)** */
+/* 🥇 **5위 - 베테랑 (Veteran)** 
+   베테랑 트레이너를 모티브로 한 황금색 */
 .tier-gold {
   position: relative;
   overflow: hidden;
-  animation: platinum-flow 3s ease-in-out infinite;
+  /* 베테랑 색상: 골드 */
+  background: linear-gradient(135deg, #FFFBEB 0%, #F59E0B 50%, #D97706 100%) !important;
+  border: 2px solid #000000 !important;
+  box-shadow: 
+    2px 2px 0px #92400E,
+    -1px -1px 0px rgba(255, 255, 255, 0.3) inset !important;
+  animation: pokemon-veteran-shimmer 3s ease-in-out infinite;
 }
 
-/* 플래티넘 - 흐르는 안개 + 얼음 조각 반짝임 */
-@keyframes platinum-flow {
+@keyframes pokemon-veteran-shimmer {
   0%, 100% {
     box-shadow: 
-      0 0 8px rgba(6, 182, 212, 0.5),
-      0 0 16px rgba(6, 182, 212, 0.3),
-      0 0 24px rgba(6, 182, 212, 0.2);
+      2px 2px 0px #92400E,
+      -1px -1px 0px rgba(255, 255, 255, 0.3) inset;
   }
   50% {
     box-shadow: 
-      0 0 12px rgba(6, 182, 212, 0.7),
-      0 0 24px rgba(6, 182, 212, 0.5),
-      0 0 36px rgba(6, 182, 212, 0.3);
+      3px 3px 0px #92400E,
+      -1px -1px 0px rgba(255, 255, 255, 0.3) inset,
+      0 0 6px rgba(245, 158, 11, 0.4);
   }
 }
 
-/* 플래티넘 - 흐르는 푸른 안개 */
-.tier-gold::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(135deg, 
-    rgba(6, 182, 212, 0.1) 0%, 
-    rgba(6, 182, 212, 0.2) 25%, 
-    transparent 50%, 
-    rgba(6, 182, 212, 0.15) 75%, 
-    rgba(6, 182, 212, 0.1) 100%);
-  animation: platinum-mist-flow 5s ease-in-out infinite;
-  border-radius: inherit;
-  pointer-events: none;
-}
-
-@keyframes platinum-mist-flow {
-  0%, 100% {
-    transform: translateX(0) translateY(0);
-    opacity: 0.3;
-  }
-  25% {
-    transform: translateX(3px) translateY(-2px);
-    opacity: 0.5;
-  }
-  50% {
-    transform: translateX(-2px) translateY(3px);
-    opacity: 0.4;
-  }
-  75% {
-    transform: translateX(-3px) translateY(-1px);
-    opacity: 0.6;
-  }
-}
-
-/* 플래티넘 - 얼음 조각 반짝임 */
-.tier-gold::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-image: 
-    radial-gradient(circle at 15% 25%, rgba(255, 255, 255, 0.7) 1px, transparent 3px),
-    radial-gradient(circle at 85% 15%, rgba(255, 255, 255, 0.5) 1px, transparent 3px),
-    radial-gradient(circle at 25% 85%, rgba(255, 255, 255, 0.6) 1px, transparent 3px),
-    radial-gradient(circle at 75% 65%, rgba(255, 255, 255, 0.4) 1px, transparent 3px),
-    radial-gradient(circle at 45% 35%, rgba(255, 255, 255, 0.5) 1px, transparent 3px);
-  animation: platinum-ice-sparkle 4s ease-in-out infinite;
-  border-radius: inherit;
-  pointer-events: none;
-}
-
-@keyframes platinum-ice-sparkle {
-  0%, 100% {
-    opacity: 0.4;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.1);
-  }
-}
-
-/* 🏆 **골드 (Gold - 6위)** */
+/* 🥈 **6위 - 루키 (Rookie)** 
+   루키 트레이너를 모티브로 한 실버 */
 .tier-silver {
   position: relative;
   overflow: hidden;
-  animation: gold-shimmer 2.5s ease-in-out infinite;
+  /* 루키 색상: 실버 */
+  background: linear-gradient(135deg, #F8FAFC 0%, #94A3B8 50%, #64748B 100%) !important;
+  border: 2px solid #000000 !important;
+  box-shadow: 
+    2px 2px 0px #475569,
+    -1px -1px 0px rgba(255, 255, 255, 0.4) inset !important;
+  animation: pokemon-rookie-gentle 5s ease-in-out infinite;
 }
 
-/* 골드 - 은은한 쉬머 */
-@keyframes gold-shimmer {
+@keyframes pokemon-rookie-gentle {
   0%, 100% {
     box-shadow: 
-      0 0 6px rgba(251, 191, 36, 0.4),
-      0 0 12px rgba(251, 191, 36, 0.3),
-      0 0 18px rgba(251, 191, 36, 0.2);
+      2px 2px 0px #475569,
+      -1px -1px 0px rgba(255, 255, 255, 0.4) inset;
   }
   50% {
     box-shadow: 
-      0 0 10px rgba(251, 191, 36, 0.6),
-      0 0 20px rgba(251, 191, 36, 0.4),
-      0 0 30px rgba(251, 191, 36, 0.3);
+      2px 2px 0px #475569,
+      -1px -1px 0px rgba(255, 255, 255, 0.4) inset,
+      0 0 4px rgba(148, 163, 184, 0.3);
   }
 }
 
-/* 골드 - 금빛 일렁임 */
-.tier-silver::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(45deg, 
-    rgba(251, 191, 36, 0.1) 0%, 
-    rgba(251, 191, 36, 0.2) 25%, 
-    rgba(251, 191, 36, 0.15) 50%, 
-    rgba(251, 191, 36, 0.2) 75%, 
-    rgba(251, 191, 36, 0.1) 100%);
-  animation: gold-elegant-shimmer 4s ease-in-out infinite;
-  border-radius: inherit;
-  pointer-events: none;
-}
-
-@keyframes gold-elegant-shimmer {
-  0%, 100% {
-    transform: translateX(0) translateY(0) scale(1);
-    opacity: 0.3;
-  }
-  50% {
-    transform: translateX(1px) translateY(-1px) scale(1.02);
-    opacity: 0.5;
-  }
-}
-
-/* 🏆 **실버 (Silver - 7-10위)** */
+/* 🥉 **7-10위 - 초보자 (Beginner)** 
+   초보 트레이너를 모티브로 한 브론즈 */
 .tier-bronze {
   position: relative;
   overflow: hidden;
-  animation: silver-glow 3s ease-in-out infinite;
+  /* 초보자 색상: 브론즈 */
+  background: linear-gradient(135deg, #FEF3C7 0%, #F59E0B 50%, #B45309 100%) !important;
+  border: 2px solid #000000 !important;
+  box-shadow: 
+    2px 2px 0px #78350F,
+    -1px -1px 0px rgba(255, 255, 255, 0.3) inset !important;
+  /* 애니메이션 없음 - 차분하게 */
 }
 
-/* 실버 - 회색 계열 그라데이션 + 기본 테두리 */
-@keyframes silver-glow {
-  0%, 100% {
-    box-shadow: 
-      0 0 4px rgba(156, 163, 175, 0.3),
-      0 0 8px rgba(156, 163, 175, 0.2);
-  }
-  50% {
-    box-shadow: 
-      0 0 8px rgba(156, 163, 175, 0.5),
-      0 0 16px rgba(156, 163, 175, 0.3);
-  }
+/* ========== 포켓몬 텍스트 스타일 업데이트 ========== */
+
+/* 🏆 포켓몬 레트로 스타일에 맞는 텍스트 색상 */
+.tier-legendary .pokemon-font {
+  color: #FFFFFF !important;
+  text-shadow: 2px 2px 0px #000000 !important;
+  font-weight: bold !important;
 }
 
-/* 🏆 **브론즈 (Bronze - 기본)** */
-/* 브론즈는 갈색 계열 그라데이션과 기본 테두리만 적용 - 별도 애니메이션 없음 */
-
-/* 🏆 **높이 최적화** */
-.pokemon-ranking {
-  max-height: 500px; /* 600px에서 500px로 줄임 */
-  min-height: 400px; /* 최소 높이 설정 */
-  /* 스크롤 성능 최적화 */
-  overflow-y: auto;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
+.tier-master .pokemon-font {
+  color: #FFFFFF !important;
+  text-shadow: 1px 1px 0px #000000 !important;
+  font-weight: bold !important;
 }
 
-/* 랭킹 항목 높이 최적화 */
+.tier-diamond .pokemon-font {
+  color: #FFFFFF !important;
+  text-shadow: 1px 1px 0px #000000 !important;
+  font-weight: bold !important;
+}
+
+.tier-platinum .pokemon-font {
+  color: #FFFFFF !important;
+  text-shadow: 1px 1px 0px #000000 !important;
+}
+
+.tier-gold .pokemon-font {
+  color: #000000 !important;
+  text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5) !important;
+}
+
+.tier-silver .pokemon-font {
+  color: #000000 !important;
+  text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5) !important;
+}
+
+.tier-bronze .pokemon-font {
+  color: #000000 !important;
+  text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* ========== 성능 최적화 ========== */
+
+/* 포켓몬 스타일 호버 효과 */
+.vip-rank-container:hover.tier-legendary,
+.vip-rank-container:hover.tier-master,
+.vip-rank-container:hover.tier-diamond {
+  transform: translateY(-2px);
+  transition: transform 0.2s ease;
+}
+
+/* 포켓몬 스타일 커서 */
 .vip-rank-container {
-  min-height: 60px; /* 기존보다 줄임 */
-  padding: 12px 16px; /* 패딩 최적화 */
-  /* 레이아웃 성능 최적화 */
-  contain: layout style paint;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-/* 확장 랭킹 영역 높이 최적화 */
-.pokemon-ranking .max-h-32 {
-  max-height: 200px; /* 확장 영역 높이 증가 */
+.vip-rank-container:hover {
+  filter: brightness(1.05);
 }
 
-/* 모바일 최적화 */
+.vip-rank-container:active {
+  transform: translateY(1px);
+}
+
+/* 레트로 선택 효과 */
+.vip-rank-container:focus {
+  outline: 3px solid #FFD700;
+  outline-offset: 2px;
+}
+
+/* 🎮 랭커 카드 모달 배경 블러 효과 - Portal 사용으로 z-index 최대화 */
+.ranker-card-backdrop {
+  backdrop-filter: blur(2px);
+  animation: ranker-card-fade-in 0.25s ease-out forwards;
+  z-index: 9999 !important; /* 최고 우선순위 */
+}
+
+@keyframes ranker-card-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 랭커 카드 애니메이션 - Portal에서 안정적 작동 */
+.ranker-card-modal {
+  animation: ranker-card-slide-in 0.25s ease-out forwards;
+  position: relative;
+  z-index: 10000 !important; /* 배경보다 높게 */
+}
+
+@keyframes ranker-card-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 클릭 유도 효과 - 아이콘 제거 (버그 방지) */
+.vip-rank-container::after {
+  display: none;
+}
+
+/* 모바일에서 애니메이션 성능 최적화 */
 @media (max-width: 768px) {
-  .pokemon-ranking {
-    max-height: 400px;
-    min-height: 300px;
-  }
-  
-  .vip-rank-container {
-    min-height: 50px;
-    padding: 10px 12px;
-  }
-  
-  /* 모바일에서는 애니메이션 강도 줄이기 */
   .tier-legendary,
   .tier-master,
   .tier-diamond,
   .tier-platinum,
   .tier-gold,
-  .tier-silver,
-  .tier-bronze {
-    animation-duration: 4s; /* 3s에서 4s로 느리게 */
+  .tier-silver {
+    animation-duration: 3s; /* 느리게 */
   }
   
-  /* 모바일에서 복잡한 이팩트 단순화 */
-  .tier-legendary::before,
-  .tier-legendary::after,
-  .tier-master::before,
-  .tier-master::after {
-    opacity: 0.5; /* 효과 강도 감소 */
+  /* 복잡한 그림자 효과 단순화 */
+  .tier-legendary {
+    box-shadow: 4px 4px 0px #800000 !important;
+  }
+  
+  .tier-master,
+  .tier-diamond {
+    box-shadow: 3px 3px 0px #4C1D95 !important;
   }
 }
 
@@ -912,73 +773,32 @@ body {
   .tier-diamond,
   .tier-platinum,
   .tier-gold,
-  .tier-silver,
-  .tier-bronze {
-    animation-duration: 5s; /* 더 느리게 */
+  .tier-silver {
+    animation: none; /* 애니메이션 비활성화 */
   }
   
-  /* 저사양에서는 복잡한 이팩트 비활성화 */
-  .tier-legendary::after,
-  .tier-master::after,
-  .tier-diamond::after {
+  /* ::before 요소들도 비활성화 */
+  .tier-legendary::before,
+  .tier-master::before,
+  .tier-diamond::before {
     display: none;
   }
 }
 
-/* 성능 최적화 - 애니메이션 효율성 개선 */
-.tier-legendary,
-.tier-master,
-.tier-diamond,
-.tier-platinum,
-.tier-gold,
-.tier-silver,
-.tier-bronze {
-  will-change: transform, box-shadow, opacity;
-  transform-origin: center;
-  /* GPU 가속 강제 적용 */
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  perspective: 1000px;
-}
-
-/* ::before, ::after 요소들도 GPU 가속 */
-.tier-legendary::before,
-.tier-legendary::after,
-.tier-master::before,
-.tier-master::after,
-.tier-diamond::before,
-.tier-diamond::after,
-.tier-platinum::before,
-.tier-platinum::after,
-.tier-gold::before,
-.tier-silver::before {
-  will-change: transform, opacity;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-}
-
-/* 애니메이션 일시정지 옵션 (사용자 선호도) */
+/* 접근성 - 모션 감소 설정 대응 */
 @media (prefers-reduced-motion: reduce) {
   .tier-legendary,
   .tier-master,
   .tier-diamond,
   .tier-platinum,
   .tier-gold,
-  .tier-silver,
-  .tier-bronze {
-    animation: none;
+  .tier-silver {
+    animation: none !important;
   }
   
   .tier-legendary::before,
-  .tier-legendary::after,
   .tier-master::before,
-  .tier-master::after,
-  .tier-diamond::before,
-  .tier-diamond::after,
-  .tier-platinum::before,
-  .tier-platinum::after,
-  .tier-gold::before,
-  .tier-silver::before {
-    animation: none;
+  .tier-diamond::before {
+    animation: none !important;
   }
 }

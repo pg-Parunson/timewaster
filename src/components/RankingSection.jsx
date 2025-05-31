@@ -4,6 +4,7 @@ import { Trophy, Crown, Medal, Users } from 'lucide-react';
 import { rankingService } from '../services/rankingService.jsx';
 import { RANKING_PERIODS, RANKING_LABELS } from '../config/firebase.js';
 import { formatTime } from '../utils/helpers';
+import TrainerCardModal from './TrainerCardModal.jsx';
 
 const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null, elapsedTime = 0 }) => {
   const [ranking, setRanking] = useState([]);
@@ -14,148 +15,164 @@ const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null,
   const [unsubscribe, setUnsubscribe] = useState(null);
   const [myRank, setMyRank] = useState(null);
   const [showMyRank, setShowMyRank] = useState(false);
+  
+  // 🎮 랭커 카드 모달 상태
+  const [selectedTrainer, setSelectedTrainer] = useState(null);
+  const [showTrainerModal, setShowTrainerModal] = useState(false);
+  const [isModalTransitioning, setIsModalTransitioning] = useState(false);
 
-  // 🏆 게임 티어 랭킹 시스템 - 진짜 게임스러운 티어!
+  // 🏆 포켓몬 레트로 스타일 티어 시스템 - 단순하면서도 임팩트 있게!
   const getGameTierStyle = (rank, isCurrentUser) => {
-    const baseClasses = `flex items-center gap-3 p-4 rounded-xl transition-all duration-500 relative overflow-hidden`;
+    const baseClasses = `flex items-center gap-3 p-4 rounded-lg transition-all duration-300 relative overflow-hidden pokemon-font`;
     
     switch (rank) {
-      case 1: // 🏆 LEGENDARY - 전설 등급 (금색 + 보라)
+      case 1: // 🏆 CHAMPION - 챔피언 (포켓몬 골드의 레드 챔피언)
         return `${baseClasses} ${
           isCurrentUser 
-            ? 'bg-gradient-to-r from-yellow-400 via-purple-500 to-yellow-400 border-4 border-yellow-300 shadow-2xl tier-legendary' 
-            : 'bg-gradient-to-r from-yellow-300 via-purple-400 to-yellow-300 border-4 border-yellow-200 shadow-2xl tier-legendary'
+            ? 'tier-legendary shadow-lg' 
+            : 'tier-legendary shadow-lg'
         }`;
         
-      case 2: // 🕸️ MASTER - 마스터 등급 (다이아몬드 블루)
+      case 2: // 🥈 ELITE FOUR - 사천왕 (보라색 + 실버)
         return `${baseClasses} ${
           isCurrentUser 
-            ? 'bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-400 border-3 border-cyan-300 shadow-xl tier-master' 
-            : 'bg-gradient-to-r from-blue-300 via-cyan-200 to-blue-300 border-3 border-cyan-200 shadow-xl tier-master'
+            ? 'tier-master shadow-md' 
+            : 'tier-master shadow-md'
         }`;
         
-      case 3: // 💎 DIAMOND - 다이아몬드 등급 (파란 다이아)
+      case 3: // 💎 GYM LEADER - 체육관 관장 (청록색)
         return `${baseClasses} ${
           isCurrentUser 
-            ? 'bg-gradient-to-r from-blue-500 via-indigo-400 to-blue-500 border-3 border-blue-400 shadow-xl tier-diamond' 
-            : 'bg-gradient-to-r from-blue-400 via-indigo-300 to-blue-400 border-3 border-blue-300 shadow-xl tier-diamond'
+            ? 'tier-diamond shadow-md' 
+            : 'tier-diamond shadow-md'
         }`;
         
-      case 4: // 🥈 PLATINUM - 플래티네 등급 (청록 + 은색)
+      case 4: // 🏅 TRAINER - 트레이너 (초록색)
         return `${baseClasses} ${
           isCurrentUser 
-            ? 'bg-gradient-to-r from-teal-400 via-gray-300 to-teal-400 border-3 border-teal-300 shadow-lg tier-platinum' 
-            : 'bg-gradient-to-r from-teal-300 via-gray-200 to-teal-300 border-3 border-teal-200 shadow-lg tier-platinum'
+            ? 'tier-platinum shadow-sm' 
+            : 'tier-platinum shadow-sm'
         }`;
         
-      case 5: // 🥇 GOLD - 골드 등급 (황금)
+      case 5: // 🥇 VETERAN - 베테랑 (황금색)
         return `${baseClasses} ${
           isCurrentUser 
-            ? 'bg-gradient-to-r from-yellow-400 via-orange-300 to-yellow-400 border-3 border-yellow-300 shadow-lg tier-gold' 
-            : 'bg-gradient-to-r from-yellow-300 via-orange-200 to-yellow-300 border-3 border-yellow-200 shadow-lg tier-gold'
+            ? 'tier-gold shadow-sm' 
+            : 'tier-gold shadow-sm'
         }`;
         
-      case 6: // 🥈 SILVER - 실버 등급 (은색)
+      case 6: // 🥈 ROOKIE - 루키 (실버)
         return `${baseClasses} ${
           isCurrentUser 
-            ? 'bg-gradient-to-r from-gray-300 via-slate-200 to-gray-300 border-2 border-gray-300 shadow-md tier-silver' 
-            : 'bg-gradient-to-r from-gray-200 via-slate-100 to-gray-200 border-2 border-gray-200 shadow-md tier-silver'
+            ? 'tier-silver shadow-sm' 
+            : 'tier-silver shadow-sm'
         }`;
         
       case 7:
       case 8:
       case 9:
-      case 10: // 🥉 BRONZE - 브론즈 등급 (동색)
+      case 10: // 🥉 BEGINNER - 초보자 (브론즈)
         return `${baseClasses} ${
           isCurrentUser 
-            ? 'bg-gradient-to-r from-orange-300 via-amber-200 to-orange-300 border-2 border-orange-300 shadow-md tier-bronze' 
-            : 'bg-gradient-to-r from-orange-200 via-amber-100 to-orange-200 border-2 border-orange-200 shadow-md tier-bronze'
+            ? 'tier-bronze shadow-sm' 
+            : 'tier-bronze shadow-sm'
         }`;
         
       default: // ⚪ UNRANKED - 언랭크드
         return `${baseClasses} ${
           isCurrentUser 
-            ? 'bg-gradient-to-r from-gray-100 via-slate-50 to-gray-100 border-2 border-gray-200 shadow-sm' 
-            : 'bg-gradient-to-r from-gray-50 via-white to-gray-50 border border-gray-100 shadow-sm'
+            ? 'bg-white border-2 border-blue-400 shadow-sm' 
+            : 'bg-gray-50 border border-gray-200 shadow-sm'
         }`;
     }
   };
   
-  // 🏆 게임 티어 텍스트 스타일
+  // 🏆 포켓몬 레트로 스타일 텍스트 (CSS에서 처리)
   const getGameTierTextStyle = (rank, isCurrentUser) => {
     const baseClasses = 'pokemon-font text-sm truncate font-bold';
     
-    switch (rank) {
-      case 1: return `${baseClasses} text-yellow-900`; // LEGENDARY
-      case 2: return `${baseClasses} text-cyan-800`;   // MASTER  
-      case 3: return `${baseClasses} text-blue-800`;   // DIAMOND
-      case 4: return `${baseClasses} text-teal-800`;   // PLATINUM
-      case 5: return `${baseClasses} text-yellow-800`; // GOLD
-      case 6: return `${baseClasses} text-gray-700`;   // SILVER
-      case 7:
-      case 8:
-      case 9:
-      case 10: return `${baseClasses} text-orange-700`; // BRONZE
-      default: return `${baseClasses} ${
-        isCurrentUser ? 'text-blue-700 font-bold' : 'text-gray-600'
-      }`;
-    }
+    // CSS 클래스에서 색상을 처리하므로 기본 클래스만 반환
+    return `${baseClasses} ${
+      isCurrentUser && rank > 10 ? 'text-blue-700 font-bold' : ''
+    }`;
   };
   
-  // 🏆 게임 티어 시간 스타일
+  // 🏆 포켓몬 레트로 스타일 시간 텍스트 (CSS에서 처리)
   const getGameTierTimeStyle = (rank, isCurrentUser) => {
     const baseClasses = 'pokemon-font text-xs font-bold';
     
-    switch (rank) {
-      case 1: return `${baseClasses} text-yellow-800`; // LEGENDARY
-      case 2: return `${baseClasses} text-cyan-700`;   // MASTER
-      case 3: return `${baseClasses} text-blue-700`;   // DIAMOND
-      case 4: return `${baseClasses} text-teal-700`;   // PLATINUM
-      case 5: return `${baseClasses} text-yellow-700`; // GOLD
-      case 6: return `${baseClasses} text-gray-600`;   // SILVER
-      case 7:
-      case 8:
-      case 9:
-      case 10: return `${baseClasses} text-orange-600`; // BRONZE
-      default: return `${baseClasses} ${isCurrentUser ? 'text-blue-600' : 'text-gray-500'}`;
-    }
+    // CSS 클래스에서 색상을 처리하므로 기본 클래스만 반환
+    return `${baseClasses} ${
+      isCurrentUser && rank > 10 ? 'text-blue-600' : ''
+    }`;
   };
 
-  // 🏆 게임 티어 아이콘 및 이모지
+  // 🏆 포켓몬 레트로 스타일 아이콘
   const getTierIcon = (rank) => {
     switch (rank) {
-      case 1: return { emoji: '🏆', icon: <Crown className="w-6 h-6 text-yellow-600" /> }; // LEGENDARY
-      case 2: return { emoji: '🕸️', icon: <Medal className="w-6 h-6 text-cyan-600" /> };   // MASTER
-      case 3: return { emoji: '💎', icon: <Medal className="w-6 h-6 text-blue-600" /> };   // DIAMOND
-      case 4: return { emoji: '💿', icon: <Medal className="w-6 h-6 text-teal-600" /> };   // PLATINUM
-      case 5: return { emoji: '🥇', icon: <Medal className="w-6 h-6 text-yellow-600" /> }; // GOLD
-      case 6: return { emoji: '🥈', icon: <Medal className="w-6 h-6 text-gray-500" /> };   // SILVER
+      case 1: return { emoji: '👑', icon: <Crown className="w-5 h-5 text-white" /> }; // CHAMPION
+      case 2: return { emoji: '⭐', icon: <Medal className="w-5 h-5 text-white" /> };   // ELITE FOUR
+      case 3: return { emoji: '🎖️', icon: <Medal className="w-5 h-5 text-white" /> };   // GYM LEADER
+      case 4: return { emoji: '🏅', icon: <Medal className="w-5 h-5 text-white" /> };   // TRAINER
+      case 5: return { emoji: '🥇', icon: <Medal className="w-5 h-5 text-black" /> }; // VETERAN
+      case 6: return { emoji: '🥈', icon: <Medal className="w-5 h-5 text-black" /> };   // ROOKIE
       case 7:
       case 8:
       case 9:
-      case 10: return { emoji: '🥉', icon: <Medal className="w-6 h-6 text-orange-500" /> }; // BRONZE
+      case 10: return { emoji: '🥉', icon: <Medal className="w-5 h-5 text-black" /> }; // BEGINNER
       default: return { 
         emoji: '⚪', 
-        icon: <div className="w-6 h-6 flex items-center justify-center text-xs font-bold text-gray-500">{rank}</div> 
+        icon: <div className="w-5 h-5 flex items-center justify-center text-xs font-bold text-gray-500">{rank}</div> 
       };
     }
   };
   
-  // 🏆 게임 티어 이름
+  // 🏆 포켓몬 레트로 스타일 티어 명칭
   const getTierName = (rank) => {
     switch (rank) {
       case 1: return 'LEGENDARY';
-      case 2: return 'MASTER';
-      case 3: return 'DIAMOND';
-      case 4: return 'PLATINUM';
-      case 5: return 'GOLD';
-      case 6: return 'SILVER';
+      case 2: return 'CHALLENGER';
+      case 3: return 'GRANDMASTER';
+      case 4: return 'MASTER';
+      case 5: return 'DIAMOND';
+      case 6: return 'PLATINUM';
       case 7:
       case 8:
       case 9:
-      case 10: return 'BRONZE';
+      case 10: return 'GOLD';
       default: return null;
     }
+  };
+
+  // 🎮 랭커 카드 모달 함수들
+  const openTrainerCard = (user) => {
+    // 이미 열려있거나 전환 중이면 무시
+    if (showTrainerModal || isModalTransitioning || !user || !user.rank) return;
+    
+    console.log('🎮 랭커 카드 열기 (Portal 사용):', user.anonymousName);
+    
+    setIsModalTransitioning(true);
+    setSelectedTrainer({
+      ...user,
+      uniqueId: `${user.rank}-${user.anonymousName}-${Date.now()}`
+    });
+    setShowTrainerModal(true);
+    
+    setTimeout(() => setIsModalTransitioning(false), 500);
+  };
+  
+  const closeTrainerCard = () => {
+    if (isModalTransitioning) return;
+    
+    console.log('🎮 랭커 카드 닫기');
+    
+    setIsModalTransitioning(true);
+    setShowTrainerModal(false);
+    
+    setTimeout(() => {
+      setSelectedTrainer(null);
+      setIsModalTransitioning(false);
+    }, 500);
   };
 
   useEffect(() => {
@@ -286,7 +303,9 @@ const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null,
                 return (
                   <div
                     key={`${user.anonymousName}-${index}`}
-                    className={`${getGameTierStyle(user.rank, user.isCurrentUser)} vip-rank-container`}
+                    className={`${getGameTierStyle(user.rank, user.isCurrentUser)} vip-rank-container cursor-pointer hover:scale-[1.02] transition-transform`}
+                    onClick={() => openTrainerCard(user)}
+                    title="클릭하면 랭커 카드를 볼 수 있어요!"
                   >
                     {/* 순위 + 티어 아이콘 */}
                     <div className="flex items-center gap-3 min-w-[80px]">
@@ -357,12 +376,14 @@ const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null,
                         <div
                           key={`${user.anonymousName}-extended-${index}`}
                           className={`
-                            flex items-center gap-3 p-3 rounded-lg transition-all text-sm
+                            flex items-center gap-3 p-3 rounded-lg transition-all text-sm cursor-pointer hover:scale-[1.01]
                             ${user.isCurrentUser 
                               ? 'bg-blue-100 border-2 border-blue-400 shadow-md' 
                               : 'bg-gray-50 border border-gray-200 hover:bg-gray-100'
                             }
                           `}
+                          onClick={() => openTrainerCard(user)}
+                          title="클릭하면 랭커 카드를 볼 수 있어요!"
                         >
                           {/* 순위 + 티어 아이콘 */}
                           <div className="flex items-center gap-2 min-w-[60px]">
@@ -469,10 +490,21 @@ const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null,
           <span className="flex items-center gap-1">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             LIVE
-          </span>
-        </div>
-      </div>
-    </div>
+            </span>
+            </div>
+            </div>
+            
+            {/* 🎮 랭커 카드 모달 - 최종 안정화 */}
+            {showTrainerModal && selectedTrainer && selectedTrainer.rank && !isModalTransitioning && (
+              <TrainerCardModal 
+                key={selectedTrainer.uniqueId || `trainer-${selectedTrainer.rank}-${selectedTrainer.anonymousName}`}
+                showModal={true}
+                trainer={selectedTrainer}
+                onClose={closeTrainerCard}
+                currentLabel={currentLabel}
+              />
+            )}
+            </div>
   );
 };
 
