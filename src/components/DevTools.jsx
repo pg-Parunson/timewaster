@@ -18,11 +18,19 @@ const DevTools = ({ isVisible, onOpenRankingTest }) => {
   
   // 🔍 Firebase 디버깅 기능 추가
   const handleCheckFirebaseStatus = () => {
-    logger.firebase('Firebase 상태 확인:', {
+    logger.firebase('Firebase 상태 상세 확인:', {
       isConnected: rankingService.isFirebaseConnected,
       sessionId: rankingService.sessionId,
-      anonymousName: rankingService.anonymousName
+      anonymousName: rankingService.anonymousName,
+      databaseURL: 'https://timewaster-ranking-default-rtdb.asia-southeast1.firebasedatabase.app'
     });
+    
+    // 동시 접속자 수 강제 업데이트 테스트
+    if (rankingService.isFirebaseConnected) {
+      logger.firebase('🔥 Firebase 모드: 동시 접속자 수 실시간 추적');
+    } else {
+      logger.firebase('🏠 로컬 모드: 시뮬레이션 동시 접속자 수');
+    }
   };
   
   const handleCheckRankingData = async () => {
@@ -144,6 +152,14 @@ const DevTools = ({ isVisible, onOpenRankingTest }) => {
                          transition-colors duration-200 w-full"
             >
               🏆 랭킹 데이터 확인
+            </button>
+            
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-red-600 hover:bg-red-500 px-2 py-1 rounded text-xs
+                         transition-colors duration-200 w-full"
+            >
+              🔄 페이지 새로고침
             </button>
           </div>
         </div>

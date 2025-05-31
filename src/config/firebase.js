@@ -1,6 +1,7 @@
 // Firebase 설정 및 초기화
 import { initializeApp } from 'firebase/app';
 import { getDatabase, connectDatabaseEmulator } from 'firebase/database';
+import { logger } from '../utils/logger.js';
 
 // 환경변수에서 Firebase 설정 로드 (fallback 포함)
 const firebaseConfig = {
@@ -14,28 +15,35 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-6850FF04H6"
 };
 
-// 디버깅용 로그 (프로덕션에서는 제거 예정)
-if (import.meta.env.DEV) {
-  console.log('🔥 Firebase Config Debug:', {
-    apiKey: firebaseConfig.apiKey ? '✅ Loaded' : '❌ Missing',
-    projectId: firebaseConfig.projectId ? '✅ Loaded' : '❌ Missing',
-    databaseURL: firebaseConfig.databaseURL ? '✅ Loaded' : '❌ Missing'
-  });
-}
+// Firebase 연결 상태 로깅
+logger.firebase('Firebase 설정 로드:', {
+  hasApiKey: !!firebaseConfig.apiKey,
+  hasProjectId: !!firebaseConfig.projectId,
+  hasDatabaseURL: !!firebaseConfig.databaseURL,
+  environment: import.meta.env.MODE
+});
 
 // Firebase 앱 초기화 (안전한 방식)
 let app = null;
 let database = null;
 let isFirebaseConnected = false;
 
-// 개발환경에서도 Firebase 활성화 (테스트를 위해)
+// 강제로 Firebase 활성화 (로컬 모드 비활성화)
 try {
   app = initializeApp(firebaseConfig);
   database = getDatabase(app);
   isFirebaseConnected = true;
+  
+  logger.firebase('✅ Firebase 연결 성공', {
+    projectId: firebaseConfig.projectId,
+    databaseURL: firebaseConfig.databaseURL
+  });
 } catch (error) {
-  // Firebase 연결 실패 (콘솔 로그 제거됨)
+  logger.error('❌ Firebase 연결 실패:', error);
   isFirebaseConnected = false;
+  
+  // 로컬 모드로 폴백
+  logger.firebase('로컬 모드로 전환');
 }
 
 export { database, isFirebaseConnected };
