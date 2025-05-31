@@ -1,10 +1,5 @@
+# 🚀 시간낭비 마스터 자동 배포 워크플로
 name: Deploy to GitHub Pages
-
-# GitHub Pages 배포 권한 추가
-permissions:
-  contents: read
-  pages: write
-  id-token: write
 
 on:
   push:
@@ -12,49 +7,58 @@ on:
   pull_request:
     branches: [ main ]
 
-# 동시 배포 방지
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - name: 📥 체크아웃
+      uses: actions/checkout@v3
+      
+    - name: 📦 Node.js 설정
+      uses: actions/setup-node@v3
       with:
         node-version: '18'
         cache: 'npm'
-
-    - name: Install dependencies
+        
+    - name: 📋 의존성 설치
       run: npm ci
-
-    - name: Build with environment variables
+      
+    - name: 🧪 테스트 실행 (있다면)
+      run: npm run test --if-present
+      
+    - name: 🏗️ Production 빌드
       run: npm run build
       env:
-        VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
-        VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
-        VITE_FIREBASE_DATABASE_URL: ${{ secrets.VITE_FIREBASE_DATABASE_URL }}
-        VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-        VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
-        VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
-        VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-        VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
-
-    # GitHub Pages 업로드 준비
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
-      
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: './dist'
+        NODE_ENV: production
         
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+    - name: 📊 번들 크기 분석
+      run: |
+        echo "📦 빌드 결과물 크기:"
+        du -sh dist/
+        echo "📁 주요 파일들:"
+        ls -lah dist/assets/ || echo "assets 폴더 없음"
+        
+    - name: 🔍 Console 로그 제거 확인
+      run: |
+        echo "🔍 빌드된 파일에서 console 로그 확인..."
+        if grep -r "console\." dist/ --exclude-dir=node_modules; then
+          echo "❌ console 로그가 발견되었습니다!"
+          exit 1
+        else
+          echo "✅ 모든 console 로그가 제거되었습니다!"
+        fi
+        
+    - name: 🚀 GitHub Pages 배포
+      if: github.ref == 'refs/heads/main'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist
+        
+    - name: 📈 배포 완료 알림
+      if: github.ref == 'refs/heads/main'
+      run: |
+        echo "🎉 배포 완료!"
+        echo "🌐 사이트 URL: https://pg-Parunson.github.io/timewaster"
+        echo "📊 실제 도메인: https://timetrash.net"

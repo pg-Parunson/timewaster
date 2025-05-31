@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { storage } from '../utils/storage';
 import { analytics } from '../utils/analytics';
+import { logger } from '../utils/logger.js';
 import { rankingService } from '../services/rankingService.jsx';
-import { statsService } from '../services/statsService.jsx'; // 📊 실제 통계 서비스 import
+import { statsService } from '../services/statsService.jsx';
 import { addMilestoneNotification, addRankingNotification, addActivityNotification } from '../services/liveFeedService.jsx';
 import { getTimeBasedActivityRecommendation } from '../data/timeBasedActivities';
 import { 
@@ -97,7 +98,7 @@ export const useTimerLogic = () => {
         }
       }
     } catch (error) {
-      // 랭킹 확인 실패 (콘솔 로그 제거됨)
+    logger.error('랭킹 확인 실패:', error);
     }
   }, [isRankingInitialized, currentRank, currentUser, typeMessage]);
 
@@ -173,7 +174,7 @@ export const useTimerLogic = () => {
           unsubscribeSessions();
         };
       } catch (error) {
-        // 통계 초기화 실패 (콘솔 로그 제거됨)
+        logger.error('통계 초기화 실패:', error);
         // 폴백: 로컬 데이터 사용
         const visits = storage.incrementVisits();
         const storedData = storage.getAllData();
@@ -197,7 +198,7 @@ export const useTimerLogic = () => {
         setCurrentUser(user);
         setIsRankingInitialized(true);
       } catch (error) {
-        // Firebase 랭킹 시스템 초기화 실패 (콘솔 로그 제거됨)
+        logger.error('Firebase 랭킹 시스템 초기화 실패:', error);
         setIsRankingInitialized(false);
       }
     };

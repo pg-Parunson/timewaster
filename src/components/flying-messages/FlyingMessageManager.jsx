@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { database } from '../../config/firebase';
 import { ref, onValue, push, off } from 'firebase/database';
 import { formatTime } from '../../utils/helpers';
-import { getRandomCoupangProduct } from '../../data/coupangProducts'; // 🎯 랜덤 쿠팡 링크 import
+import { logger } from '../../utils/logger.js';
+import { getRandomCoupangProduct } from '../../data/coupangProducts';
 import FlyingRankingMessage from './FlyingRankingMessage';
 import FlyingChatMessage from './FlyingChatMessage';
 import ChatModal from './ChatModal';
@@ -142,7 +143,7 @@ const FlyingMessageManager = ({
           }
         }
       } catch (error) {
-        // 채팅 리스너 오류 (콘솔 로그 제거됨)
+        logger.error('채팅 리스너 오류:', error);
         // 오류가 발생해도 Firebase 리스너를 유지
       }
     });
@@ -259,10 +260,9 @@ const FlyingMessageManager = ({
       // 성공 시 로그 없음
     })
     .catch((error) => {
-      // 운영 환경에서는 에러 로그 제거됨
-      // 콘솔 로그를 사용자 피드백으로 대체
+      logger.error('채팅 메시지 전송 실패:', error);
       
-      // 오류 상황에서도 피드백 - 종류에 따라 다른 메시지
+      // 사용자 친화적 피드백
       if (error.code === 'PERMISSION_DENIED') {
         addFlyingChatMessage('😔 서버 연결 문제로 메시지가 다른 사람들에게 전송되지 않았어요', false);
       } else if (error.code === 'NETWORK_ERROR') {
@@ -316,8 +316,8 @@ const FlyingMessageManager = ({
           💬 {canChat ? `메시지 보내기 (일반:${chatTokens} 프리미엄:${premiumTokens})` : '메시지 보내기 (권한없음)'}
         </button>
         
-        {/* 테스트용 토큰 지급 버튼 */}
-        {import.meta.env.DEV && (
+        {/* 개발 모드 전용 테스트 버튼 */}
+        {(import.meta.env.DEV || import.meta.env.MODE === 'development') && (
           <button
             onClick={() => {
               setChatTokens(prev => prev + 2);

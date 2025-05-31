@@ -11,10 +11,11 @@ import {
   orderByChild,
   limitToLast,
   remove,
-  onDisconnect, // 🔥 누락된 부분 추가!
-  update // 🔥 추가된 import - 한 번에 여러 필드 업데이트용
+  onDisconnect,
+  update
 } from 'firebase/database';
 import { database, ANONYMOUS_NAMES, DB_PATHS, RANKING_PERIODS, isFirebaseConnected } from '../config/firebase.js';
+import { logger } from '../utils/logger.js';
 
 class RankingService {
   constructor() {
@@ -97,7 +98,7 @@ class RankingService {
       return { sessionId: this.sessionId, anonymousName: this.anonymousName };
 
     } catch (error) {
-      // 세션 초기화 실패 (콘솔 로그 제거됨)
+      logger.error('세션 초기화 실패:', error);
       throw error;
     }
   }
@@ -112,7 +113,7 @@ class RankingService {
           await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/lastHeartbeat`), serverTimestamp());
           await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/isActive`), true);
         } catch (error) {
-          // 하트비트 실패 (콘솔 로그 제거됨)
+          logger.error('하트비트 실패:', error);
         }
       }
     }, 2000); // 🔥 2초마다 (실시간에 가깝게, 하지만 Firebase 요금 고려)
@@ -132,7 +133,7 @@ class RankingService {
             this.localRanking = stored;
           }
         } catch (error) {
-          // 로컬 하트비트 실패 (콘솔 로그 제거됨)
+          logger.error('로컬 하트비트 실패:', error);
         }
       }
     }, 1000); // 🔥 1초마다 (로컬은 제한 없으니 진짜 실시간)
@@ -160,7 +161,7 @@ class RankingService {
         // 로컬 모드에서는 마일스톤 찴크 생략 (알림 기능 없음)
       }
     } catch (error) {
-      // 시간 업데이트 실패 (콘솔 로그 제거됨)
+      logger.error('시간 업데이트 실패:', error);
     }
   }
 
@@ -196,7 +197,7 @@ class RankingService {
       await this.cleanupLiveFeed();
 
     } catch (error) {
-      // 라이브 피드 추가 실패 (콘솔 로그 제거됨)
+      logger.error('라이브 피드 추가 실패:', error);
     }
   }
 
@@ -220,7 +221,7 @@ class RankingService {
         }
       }
     } catch (error) {
-      // 라이브 피드 정리 실패 (콘솔 로그 제거됨)
+      logger.error('라이브 피드 정리 실패:', error);
     }
   }
 
@@ -244,12 +245,19 @@ class RankingService {
           const hasValidNickname = session.finalNickname || session.anonymousName;
           const isSubmitted = session.submittedToRanking === true;
           
-          // 디버깅 로그 제거됨
+          logger.debug('랭킹 세션 필터링:', {
+            sessionId: session.sessionId,
+            hasValidTime,
+            hasValidNickname,
+            isSubmitted,
+            finalTime: session.finalTime,
+            currentTime: session.currentTime
+          });
           
           return hasValidTime && hasValidNickname && isSubmitted;
         });
         
-        // 유효한 랭킹 세션 확인 완료
+        logger.ranking('유효한 랭킹 세션:', validSessions.length, '개');
 
         // 시간순 정렬
         const sessions = validSessions
@@ -303,7 +311,7 @@ class RankingService {
       }
 
     } catch (error) {
-      // 랭킹 조회 실패 (콘솔 로그 제거됨)
+      logger.error('랭킹 조회 실패:', error);
       return [];
     }
   }
@@ -470,7 +478,7 @@ class RankingService {
 
       }
     } catch (error) {
-      // 세션 종료 실패 (콘솔 로그 제거됨)
+      logger.error('세션 종료 실패:', error);
     }
   }
 
@@ -517,7 +525,7 @@ class RankingService {
         return higherScores + 1;
       }
     } catch (error) {
-      // 예상 순위 확인 실패 (콘솔 로그 제거됨)
+      logger.error('예상 순위 확인 실패:', error);
       return null;
     }
   }
@@ -531,7 +539,12 @@ class RankingService {
 
       const finalNickname = customNickname || this.anonymousName;
       
-      // 랭킹 등록 시작
+      logger.ranking('랭킹 등록 시작:', {
+        timeInSeconds,
+        finalNickname,
+        customComment,
+        sessionId: this.sessionId
+      });
       
       if (this.isFirebaseConnected) {
         // Firebase 모드 - 트랜잭션처럼 한 번에 모든 데이터 업데이트
@@ -546,7 +559,7 @@ class RankingService {
         // 한 번에 업데이트 (원자적 연산)
         await update(ref(database), updates);
         
-        // Firebase 업데이트 완료
+        logger.firebase('랭킹 데이트 Firebase 업데이트 완료');
         
         // 라이브 피드에 랭킹 등록 알림
         const rank = await this.getExpectedRank(timeInSeconds);
@@ -574,7 +587,7 @@ class RankingService {
         throw new Error('세션을 찾을 수 없습니다');
       }
     } catch (error) {
-      // 랭킹 제출 실패 (콘솔 로그 제거됨)
+      logger.error('랭킹 제출 실패:', error);
       throw error;
     }
   }

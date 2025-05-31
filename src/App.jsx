@@ -908,28 +908,28 @@ function App() {
         setPremiumTokens={setPremiumTokens}
       />
       
-      {/* 🧪 테스트용 강제 메시지 - 개발 확인용 */}
-      {import.meta.env.DEV && (
+      {/* 개발 모드에서만 테스트 메시지 표시 */}
+      {(import.meta.env.DEV || import.meta.env.MODE === 'development') && (
         <>
           <FlyingChatMessage 
             id={9999} 
-            message="💬 강제 테스트 메시지 - 내 메시지!" 
+            message="💬 개발 모드 테스트 메시지" 
             isMyMessage={true} 
             onComplete={() => {}} 
           />
           <FlyingChatMessage 
             id={9998} 
-            message="💭 다른 사람 메시지 테스트!" 
+            message="💭 Firebase 연결 테스트" 
             isMyMessage={false} 
             onComplete={() => {}} 
           />
         </>
       )}
       
-      {/* 개발자 도구 - 🏆 랭킹 테스트 버튼 추가 */}
+      {/* 개발자 도구 - 개발 모드에서만 표시 */}
       <DevTools 
-        isVisible={import.meta.env.DEV} 
-        onOpenRankingTest={handleRankingTest} // 🏆 랭킹 테스트 콜백
+        isVisible={import.meta.env.DEV || import.meta.env.MODE === 'development'} 
+        onOpenRankingTest={handleRankingTest}
       />
 
       {/* 🎉 축하 이펙트 - 포켓몬 스타일 */}

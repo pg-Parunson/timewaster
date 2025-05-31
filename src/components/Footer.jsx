@@ -52,9 +52,7 @@ const Footer = () => {
               </div>
               
               <div className="flex items-center gap-4">
-                <span>v2.8.0</span>
-                <span>•</span>
-                <span>React + Firebase</span>
+                <span>v1.0.0</span>
                 <span>•</span>
                 <span className="flex items-center gap-1">
                   <Mail className="w-3 h-3" />

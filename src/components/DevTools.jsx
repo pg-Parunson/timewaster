@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '../utils/logger.js';
 import { generateTestNotifications } from '../services/liveFeedService';
 import { rankingService } from '../services/rankingService.jsx';
 
@@ -17,17 +18,23 @@ const DevTools = ({ isVisible, onOpenRankingTest }) => {
   
   // 🔍 Firebase 디버깅 기능 추가
   const handleCheckFirebaseStatus = () => {
-    // Firebase 상태 확인 (콘솔 로그 제거됨)
-    // 필요시 브라우저 개발자 도구에서 직접 rankingService 객체 확인 가능
+    logger.firebase('Firebase 상태 확인:', {
+      isConnected: rankingService.isFirebaseConnected,
+      sessionId: rankingService.sessionId,
+      anonymousName: rankingService.anonymousName
+    });
   };
   
   const handleCheckRankingData = async () => {
-    // 랭킹 데이터 확인 (콘솔 로그 제거됨)
+    logger.ranking('랭킹 데이터 확인 시작...');
     try {
       const ranking = await rankingService.getRanking('daily');
-      // 데이터는 정상적으로 조회되지만 콘솔 출력하지 않음
+      logger.ranking('일일 랭킹 데이터:', ranking);
+      
+      const weeklyRanking = await rankingService.getRanking('weekly');
+      logger.ranking('주간 랭킹 데이터:', weeklyRanking);
     } catch (error) {
-      // 오류 발생 시에도 콘솔에 출력하지 않음
+      logger.error('럭킹 데이터 조회 실패:', error);
     }
   };
   

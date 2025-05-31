@@ -5,9 +5,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "NODE_ENV=production vite build",
+    "build:dev": "vite build",
     "preview": "vite preview",
-    "deploy": "npm run build && gh-pages -d dist"
+    "deploy": "npm run build && gh-pages -d dist",
+    "analyze": "npx vite-bundle-analyzer dist"
   },
   "keywords": [
     "timewaster",
@@ -34,6 +36,7 @@
     "gh-pages": "^6.0.0",
     "postcss": "^8.4.27",
     "tailwindcss": "^3.3.3",
+    "terser": "^5.19.2",
     "vite": "^4.4.5"
   },
   "repository": {
