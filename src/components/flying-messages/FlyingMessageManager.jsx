@@ -3,7 +3,6 @@ import { database } from '../../config/firebase';
 import { ref, onValue, push, off } from 'firebase/database';
 import { formatTime } from '../../utils/helpers';
 import { getRandomCoupangProduct } from '../../data/coupangProducts'; // 🎯 랜덤 쿠팡 링크 import
-import ConnectionNotification from './ConnectionNotification';
 import FlyingRankingMessage from './FlyingRankingMessage';
 import FlyingChatMessage from './FlyingChatMessage';
 import ChatModal from './ChatModal';
@@ -17,7 +16,6 @@ const FlyingMessageManager = ({
   premiumTokens: propPremiumTokens,
   setPremiumTokens: setPropPremiumTokens
 }) => {
-  const [connectionNotification, setConnectionNotification] = useState(null);
   const [flyingRankingMessages, setFlyingRankingMessages] = useState([]);
   const [flyingChatMessages, setFlyingChatMessages] = useState([]);
   const [chatModal, setChatModal] = useState(false);
@@ -95,13 +93,6 @@ const FlyingMessageManager = ({
     if (!database) {
       // Firebase가 없을 때 테스트용 더미 데이터
       setTimeout(() => {
-        setConnectionNotification({
-          totalUsers: Math.floor(Math.random() * 50) + 10,
-          timestamp: Date.now()
-        });
-      }, 5000);
-      
-      setTimeout(() => {
         addFlyingRankingMessage("테스터님이 25분34초로 3위를 기록했습니다!");
       }, 10000);
       
@@ -112,23 +103,8 @@ const FlyingMessageManager = ({
       return;
     }
 
-    const connectionsRef = ref(database, 'live-feed/connections');
     const rankingRef = ref(database, 'live-feed/ranking-updates');
     const chatRef = ref(database, 'live-feed/global-chat');
-
-    // 새 접속자 알림
-    const unsubscribeConnection = onValue(connectionsRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const latestConnection = Object.values(data).sort((a, b) => b.timestamp - a.timestamp)[0];
-        if (latestConnection && Date.now() - latestConnection.timestamp < 5000) {
-          setConnectionNotification({
-            totalUsers: latestConnection.totalUsers || 1,
-            timestamp: latestConnection.timestamp
-          });
-        }
-      }
-    });
 
     // 랭킹 변동 알림
     const unsubscribeRanking = onValue(rankingRef, (snapshot) => {
@@ -172,7 +148,6 @@ const FlyingMessageManager = ({
     });
 
     return () => {
-      off(connectionsRef);
       off(rankingRef);
       off(chatRef);
     };
@@ -304,13 +279,6 @@ const FlyingMessageManager = ({
 
   return (
     <>
-      {/* 접속 알림 */}
-      <ConnectionNotification
-        user={connectionNotification}
-        isVisible={!!connectionNotification}
-        onClose={() => setConnectionNotification(null)}
-      />
-
       {/* 날아가는 랭킹 메시지들 */}
       {flyingRankingMessages.map(msg => (
         <FlyingRankingMessage
