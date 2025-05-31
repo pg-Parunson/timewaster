@@ -21,7 +21,7 @@ export const sharing = {
         Kakao.Share.sendDefault({
           objectType: 'feed',
           content: {
-            title: '🕒 시간낭비 계산기',
+            title: '🕒 시간 낭비 마스터',
             description: `나는 이 사이트에서 ${formatTime(elapsedTime)}를 날렸습니다! 너도 똑같이 당해보시겠어요? 😂`,
             imageUrl: 'https://pg-parunson.github.io/timewaster/timer-icon.svg',
             link: {
@@ -53,11 +53,11 @@ export const sharing = {
 
   // 폴백 공유 방법
   fallbackKakaoShare: (elapsedTime, formatTime, showModernModal) => {
-    const text = `🕒 시간낭비 계산기\n\n나는 이 사이트에서 ${formatTime(elapsedTime)}를 날렸습니다! 너도 똑같이 당해보시겠어요? 😂\n\n${window.location.href}`;
+    const text = `🕒 시간 낭비 마스터\n\n나는 이 사이트에서 ${formatTime(elapsedTime)}를 날렸습니다! 너도 똑같이 당해보시겠어요? 😂\n\n${window.location.href}`;
     
     if (navigator.share) {
       navigator.share({
-        title: '🕒 시간낭비 계산기',
+        title: '🕒 시간 낭비 마스터',
         text: text,
         url: window.location.href
       });

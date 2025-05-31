@@ -31,6 +31,18 @@ import { useModalLogic } from './hooks/useModalLogic.jsx';
 // 유틸리티 imports
 import { formatTime } from './utils/helpers';
 
+// 🧹 개발 모드에서만 Firebase 정리 도구 추가
+if (import.meta.env.DEV) {
+  import('./utils/firebaseCleanup.js').then(module => {
+    window.cleanup = module.firebaseCleanup;
+    console.log('🧹 Firebase 정리 도구가 로드되었습니다!');
+    console.log('사용법:');
+    console.log('- cleanup.checkDataStatus() - 현재 데이터 확인');
+    console.log('- cleanup.clearAllTestData() - 모든 테스트 데이터 삭제');
+    console.log('- cleanup.clearSpecificData("sessions") - 특정 데이터만 삭제');
+  });
+}
+
 // 시간에 따른 타이머 색상 계산 함수
 const getTimerColor = (elapsedTime) => {
   const minutes = Math.floor(elapsedTime / 60);
