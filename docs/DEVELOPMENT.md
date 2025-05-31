@@ -1,6 +1,6 @@
 # 🚀 개발 가이드 - 시간 낭비 마스터
 
-## 📋 현재 상태 (v2.8.3) - 🎨 헤더 배경 이미지 & 플로팅 BGM 컴트롤러!
+## 📋 현재 상태 (v2.8.4) - 🚀 Vercel 마이그레이션 완료!
 
 ### ✅ 완성된 핵심 기능
 - **시간 낭비 마스터** 타이틀 + 10초 회전 부제목
@@ -27,6 +27,7 @@
 - **정식 도메인** timetrash.net 운영
 - **코드 품질 개선** RankingSection.jsx 구조 정리 + JSX 오류 해결
 - **🆕 메시지 시스템 개편** roastMessages.js + timeBasedActivities.js 완전 개선
+- **🚀 Vercel 배포 환경** GitHub Pages → Vercel 완전 마이그레이션 + 도메인 연결
 
 ### 🔥 비난 메시지 대폭 개선 (v2.8.2)
 - **톤앤매너 완전 변경**: 선비적 → 친근하고 자극적
@@ -63,7 +64,8 @@ npm run dev  # → http://localhost:5173
 ### 배포
 ```bash
 npm run build
-npm run deploy  # GitHub Pages 자동 배포
+# Vercel 자동 배포: main 브랜치 푸시 시 자동 배포
+git push origin main
 ```
 
 ### Git 워크플로우
@@ -76,22 +78,27 @@ git push origin main
 ## 🎯 다음 작업 우선순위
 
 ### 🔥 즉시 개선 (다음 세션)
-1. **🎯 Google Search Console 등록 (최우선)**
+1. **🐛 Firebase 랭킹 시스템 버그 수정 (최우선)**
+   - 명예의 전당 일간/월간 랭킹 표시 오류 수정
+   - 동시접속자 카운터 정확도 개선
+   - Firebase 실시간 데이터베이스 쿼리 최적화
+
+2. **🎯 Google Search Console 등록**
    - timetrash.net 사이트 등록
    - sitemap.xml 제출
    - AdSense 재검토 요청
 
-2. **다크 모드 구현**
+3. **다크 모드 구현**
    - 포켓몬 스타일 다크 테마
    - 메시지 스타일 다크 모드 최적화
    - 토글 버튼 UI
 
-3. **사운드 효과 시스템**
+4. **사운드 효과 시스템**
    - 메시지 전송/수신 효과음 (일반 vs 프리미엄 차별화)
    - 축하 이펙트 사운드
    - BGM과 조화로운 볼륨 설정
 
-4. **PWA 변환**
+5. **PWA 변환**
    - manifest.json 생성
    - Service Worker 구현
    - 앱처럼 설치 가능
@@ -320,6 +327,11 @@ if (!mySentMessagesRef.current.has(latestChat.messageId)) {
 - 사운드 효과 없음
 - PWA 미적용
 
+### 🐛 현재 버그 (다음 세션 수정 예정)
+- **명예의 전당 랭킹**: 일간/월간 랭킹이 제대로 표시되지 않음
+- **동시접속자 카운터**: 실시간 사용자 수가 정확히 반영되지 않음
+- **Firebase 쿼리 최적화 필요**: 랭킹 데이터 조회 성능 개선 필요
+
 ## 💡 개발 팁
 
 ### 상태 관리 베스트 프랙티스
@@ -408,7 +420,34 @@ if (!mySentMessagesRef.current.has(latestChat.messageId)) {
 - **티어 배지**: flex-nowrap으로 모든 기간에서 일관된 한 줄 표시
 - **높이 확대**: 600px → 650px로 더 많은 정보 표시
 
+### 🚀 Vercel 마이그레이션 완료 (v2.8.4)
+- **호스팅 플랫폼 변경**: GitHub Pages → Vercel 완전 이전
+- **환경변수 설정**: Firebase 설정 8개 Vercel 환경변수로 안전하게 이전
+- **도메인 연결**: timetrash.net, www.timetrash.net DNS 설정 완료
+- **DNS 전파 완료**: 전 세계 90% 이상 지역에서 정상 접속 확인
+- **배포 자동화**: main 브랜치 푸시 시 즉시 자동 배포
+- **성능 향상**: Vercel CDN으로 로딩 속도 및 안정성 대폭 개선
+- **통합 도메인**: 모든 URL에서 동일한 최신 버전 제공
+
+### Vercel 설정 상세
+```
+환경변수 (Production, Preview, Development 모두 적용):
+- VITE_FIREBASE_API_KEY
+- VITE_FIREBASE_AUTH_DOMAIN  
+- VITE_FIREBASE_DATABASE_URL
+- VITE_FIREBASE_PROJECT_ID
+- VITE_FIREBASE_STORAGE_BUCKET
+- VITE_FIREBASE_MESSAGING_SENDER_ID
+- VITE_FIREBASE_APP_ID
+- VITE_FIREBASE_MEASUREMENT_ID
+
+도메인 상태:
+✅ timetrash.net - Configured Correctly
+✅ www.timetrash.net - Configured Correctly  
+✅ timewaster-umber.vercel.app - Configured Correctly
+```
+
 ---
 
-**🎮 시간 낭비 마스터 v2.8.3 - 헤더 배경 이미지 & 플로팅 BGM 컴트롤러!**  
-*현재 완성도: 99.8% | 다음 목표: 다크모드 🌙 + 사운드 효과 🔊 + PWA 📱*
+**🎮 시간 낭비 마스터 v2.8.4 - Vercel 마이그레이션 완료!**  
+*현재 완성도: 99.5% | 다음 목표: Firebase 버그 수정 🐛 + 다크모드 🌙 + 사운드 효과 🔊*
