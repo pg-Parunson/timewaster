@@ -132,9 +132,29 @@ function App() {
   // 🐛 광고 쿨다운 상태 관리
   const [adCooldownInfo, setAdCooldownInfo] = useState({ cooldown: 0, canGetToken: true });
   
+  // 🎨 채팅 권한 시스템 상태 추가
+  const [chatTokens, setChatTokens] = useState(0); // 일반 메시지 권한
+  const [premiumTokens, setPremiumTokens] = useState(0); // 프리미엄 메시지 권한
+  
   // 🏆 랭킹 테스트를 위한 상태 추가
   const [isRankingTestMode, setIsRankingTestMode] = useState(false);
   const [testElapsedTime, setTestElapsedTime] = useState(300); // 테스트용 시간 상태
+  
+  // 🔰 광고 쿨다운 타이머 추가
+  useEffect(() => {
+    if (adCooldownInfo.cooldown > 0) {
+      const timer = setInterval(() => {
+        setAdCooldownInfo(prev => {
+          const newCooldown = Math.max(0, prev.cooldown - 1000);
+          return {
+            cooldown: newCooldown,
+            canGetToken: newCooldown === 0
+          };
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [adCooldownInfo.cooldown]);
   
   // 회전 부제목 훅
   const { currentSubtitle, isAnimating } = useRotatingSubtitle();
@@ -181,7 +201,13 @@ function App() {
     totalTimeWasted,
     visits,
     isRankingInitialized,
-    currentUser
+    currentUser,
+    // 🎆 채팅 권한 시스템 연동
+    premiumTokens,
+    setPremiumTokens,
+    // 🔰 광고 쿨다운 시스템 연동
+    adCooldownInfo,
+    setAdCooldownInfo
   });
   
   // 🏆 랭킹 테스트 함수 추가 - 시간 매개변수 추가
@@ -209,6 +235,11 @@ function App() {
   useEffect(() => {
     const pokemonStyles = `
       /* Galmuri 폰트가 이미 import 되어 있음 */
+      
+      /* 📝 텍스트 커서(캐릿) 깜빡거리는 것 숨기기 */
+      * {
+        caret-color: transparent !important;
+      }
       
       /* 포켓몬 골드 진짜 컬러 팔레트 - 더 선명하게! */
       :root {
@@ -647,6 +678,28 @@ function App() {
         bottom: 22px;
       }
       
+      /* 🎆 모달 애니메이션 추가 */
+      @keyframes bounce-in {
+        0% {
+          transform: translate(-50%, -50%) scale(0.3);
+          opacity: 0;
+        }
+        50% {
+          transform: translate(-50%, -50%) scale(1.05);
+        }
+        70% {
+          transform: translate(-50%, -50%) scale(0.9);
+        }
+        100% {
+          transform: translate(-50%, -50%) scale(1);
+          opacity: 1;
+        }
+      }
+      
+      .animate-bounce-in {
+        animation: bounce-in 0.5s ease-out;
+      }
+      
 
     `;
     
@@ -657,8 +710,10 @@ function App() {
     // 키보드 단축키 지원
     const handleKeyPress = (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault(); // 🔥 브라우저 기본 동작 방지 (스페이스바 스크롤 등)
         refreshMessage();
       } else if (e.key === 'Escape') {
+        e.preventDefault(); // ESC 기본 동작도 방지
         handleExit();
       }
     };
@@ -844,10 +899,15 @@ function App() {
       {/* 이스터 에그 */}
       <EasterEgg elapsedTime={elapsedTime} />
 
-      {/* 날아가는 메시지 시스템 - 🐛 쿨다운 콜백 추가 */}
+      {/* 날아가는 메시지 시스템 - 🐛 쿨다운 콜백 + 🎆 권한 시스템 연동 */}
       <FlyingMessageManager 
         elapsedTime={elapsedTime} 
         onAdCooldownChange={setAdCooldownInfo} // 🐛 쿨다운 상태 콜백
+        // 🎆 채팅 권한 시스템 연동
+        chatTokens={chatTokens}
+        setChatTokens={setChatTokens}
+        premiumTokens={premiumTokens}
+        setPremiumTokens={setPremiumTokens}
       />
       
       {/* 🧪 테스트용 강제 메시지 - 개발 확인용 */}

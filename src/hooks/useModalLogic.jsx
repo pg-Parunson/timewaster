@@ -12,7 +12,13 @@ export const useModalLogic = ({
   totalTimeWasted,
   visits,
   isRankingInitialized,
-  currentUser
+  currentUser,
+  // 🎆 채팅 권한 시스템 연동
+  premiumTokens,
+  setPremiumTokens,
+  // 🔰 광고 쿨다운 시스템 연동
+  adCooldownInfo,
+  setAdCooldownInfo
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [modalConfig, setModalConfig] = useState({});
@@ -47,14 +53,37 @@ export const useModalLogic = ({
 
   // 쿠팡 상품 클릭
   const handleProductClick = () => {
-    const product = getRandomCoupangProduct(); // 🎯 랜덤 쿠팡 상품 선택
+    // 🔰 쿨다운 체크 - 쿨다운 중이면 권한 지급 안함
+    if (!adCooldownInfo.canGetToken) {
+      showModernModal(
+        "🕰️ 쿨다운 중!", 
+        `아직 ${Math.ceil(adCooldownInfo.cooldown / 1000)}초 남았어요! 조금만 기다리세요`, 
+        'warning'
+      );
+      return;
+    }
+    
+    const product = getRecommendedProduct(elapsedTime); // 🎯 표시된 상품과 동일한 상품 선택
     
     analytics.trackCoupangClick(product.name, product.category, elapsedTime, adClicks + 1);
     
     window.open(product.url, '_blank');
     
+    // 🎆 프리미엄 채팅 권한 지급!
+    if (setPremiumTokens) {
+      setPremiumTokens(prev => prev + 1);
+    }
+    
+    // 🔰 30초 쿨다운 설정
+    if (setAdCooldownInfo) {
+      setAdCooldownInfo({
+        cooldown: 30000, // 30초 (30,000ms)
+        canGetToken: false
+      });
+    }
+    
     const responses = [
-      `${product.icon} ${product.name} 좋은 선택이에요! 🎉`,
+      `${product.icon} ${product.name} 좋은 선택이에요! 🎆 프리미엄 채팅 권한 지급!`,
       `훌륭해요! ${product.category} 분야 투자는 언제나 옳습니다!`,
       `${product.name}로 시간낭비를 생산적으로 만드셨네요!`,
       `감사합니다! ${product.category} 상품 클릭으로 사이트를 후원해주셨어요!`,

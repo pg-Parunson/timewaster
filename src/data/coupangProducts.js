@@ -72,19 +72,26 @@ export const getRandomCoupangProduct = () => {
   return COUPANG_PRODUCTS[randomIndex];
 };
 
-// 시간대별 상황에 맞는 상품 추천 로직 - 안정화된 버전
+// 시간대별 상황에 맞는 상품 추천 로직 - 🎲 재미있는 랜덤 시스템
 export const getRecommendedProduct = (elapsedSeconds) => {
-  // 시간 기반으로 고정된 상품 선택 (랜덤 제거)
-  const timeSlot = Math.floor(elapsedSeconds / 120); // 2분마다 변경
+  // 시간대별 상품 풀 정의
+  let productPool = [];
   
-  if (elapsedSeconds < 300) { // 5분 미만
-    const productIndex = timeSlot % 3; // 0, 1, 2 순환
-    return COUPANG_PRODUCTS[productIndex]; // 쿠팡홈, 덤벨, 도서 순환
-  } else if (elapsedSeconds < 600) { // 10분 미만
-    const productIndex = 3 + (timeSlot % 3); // 3, 4, 5 순환
-    return COUPANG_PRODUCTS[productIndex]; // 알람시계, 영양제, 보드게임 순환
-  } else { // 10분 이상
-    const productIndex = 6 + (timeSlot % 2); // 6, 7 순환
-    return COUPANG_PRODUCTS[productIndex]; // 차, DIY 순환
+  if (elapsedSeconds < 180) { // 3분 미만: 초보자용 상품들
+    productPool = [0, 1, 2]; // 쿠팡홈, 덤벨, 도서
+  } else if (elapsedSeconds < 420) { // 7분 미만: 중급자용 상품들  
+    productPool = [1, 2, 3, 4]; // 덤벨, 도서, 알람시계, 영양제
+  } else if (elapsedSeconds < 660) { // 11분 미만: 고급자용 상품들
+    productPool = [3, 4, 5, 6]; // 알람시계, 영양제, 보드게임, 차
+  } else { // 11분 이상: 프로급 시간낭비자용
+    productPool = [5, 6, 7]; // 보드게임, 차, DIY
   }
+  
+  // 🎲 해당 시간대 풀에서 랜덤 선택 (하지만 일정 시간마다 변경)
+  const changeInterval = 90; // 90초(1.5분)마다 상품 변경
+  const seed = Math.floor(elapsedSeconds / changeInterval);
+  const randomIndex = seed % productPool.length;
+  const selectedProductIndex = productPool[randomIndex];
+  
+  return COUPANG_PRODUCTS[selectedProductIndex];
 };

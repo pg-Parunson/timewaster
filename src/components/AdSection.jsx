@@ -61,12 +61,12 @@ const AdSection = React.memo(({ showAd, adMessage, extremeMode, elapsedTime, onP
               <div className="flex flex-col items-center gap-2">
                 <div className="text-2xl">{adCooldownInfo.canGetToken ? product.icon : '⏰'}</div> {/* 🐛 쿨다운 중이면 시계 아이콘 */}
                 <div className="pokemon-font font-bold text-black">
-                  {adCooldownInfo.canGetToken ? product.name : '광고 쿨다운 중'}
+                  {adCooldownInfo.canGetToken ? product.name : '쇼핑 쿨다운 중'}
                 </div>
                 <div className="pokemon-font text-sm text-black/80 leading-tight">
                   {adCooldownInfo.canGetToken 
                     ? product.description 
-                    : `${Math.ceil(adCooldownInfo.cooldown / 1000)}초 후 다시 시도하세요`
+                    : `${Math.ceil(adCooldownInfo.cooldown / 1000)}초 후 다시 돈 쓸 수 있어요`
                   }
                 </div>
               </div>
@@ -77,8 +77,8 @@ const AdSection = React.memo(({ showAd, adMessage, extremeMode, elapsedTime, onP
           <div className="mt-4 p-3 bg-blue-100 border-2 border-blue-400 rounded-lg">
             <div className="pokemon-font text-sm text-blue-800 text-center">
               {adCooldownInfo.canGetToken 
-                ? '💡 시간을 낭비한 만큼 쇼핑도 해보세요!' 
-                : `🕰️ 채팅 권한 쿨다운 중! ${Math.ceil(adCooldownInfo.cooldown / 1000)}초 후 다시 시도하세요`
+                ? '💡 어차피 시간 버린 거, 돈도 좀 써보세요' 
+                : `🕰️ 광고 쿨다운 중! ${Math.ceil(adCooldownInfo.cooldown / 1000)}초 후 다시 돈 쓸 수 있어요`
               }
             </div>
           </div>
@@ -86,7 +86,7 @@ const AdSection = React.memo(({ showAd, adMessage, extremeMode, elapsedTime, onP
       ) : (
         <div className="pokemon-dialog text-center">
           <div className="pokemon-font text-xl mb-4 text-red-800 font-bold">
-            😤 아직 광고 볼 자격도 없어 돌아가! 😤
+            😤 아직 쇼핑 자격도 없어요? 😤
           </div>
           
           <div className="flex flex-col items-center gap-3">
@@ -94,14 +94,14 @@ const AdSection = React.memo(({ showAd, adMessage, extremeMode, elapsedTime, onP
               animationDuration: '3s'
             }} />
             <div className="pokemon-font text-red-600 font-bold">
-              1분 더 낭비해야 광고 자격 획득!
+              1분 더 낭비해야 쇼핑 기회 오픈!
             </div>
           </div>
 
           {/* 빈정거리는 메시지 */}
           <div className="mt-4 p-3 bg-red-100 border-2 border-red-400 rounded-lg animate-pulse">
             <div className="pokemon-font text-sm text-red-700 text-center font-bold">
-              🚫 시간낭비 초보자는 광고 금지! 가서 더 낭비해와!
+              🙅 시간비 줄이는 초보자는 쇼핑도 금지! 가서 더 낭비하고 오세요~
             </div>
           </div>
         </div>

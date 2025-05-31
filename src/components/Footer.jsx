@@ -63,13 +63,6 @@ const Footer = () => {
               </div>
             </div>
           </div>
-
-          {/* 재미있는 메시지 */}
-          <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-3 text-yellow-800">
-            <p className="text-sm">
-              🎯 <strong>AdSense 승인 대기 중!</strong> 곧 더 많은 광고로 여러분의 시간낭비를 도와드리겠습니다 😄
-            </p>
-          </div>
         </div>
       </footer>
 

@@ -8,15 +8,28 @@ import FlyingRankingMessage from './FlyingRankingMessage';
 import FlyingChatMessage from './FlyingChatMessage';
 import ChatModal from './ChatModal';
 
-const FlyingMessageManager = ({ elapsedTime = 0, onAdCooldownChange }) => { // 🕰️ elapsedTime prop 추가 + 쿨다운 콜백
+const FlyingMessageManager = ({ 
+  elapsedTime = 0, 
+  onAdCooldownChange,
+  // 🎆 상위에서 전달받은 채팅 권한 상태
+  chatTokens: propChatTokens,
+  setChatTokens: setPropChatTokens,
+  premiumTokens: propPremiumTokens,
+  setPremiumTokens: setPropPremiumTokens
+}) => {
   const [connectionNotification, setConnectionNotification] = useState(null);
   const [flyingRankingMessages, setFlyingRankingMessages] = useState([]);
   const [flyingChatMessages, setFlyingChatMessages] = useState([]);
   const [chatModal, setChatModal] = useState(false);
   const [chatCooldown, setChatCooldown] = useState(0); // 기본적으로 권한 없음
   const [adChatCooldown, setAdChatCooldown] = useState(0); // 광고 클릭 쿨다운 (30초)
-  const [chatTokens, setChatTokens] = useState(0); // 채팅 권한 토큰
-  const [premiumTokens, setPremiumTokens] = useState(0); // 광고로 얻은 프리미엄 토큰
+  // 🎆 상위에서 전달받은 채팅 권한 상태 사용 (로컬 상태 제거)
+  // const [chatTokens, setChatTokens] = useState(0); // 제거
+  // const [premiumTokens, setPremiumTokens] = useState(0); // 제거
+  const chatTokens = propChatTokens || 0;
+  const setChatTokens = setPropChatTokens || (() => {});
+  const premiumTokens = propPremiumTokens || 0;
+  const setPremiumTokens = setPropPremiumTokens || (() => {});
   const [messageIdCounter, setMessageIdCounter] = useState(0);
   const [totalTimeWasted, setTotalTimeWasted] = useState(0); // 총 체류 시간 추적
   const [lastProcessedMessage, setLastProcessedMessage] = useState(null); // 중복 방지
@@ -201,21 +214,36 @@ const FlyingMessageManager = ({ elapsedTime = 0, onAdCooldownChange }) => { // �
     }
   };
   
-  const handleSendChatMessage = (message) => {
-    // 최근 전송한 메시지와 같으면 중복 전송 방지
+  const handleSendChatMessage = (message, selectedMessageType = 'auto') => {
+    // 최근 전송한 메시지와 같으마 중복 전송 방지
     if (recentlySentMessage === message) {
       return;
     }
     
-    // 권한 타입 결정 (프리미엄 우선)
+    // 🎯 사용자가 선택한 메시지 타입에 따른 근한 결정
     let messageType = 'none';
-    if (premiumTokens > 0) {
+    
+    if (selectedMessageType === 'premium' && premiumTokens > 0) {
+      // 사용자가 프리미엄 선택 + 권한 있음
       messageType = 'premium';
       setPremiumTokens(prev => prev - 1);
-    } else if (chatTokens > 0) {
+    } else if (selectedMessageType === 'basic' && chatTokens > 0) {
+      // 사용자가 일반 선택 + 권한 있음
       messageType = 'basic';
       setChatTokens(prev => prev - 1);
-    } else {
+    } else if (selectedMessageType === 'auto') {
+      // 자동 선택: 기존 로직 (프리미엄 우선)
+      if (premiumTokens > 0) {
+        messageType = 'premium';
+        setPremiumTokens(prev => prev - 1);
+      } else if (chatTokens > 0) {
+        messageType = 'basic';
+        setChatTokens(prev => prev - 1);
+      }
+    }
+    
+    // 권한이 없으면 전송 불가
+    if (messageType === 'none') {
       return;
     }
     

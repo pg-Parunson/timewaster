@@ -105,7 +105,7 @@ export const useTimerLogic = () => {
   // 메시지 새로고침
   const refreshMessage = useCallback(() => {
     if (elapsedTime < 10) {
-      const newMessage = "드디어 시작이네요! 시간낭비의 대장정에 오신 걸 환영합니다 ㅋㅋ";
+      const newMessage = "드디어 시작이네요! 시간낭비의 대장정에 오신 걸 환영합니다";
       setCurrentMessage(newMessage);
       setCurrentMessageData(null);
       typeMessage(newMessage);
@@ -308,7 +308,7 @@ export const useTimerLogic = () => {
         // 📊 Firebase 통계에도 시간 추가
         statsService.updateOnSessionEnd(elapsedTime);
         
-        const message = '아 진짜 나가세요? 이제 막 재밌어지려고 했는데... ㅋㅋ 아까워요!';
+        const message = '아 진짜 나가세요? 이제 막 재밌어지려고 했는데... 아까워요!';
         e.preventDefault();
         e.returnValue = message;
         return message;

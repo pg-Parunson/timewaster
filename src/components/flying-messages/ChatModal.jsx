@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 
 const ChatModal = ({ isOpen, onClose, onSendMessage, remainingTime, canChat, chatTokens, premiumTokens, onAdClick, canGetTokenFromAd, elapsedTime }) => {
   const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState('auto'); // 'auto', 'basic', 'premium'
   const maxLength = 50;
 
   const handleSubmit = (e) => {
     e.preventDefault();
     
     if (message.trim() && message.length <= maxLength) {
-      onSendMessage(message.trim());
+      // 🎯 사용자가 선택한 메시지 타입 전달
+      onSendMessage(message.trim(), messageType);
       setMessage('');
       onClose();
     } else {
@@ -35,6 +37,7 @@ const ChatModal = ({ isOpen, onClose, onSendMessage, remainingTime, canChat, cha
             </span>
           </h3>
           
+          {/* 권한 없을 때 경고 메시지 */}
           {!canChat && (
             <div className="mb-4 p-3 bg-yellow-50 border border-yellow-300 rounded-lg">
               <div className="pokemon-font text-sm text-yellow-800 text-center mb-3">
@@ -72,6 +75,112 @@ const ChatModal = ({ isOpen, onClose, onSendMessage, remainingTime, canChat, cha
                     )
                 }
               </button>
+            </div>
+          )}
+          
+          {/* 🎯 메시지 타입 선택 UI - 권한이 있을 때만 표시 */}
+          {canChat && (chatTokens > 0 || premiumTokens > 0) && (
+            <div className="mb-4 p-3 bg-blue-50 border border-blue-300 rounded-lg">
+              <div className="pokemon-font text-sm font-bold text-blue-800 mb-2 text-center">
+                🎯 메시지 타입 선택
+              </div>
+              
+              <div className="flex gap-2">
+                {/* 자동 선택 (기본값) */}
+                <label className={`flex-1 p-2 border-2 rounded-lg cursor-pointer transition-all ${
+                  messageType === 'auto'
+                    ? 'border-blue-500 bg-blue-100'
+                    : 'border-gray-300 hover:border-blue-300'
+                }`}>
+                  <input
+                    type="radio"
+                    name="messageType"
+                    value="auto"
+                    checked={messageType === 'auto'}
+                    onChange={(e) => setMessageType(e.target.value)}
+                    className="sr-only"
+                  />
+                  <div className="text-center">
+                    <div className="text-lg mb-1">✨</div>
+                    <div className="pokemon-font text-xs font-bold">자동</div>
+                    <div className="pokemon-font text-xs text-gray-600">
+                      {premiumTokens > 0 ? '프리미엄 우선' : '일반 메시지'}
+                    </div>
+                  </div>
+                </label>
+
+                {/* 일반 메시지 */}
+                {chatTokens > 0 && (
+                  <label className={`flex-1 p-2 border-2 rounded-lg cursor-pointer transition-all ${
+                    messageType === 'basic'
+                      ? 'border-green-500 bg-green-100'
+                      : 'border-gray-300 hover:border-green-300'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="messageType"
+                      value="basic"
+                      checked={messageType === 'basic'}
+                      onChange={(e) => setMessageType(e.target.value)}
+                      className="sr-only"
+                    />
+                    <div className="text-center">
+                      <div className="text-lg mb-1">💬</div>
+                      <div className="pokemon-font text-xs font-bold">일반</div>
+                      <div className="pokemon-font text-xs text-gray-600">
+                        {chatTokens}개 보유
+                      </div>
+                    </div>
+                  </label>
+                )}
+
+                {/* 프리미엄 메시지 */}
+                {premiumTokens > 0 && (
+                  <label className={`flex-1 p-2 border-2 rounded-lg cursor-pointer transition-all ${
+                    messageType === 'premium'
+                      ? 'border-yellow-500 bg-yellow-100'
+                      : 'border-gray-300 hover:border-yellow-300'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="messageType"
+                      value="premium"
+                      checked={messageType === 'premium'}
+                      onChange={(e) => setMessageType(e.target.value)}
+                      className="sr-only"
+                    />
+                    <div className="text-center">
+                      <div className="text-lg mb-1">🎆</div>
+                      <div className="pokemon-font text-xs font-bold">프리미엄</div>
+                      <div className="pokemon-font text-xs text-gray-600">
+                        {premiumTokens}개 보유
+                      </div>
+                    </div>
+                  </label>
+                )}
+              </div>
+              
+              {/* 선택된 타입 설명 */}
+              <div className="mt-2 text-center">
+                {messageType === 'auto' && (
+                  <div className="pokemon-font text-xs text-blue-600">
+                    {premiumTokens > 0 
+                      ? '🎆 프리미엄 권한이 우선 사용되어 화려하게 빛나요!' 
+                      : '💬 일반 메시지로 전송되어요'
+                    }
+                  </div>
+                )}
+                {messageType === 'basic' && (
+                  <div className="pokemon-font text-xs text-green-600">
+                    💬 일반 메시지로 전송됩니다 (권한 1개 소모)
+                  </div>
+                )}
+                {messageType === 'premium' && (
+                  <div className="pokemon-font text-xs text-yellow-600">
+                    🎆 프리미엄 메시지로 화려하게 빛나요! (권한 1개 소모)
+                  </div>
+                )}
+              </div>
             </div>
           )}
           
