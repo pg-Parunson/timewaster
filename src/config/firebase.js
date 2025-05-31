@@ -2,17 +2,26 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase, connectDatabaseEmulator } from 'firebase/database';
 
-// 환경변수에서 Firebase 설정 로드
+// 환경변수에서 Firebase 설정 로드 (fallback 포함)
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyBIiVYzJyoe5l_Sx9ctjXHSfWFa1iK4d2Q",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "timewaster-ranking.firebaseapp.com",
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL || "https://timewaster-ranking-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "timewaster-ranking",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "timewaster-ranking.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "43389524361",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:43389524361:web:2bb4cb052bc6e5a8e4e958",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-6850FF04H6"
 };
+
+// 디버깅용 로그 (프로덕션에서는 제거 예정)
+if (import.meta.env.DEV) {
+  console.log('🔥 Firebase Config Debug:', {
+    apiKey: firebaseConfig.apiKey ? '✅ Loaded' : '❌ Missing',
+    projectId: firebaseConfig.projectId ? '✅ Loaded' : '❌ Missing',
+    databaseURL: firebaseConfig.databaseURL ? '✅ Loaded' : '❌ Missing'
+  });
+}
 
 // Firebase 앱 초기화 (안전한 방식)
 let app = null;
