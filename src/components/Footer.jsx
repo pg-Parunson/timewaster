@@ -41,7 +41,7 @@ const Footer = () => {
               GitHub
             </a>
           </div>
-
+ 
           {/* 구분선 */}
           <div className="border-t-2 border-gray-200 pt-4">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-gray-500">
