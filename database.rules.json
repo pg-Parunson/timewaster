@@ -1,0 +1,33 @@
+{
+  "rules": {
+    "sessions": {
+      ".read": true,
+      ".write": true,
+      "$sessionId": {
+        ".validate": "newData.child('sessionId').exists() && newData.child('anonymousName').exists()"
+      }
+    },
+    "live-feed": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["timestamp"]
+    },
+    "liveFeed": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["timestamp"]
+    },
+    "rankings": {
+      ".read": true,
+      ".write": true
+    },
+    "global-stats": {
+      ".read": true,
+      ".write": true
+    },
+    "GLOBAL_STATS": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}

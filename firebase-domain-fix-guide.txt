@@ -1,0 +1,43 @@
+🔥 Firebase 도메인 설정 변경 가이드
+
+=== 1. Firebase Console 접속 ===
+https://console.firebase.google.com/project/timewaster-ranking
+
+=== 2. Authentication → Settings → Authorized domains ===
+현재: 
+- vercel.app 도메인들
+- localhost
+
+추가해야 할 도메인:
+- timetrash.net
+- [사용자명].github.io (GitHub Pages 도메인)
+
+=== 3. 프로젝트 설정 → 일반 ===
+웹 앱에서 도메인 설정 확인
+
+=== 4. Database → Rules ===
+현재 규칙이 맞는지 확인:
+{
+  "rules": {
+    "sessions": {
+      ".read": true,
+      ".write": true
+    },
+    "live-feed": {
+      ".read": true,
+      ".write": true
+    },
+    "global-stats": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}
+
+=== 5. 즉시 테스트 가능한 임시 규칙 ===
+{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}
