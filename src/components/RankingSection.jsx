@@ -1,3 +1,20 @@
+// 포켓몬 명예의 전당 스타일 랭킹 컴포넌트
+import React, { useState, useEffect } from 'react';
+import { Trophy, Crown, Medal, Users } from 'lucide-react';
+import { rankingService } from '../services/rankingService.jsx';
+import { RANKING_PERIODS, RANKING_LABELS } from '../config/firebase.js';
+import { formatTime } from '../utils/helpers';
+
+const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null, elapsedTime = 0 }) => {
+  const [ranking, setRanking] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activePeriod, setActivePeriod] = useState(RANKING_PERIODS.DAILY);
+  const [unsubscribe, setUnsubscribe] = useState(null);
+  const [myRank, setMyRank] = useState(null);
+  const [showMyRank, setShowMyRank] = useState(false);
+
   // 🏆 게임 티어 랭킹 시스템 - 진짜 게임스러운 티어!
   const getGameTierStyle = (rank, isCurrentUser) => {
     const baseClasses = `flex items-center gap-3 p-4 rounded-xl transition-all duration-500 relative overflow-hidden`;
@@ -24,7 +41,7 @@
             : 'bg-gradient-to-r from-blue-400 via-indigo-300 to-blue-400 border-3 border-blue-300 shadow-xl tier-diamond'
         }`;
         
-      case 4: // 🥈 PLATINUM - 플래티네 등급 (청록 + 은샄)
+      case 4: // 🥈 PLATINUM - 플래티네 등급 (청록 + 은색)
         return `${baseClasses} ${
           isCurrentUser 
             ? 'bg-gradient-to-r from-teal-400 via-gray-300 to-teal-400 border-3 border-teal-300 shadow-lg tier-platinum' 
@@ -48,7 +65,7 @@
       case 7:
       case 8:
       case 9:
-      case 10: // 🥉 BRONZE - 브로즈 등급 (동색)
+      case 10: // 🥉 BRONZE - 브론즈 등급 (동색)
         return `${baseClasses} ${
           isCurrentUser 
             ? 'bg-gradient-to-r from-orange-300 via-amber-200 to-orange-300 border-2 border-orange-300 shadow-md tier-bronze' 
@@ -102,22 +119,44 @@
       case 10: return `${baseClasses} text-orange-600`; // BRONZE
       default: return `${baseClasses} ${isCurrentUser ? 'text-blue-600' : 'text-gray-500'}`;
     }
-  };// 포켓몬 명예의 전당 스타일 랭킹 컴포넌트
-import React, { useState, useEffect } from 'react';
-import { Trophy, Crown, Medal, Users } from 'lucide-react';
-import { rankingService } from '../services/rankingService.jsx';
-import { RANKING_PERIODS, RANKING_LABELS } from '../config/firebase.js';
-import { formatTime } from '../utils/helpers';
+  };
 
-const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null, elapsedTime = 0 }) => {
-  const [ranking, setRanking] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [activePeriod, setActivePeriod] = useState(RANKING_PERIODS.DAILY);
-  const [unsubscribe, setUnsubscribe] = useState(null);
-  const [myRank, setMyRank] = useState(null);
-  const [showMyRank, setShowMyRank] = useState(false);
+  // 🏆 게임 티어 아이콘 및 이모지
+  const getTierIcon = (rank) => {
+    switch (rank) {
+      case 1: return { emoji: '🏆', icon: <Crown className="w-6 h-6 text-yellow-600" /> }; // LEGENDARY
+      case 2: return { emoji: '🕸️', icon: <Medal className="w-6 h-6 text-cyan-600" /> };   // MASTER
+      case 3: return { emoji: '💎', icon: <Medal className="w-6 h-6 text-blue-600" /> };   // DIAMOND
+      case 4: return { emoji: '💿', icon: <Medal className="w-6 h-6 text-teal-600" /> };   // PLATINUM
+      case 5: return { emoji: '🥇', icon: <Medal className="w-6 h-6 text-yellow-600" /> }; // GOLD
+      case 6: return { emoji: '🥈', icon: <Medal className="w-6 h-6 text-gray-500" /> };   // SILVER
+      case 7:
+      case 8:
+      case 9:
+      case 10: return { emoji: '🥉', icon: <Medal className="w-6 h-6 text-orange-500" /> }; // BRONZE
+      default: return { 
+        emoji: '⚪', 
+        icon: <div className="w-6 h-6 flex items-center justify-center text-xs font-bold text-gray-500">{rank}</div> 
+      };
+    }
+  };
+  
+  // 🏆 게임 티어 이름
+  const getTierName = (rank) => {
+    switch (rank) {
+      case 1: return 'LEGENDARY';
+      case 2: return 'MASTER';
+      case 3: return 'DIAMOND';
+      case 4: return 'PLATINUM';
+      case 5: return 'GOLD';
+      case 6: return 'SILVER';
+      case 7:
+      case 8:
+      case 9:
+      case 10: return 'BRONZE';
+      default: return null;
+    }
+  };
 
   useEffect(() => {
     // 현재 사용자 정보 설정
@@ -172,43 +211,6 @@ const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null,
   // 탭 변경 핸들러
   const handlePeriodChange = (period) => {
     setActivePeriod(period);
-  };
-
-  // 🏆 게임 티어 아이콘 및 이모지
-  const getTierIcon = (rank) => {
-    switch (rank) {
-      case 1: return { emoji: '🏆', icon: <Crown className="w-6 h-6 text-yellow-600" /> }; // LEGENDARY
-      case 2: return { emoji: '🕸️', icon: <Medal className="w-6 h-6 text-cyan-600" /> };   // MASTER
-      case 3: return { emoji: '💎', icon: <Medal className="w-6 h-6 text-blue-600" /> };   // DIAMOND
-      case 4: return { emoji: '💿', icon: <Medal className="w-6 h-6 text-teal-600" /> };   // PLATINUM
-      case 5: return { emoji: '🥇', icon: <Medal className="w-6 h-6 text-yellow-600" /> }; // GOLD
-      case 6: return { emoji: '🥈', icon: <Medal className="w-6 h-6 text-gray-500" /> };   // SILVER
-      case 7:
-      case 8:
-      case 9:
-      case 10: return { emoji: '🥉', icon: <Medal className="w-6 h-6 text-orange-500" /> }; // BRONZE
-      default: return { 
-        emoji: '⚪', 
-        icon: <div className="w-6 h-6 flex items-center justify-center text-xs font-bold text-gray-500">{rank}</div> 
-      };
-    }
-  };
-  
-  // 🏆 게임 티어 이름
-  const getTierName = (rank) => {
-    switch (rank) {
-      case 1: return 'LEGENDARY';
-      case 2: return 'MASTER';
-      case 3: return 'DIAMOND';
-      case 4: return 'PLATINUM';
-      case 5: return 'GOLD';
-      case 6: return 'SILVER';
-      case 7:
-      case 8:
-      case 9:
-      case 10: return 'BRONZE';
-      default: return null;
-    }
   };
 
   if (!isVisible) return null;
@@ -293,37 +295,37 @@ const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null,
                       <div className="text-sm font-bold text-gray-800">#{user.rank}</div>
                     </div>
 
-                    {/* 닉네임 + 티어 + 소감 */}
+                    {/* 닉네임 + 티어 + 소감 - 가로폭 제한 완화 */}
                     <div className="flex-1 min-w-0 px-3">
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <div className={getGameTierTextStyle(user.rank, user.isCurrentUser)}>
+                      <div className="flex items-center gap-1 flex-nowrap">
+                        <div className={`${getGameTierTextStyle(user.rank, user.isCurrentUser)} truncate`} style={{ maxWidth: '100px' }}>
                           {user.anonymousName}
                         </div>
                         {user.isCurrentUser && (
-                          <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded-full whitespace-nowrap font-bold">
+                          <span className="text-xs bg-blue-500 text-white px-1 py-0.5 rounded-full whitespace-nowrap font-bold flex-shrink-0">
                             나
                           </span>
                         )}
-                        {/* 🏆 게임 티어 배지 */}
+                        {/* 🏆 게임 티어 배지 - 모바일에서는 아예 숨김, 데스크톱에서도 작게 + 줄바꿈 방지 */}
                         {tierName && (
-                          <span className={`text-xs px-3 py-1 rounded-full font-black whitespace-nowrap border-2 ${
+                          <span className={`text-xs px-1 py-0.5 rounded font-black whitespace-nowrap border flex-shrink-0 hidden lg:inline ${
                             user.rank === 1 ? 'bg-yellow-100 text-yellow-900 border-yellow-400' :
                             user.rank === 2 ? 'bg-cyan-100 text-cyan-900 border-cyan-400' :
                             user.rank === 3 ? 'bg-blue-100 text-blue-900 border-blue-400' :
                             user.rank === 4 ? 'bg-teal-100 text-teal-900 border-teal-400' :
                             user.rank === 5 ? 'bg-yellow-100 text-yellow-900 border-yellow-400' :
                             user.rank === 6 ? 'bg-gray-100 text-gray-900 border-gray-400' :
-                            'bg-orange-100 text-orange-900 border-orange-400' // BRONZE
+                            'bg-orange-100 text-orange-900 border-orange-400'
                           }`}>
                             {tierName}
                           </span>
                         )}
                       </div>
-                      {/* 소감 - 연한 느낌으로 */}
+                      {/* 소감 - 연한 느낌으로 + 가로폭 제한 완화 */}
                       {user.comment && (
-                        <div className="pokemon-font text-xs text-gray-600 mt-2 truncate" 
-                             style={{ maxWidth: '250px' }}>
-                          📝 {user.comment}
+                        <div className="pokemon-font text-xs text-gray-600 mt-1 truncate w-full" 
+                             style={{ maxWidth: '180px' }}>
+                          📝 {user.comment.length > 12 ? user.comment.slice(0, 12) + '...' : user.comment}
                         </div>
                       )}
                     </div>
@@ -334,17 +336,6 @@ const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null,
                         {user.timeDisplay}
                       </div>
                     </div>
-                    
-                    {/* 🔥 풀파워 VIP 이팩트 - TOP 3만 화려하게! */}
-                    {user.rank === 1 && (
-                      <div className="rank-gold-sparkle"></div>
-                    )}
-                    {user.rank === 2 && (
-                      <div className="rank-silver-shimmer"></div>
-                    )}
-                    {user.rank === 3 && (
-                      <div className="rank-bronze-gleam"></div>
-                    )}
                   </div>
                 );
               })}
@@ -379,30 +370,24 @@ const RankingSection = ({ isVisible = true, currentUser: propCurrentUser = null,
                             <span className="text-xs font-bold text-gray-600">#{user.rank}</span>
                           </div>
 
-                          {/* 닉네임 + 소감 */}
+                          {/* 닉네임 + 소감 - 가로폭 제한 완화 */}
                           <div className="flex-1 min-w-0 px-2">
                             <div className={`
-                              pokemon-font text-xs font-bold
+                              pokemon-font text-xs font-bold truncate
                               ${user.isCurrentUser ? 'text-blue-700' : 'text-gray-700'}
-                            `}>
-                              {user.anonymousName}
+                            `} style={{ maxWidth: '150px' }}>
+                              {user.anonymousName.length > 10 ? user.anonymousName.slice(0, 10) + '...' : user.anonymousName}
                               {user.isCurrentUser && (
-                                <span className="ml-2 text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full">
+                                <span className="ml-1 text-xs bg-blue-500 text-white px-1 py-0.5 rounded-full">
                                   나
                                 </span>
                               )}
                             </div>
-                            {/* 소감 표시 + 길이 제한 */}
+                            {/* 소감 표시 + 길이 제한 완화 */}
                             {user.comment && (
-                              <div className="pokemon-font text-xs text-gray-400 mt-1" 
-                                   style={{ 
-                                     maxWidth: '150px', 
-                                     wordBreak: 'break-all',
-                                     overflow: 'hidden',
-                                     textOverflow: 'ellipsis',
-                                     whiteSpace: 'nowrap'
-                                   }}>
-                                📝 {user.comment.length > 15 ? user.comment.slice(0, 15) + '...' : user.comment}
+                              <div className="pokemon-font text-xs text-gray-400 mt-1 truncate" 
+                                   style={{ maxWidth: '130px' }}>
+                                📝 {user.comment.length > 10 ? user.comment.slice(0, 10) + '...' : user.comment}
                               </div>
                             )}
                           </div>

@@ -17,14 +17,7 @@ const ShareSection = ({ elapsedTime, formatTime, showModernModal }) => {
   };
 
   return (
-    <div className="text-center">
-      {/* 포켓몬 스타일 제목 */}
-      <div className="pokemon-font text-lg mb-6 text-gray-800 flex items-center justify-center gap-2">
-        <Heart className="w-5 h-5 text-red-500 animate-pulse" />
-        <span>친구들도 시간낭비시키기</span>
-        <Share2 className="w-5 h-5 text-blue-500" />
-      </div>
-      
+    <div className="text-center">      
       {/* 포켓몬 스타일 버튼들 */}
       <div className="flex flex-col gap-3">
         <button

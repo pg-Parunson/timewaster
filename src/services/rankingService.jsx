@@ -11,7 +11,8 @@ import {
   orderByChild,
   limitToLast,
   remove,
-  onDisconnect // 🔥 누락된 부분 추가!
+  onDisconnect, // 🔥 누락된 부분 추가!
+  update // 🔥 추가된 import - 한 번에 여러 필드 업데이트용
 } from 'firebase/database';
 import { database, ANONYMOUS_NAMES, DB_PATHS, RANKING_PERIODS, isFirebaseConnected } from '../config/firebase.js';
 
@@ -223,31 +224,49 @@ class RankingService {
     }
   }
 
-  // 실시간 랭킹 조회 (기간별 지원)
+  // 실시간 랭킹 조회 (기간별 지원) - 🔍 디버깅 강화
   async getRanking(period = RANKING_PERIODS.DAILY) {
     try {
       if (this.isFirebaseConnected) {
+        console.log('🔍 랭킹 조회 시작:', period);
+        
         // Firebase 모드
         const sessionsRef = ref(database, DB_PATHS.SESSIONS);
-        
-        // 활성 세션들 조회
-        const sessionsSnapshot = await get(query(
-          sessionsRef,
-          orderByChild('isActive'),
-          limitToLast(100) // 랭킹 탭을 위해 더 많이 가져오기
-        ));
+        const sessionsSnapshot = await get(sessionsRef);
 
         if (!sessionsSnapshot.exists()) {
+          console.log('📯 세션 데이터 없음');
           return [];
         }
 
-        // 세션 데이터를 기간별로 필터링 - 🔥 랭킹과 동시접속자를 분리해서 처리
-        const sessions = Object.values(sessionsSnapshot.val())
-          .filter(session => {
-            // 랭킹용: 유효한 시간이 있는 모든 세션 포함 (활성 상태 무관)
-            const hasValidTime = (session.currentTime > 0) || (session.finalTime > 0);
-            return hasValidTime;
-          })
+        const allSessions = Object.values(sessionsSnapshot.val());
+        console.log('📊 전체 세션 수:', allSessions.length);
+
+        // 랭킹용 세션 필터링 (더 관대하게)
+        const validSessions = allSessions.filter(session => {
+          const hasValidTime = (session.finalTime > 0) || (session.currentTime > 0);
+          const hasValidNickname = session.finalNickname || session.anonymousName;
+          const isSubmitted = session.submittedToRanking === true;
+          
+          // 디버깅 로그
+          if (session.sessionId && (session.finalTime > 0 || session.submittedToRanking)) {
+            console.log('🔍 세션 검증:', {
+              sessionId: session.sessionId?.substring(0, 10) + '...',
+              finalTime: session.finalTime,
+              currentTime: session.currentTime,
+              finalNickname: session.finalNickname,
+              submittedToRanking: session.submittedToRanking,
+              valid: hasValidTime && hasValidNickname && isSubmitted
+            });
+          }
+          
+          return hasValidTime && hasValidNickname && isSubmitted;
+        });
+        
+        console.log('✅ 유효한 랭킹 세션 수:', validSessions.length);
+
+        // 시간순 정렬
+        const sessions = validSessions
           .filter(session => this.isSessionInPeriod(session, period))
           .sort((a, b) => {
             // finalTime이 있으면 우선, 없으면 currentTime 사용
@@ -257,7 +276,7 @@ class RankingService {
           })
           .slice(0, 20); // TOP 20으로 증가!
 
-        return sessions.map((session, index) => ({
+        const ranking = sessions.map((session, index) => ({
           rank: index + 1,
           anonymousName: session.finalNickname || session.anonymousName, // 🐛 사용자 닉네임 우선 사용
           comment: session.finalComment || '', // 🐛 소감 데이터 추가
@@ -265,6 +284,9 @@ class RankingService {
           timeDisplay: this.formatTime(session.finalTime || session.currentTime),
           isCurrentUser: session.sessionId === this.sessionId
         }));
+        
+        console.log('🏆 최종 랭킹:', ranking);
+        return ranking;
       } else {
         // 로컬 모드
         const stored = JSON.parse(localStorage.getItem('timewaster_local_ranking') || '[]');
@@ -515,7 +537,7 @@ class RankingService {
     }
   }
 
-  // 랭킹에 점수 제출 (종료 시) - 🐛 소감 저장 추가
+  // 랭킹에 점수 제출 (종료 시) - 🐛 소감 저장 추가 + 강화된 디버깅
   async submitScore(timeInSeconds, customNickname = null, customComment = '') {
     try {
       if (!this.sessionId) {
@@ -524,16 +546,28 @@ class RankingService {
 
       const finalNickname = customNickname || this.anonymousName;
       
+      console.log('🏆 랭킹 등록 시작:', {
+        sessionId: this.sessionId,
+        timeInSeconds,
+        finalNickname,
+        customComment,
+        isFirebaseConnected: this.isFirebaseConnected
+      });
+      
       if (this.isFirebaseConnected) {
-        // Firebase 모드
-        const sessionRef = ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}`);
+        // Firebase 모드 - 트랜잭션처럼 한 번에 모든 데이터 업데이트
+        const updates = {};
+        updates[`${DB_PATHS.SESSIONS}/${this.sessionId}/finalTime`] = timeInSeconds;
+        updates[`${DB_PATHS.SESSIONS}/${this.sessionId}/finalNickname`] = finalNickname;
+        updates[`${DB_PATHS.SESSIONS}/${this.sessionId}/finalComment`] = customComment;
+        updates[`${DB_PATHS.SESSIONS}/${this.sessionId}/submittedToRanking`] = true;
+        updates[`${DB_PATHS.SESSIONS}/${this.sessionId}/endTime`] = serverTimestamp();
+        updates[`${DB_PATHS.SESSIONS}/${this.sessionId}/isActive`] = false; // 세션 종료
+
+        // 한 번에 업데이트 (원자적 연산)
+        await update(ref(database), updates);
         
-        // 세션 정보 업데이트 - 🐛 소감 저장 추가
-        await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/finalTime`), timeInSeconds);
-        await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/finalNickname`), finalNickname);
-        await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/finalComment`), customComment); // 🐛 소감 저장
-        await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/submittedToRanking`), true);
-        await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/endTime`), serverTimestamp());
+        console.log('✅ Firebase 업데이트 완료!');
         
         // 라이브 피드에 랭킹 등록 알림
         const rank = await this.getExpectedRank(timeInSeconds);
@@ -541,6 +575,7 @@ class RankingService {
           `${finalNickname}님이 ${this.formatTime(timeInSeconds)}로 ${rank}위 달성! 🏆`
         );
         
+        console.log('🎉 랭킹 등록 완료!');
         return true;
       } else {
         // 로컬 모드

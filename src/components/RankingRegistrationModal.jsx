@@ -44,25 +44,48 @@ const RankingRegistrationModal = ({
     setCustomNickname(filteredValue);
   };
 
-  // 랭킹 등록 처리
+  // 랭킹 등록 처리 - 🐛 에러 처리 강화
   const handleRegisterRanking = async () => {
     setIsSubmitting(true);
     
     try {
+      console.log('🏆 랭킹 등록 시작:', {
+        elapsedTime,
+        customNickname: customNickname.trim(),
+        customComment: customComment.trim()
+      });
+      
       // 사용자가 닉네임을 입력했는지 확인
       const hasCustomNickname = customNickname.trim().length > 0;
       const finalNickname = hasCustomNickname ? customNickname.trim() : currentUser?.anonymousName || '익명';
       const finalComment = customComment.trim();
       
       // Firebase 랭킹에 등록 (소감 포함)
-      await rankingService.submitScore(elapsedTime, finalNickname, finalComment);
+      const result = await rankingService.submitScore(elapsedTime, finalNickname, finalComment);
       
-      // 성공 후 종료 처리
-      onConfirm();
+      if (result) {
+        console.log('✅ 랭킹 등록 성공!');
+        
+        // 성공 피드백 (선택사항)
+        if (window.confirm) {
+          alert(`🏆 랭킹 등록 완료!\n닉네임: ${finalNickname}\n시간: ${formatTime(elapsedTime)}`);
+        }
+        
+        // 성공 후 종료 처리
+        onConfirm();
+      } else {
+        throw new Error('랭킹 등록 실패');
+      }
     } catch (error) {
-      console.error('랭킹 등록 실패:', error);
-      // 실패해도 종료는 진행
-      onConfirm();
+      console.error('❌ 랭킹 등록 실패:', error);
+      
+      // 사용자에게 에러 알림
+      if (window.alert) {
+        alert('랭킹 등록에 실패했습니다. 다시 시도해주세요.');
+      }
+      
+      // 실패 시 재시도 가능하도록 모달을 닫지 않음
+      // onConfirm(); // 주석 처리하여 재시도 가능하게
     } finally {
       setIsSubmitting(false);
     }

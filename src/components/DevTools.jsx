@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { generateTestNotifications } from '../services/liveFeedService';
+import { rankingService } from '../services/rankingService.jsx';
 
 const DevTools = ({ isVisible, onOpenRankingTest }) => {
   const [testTime, setTestTime] = useState(1800); // 기본값 30분 (1800초)
@@ -12,6 +13,31 @@ const DevTools = ({ isVisible, onOpenRankingTest }) => {
   
   const handleRankingTest = () => {
     onOpenRankingTest(testTime); // 시간을 매개변수로 전달
+  };
+  
+  // 🔍 Firebase 디버깅 기능 추가
+  const handleCheckFirebaseStatus = () => {
+    console.log('🔥 Firebase 연결 상태 확인:');
+    console.log('- 연결 상태:', rankingService.isFirebaseConnected);
+    console.log('- 세션 ID:', rankingService.sessionId);
+    console.log('- 사용자 닉네임:', rankingService.anonymousName);
+    
+    if (rankingService.isFirebaseConnected) {
+      console.log('✅ Firebase 연결 정상');
+    } else {
+      console.log('❌ Firebase 연결 실패 - 로컬 모드로 동작');
+    }
+  };
+  
+  const handleCheckRankingData = async () => {
+    console.log('🏆 현재 랭킹 데이터 확인:');
+    try {
+      const ranking = await rankingService.getRanking('daily');
+      console.log('- 오늘의 랭킹 데이터:', ranking);
+      console.log('- 랭킹 엔트리 수:', ranking.length);
+    } catch (error) {
+      console.error('❌ 랭킹 데이터 조회 실패:', error);
+    }
   };
   
   const formatTimeDisplay = (seconds) => {
@@ -99,8 +125,33 @@ const DevTools = ({ isVisible, onOpenRankingTest }) => {
           🏆 랭킹 등록 테스트 ({Math.floor(testTime / 60)}분)
         </button>
         
+        {/* 🔍 디버깅 도구들 */}
+        <div className="border-t border-white/20 pt-2 mt-2">
+          <div className="text-xs text-cyan-300 mb-2 font-bold">
+            🔍 디버깅 도구
+          </div>
+          
+          <div className="space-y-1">
+            <button
+              onClick={handleCheckFirebaseStatus}
+              className="bg-cyan-600 hover:bg-cyan-500 px-2 py-1 rounded text-xs
+                         transition-colors duration-200 w-full"
+            >
+              🔥 Firebase 상태 확인
+            </button>
+            
+            <button
+              onClick={handleCheckRankingData}
+              className="bg-purple-600 hover:bg-purple-500 px-2 py-1 rounded text-xs
+                         transition-colors duration-200 w-full"
+            >
+              🏆 랭킹 데이터 확인
+            </button>
+          </div>
+        </div>
+        
         <div className="text-xs text-gray-300 mt-2 border-t border-white/20 pt-2">
-          📝 랭킹 테스트: 닉네임과 소감 저장 테스트
+          📝 F12 콘솔에서 로그 확인 | 랭킹 테스트: 닉네임과 소감 저장 테스트
         </div>
       </div>
     </div>
