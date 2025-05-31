@@ -1,0 +1,24 @@
+User-agent: *
+Allow: /
+
+# 주요 페이지들
+Allow: /index.html
+Allow: /*.css
+Allow: /*.js
+Allow: /*.png
+Allow: /*.svg
+Allow: /*.ico
+
+# 사이트맵 위치
+Sitemap: https://timetrash.net/sitemap.xml
+
+# 크롤링 딜레이 (서버 부하 방지)
+Crawl-delay: 1
+
+# Google AdSense 봇 허용
+User-agent: Mediapartners-Google
+Allow: /
+
+# Google 봇 허용  
+User-agent: Googlebot
+Allow: /

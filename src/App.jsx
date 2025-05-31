@@ -20,6 +20,7 @@ import TimerSection from './components/TimerSection.jsx';
 import FlyingMessageManager from './components/flying-messages/FlyingMessageManager.jsx';
 import FlyingChatMessage from './components/flying-messages/FlyingChatMessage.jsx'; // 테스트용 추가
 import BGMManager from './components/BGMManager.jsx';
+import Footer from './components/Footer.jsx';
 
 // 훅스 imports
 import { useCelebrationSystem } from './hooks/useCelebrationSystem.jsx';
@@ -378,7 +379,7 @@ function App() {
         position: relative;
       }
       
-      /* 포켓몬 게임 메인 윈도우 */
+      /* 포켓몬 게임 메인 윈도우 - 더 넓은 가로 크기 */
       .pokemon-window {
         background: var(--pokemon-white);
         border: 6px solid var(--pokemon-black);
@@ -389,17 +390,24 @@ function App() {
           8px 8px 16px rgba(0,0,0,0.4);
       }
       
-      /* PC 친화적 가로형 그리드 */
+      /* PC 친화적 가로형 그리드 - 적절한 간격 */
       .pokemon-grid {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
-        gap: 24px;
-        padding: 24px;
+        gap: 28px; /* 적절한 간격 */
+        padding: 28px; /* 적절한 여백 */
       }
       
-      @media (max-width: 1024px) {
+      @media (max-width: 1200px) {
         .pokemon-grid {
           grid-template-columns: 1fr;
+          gap: 20px;
+          padding: 20px;
+        }
+      }
+      
+      @media (max-width: 768px) {
+        .pokemon-grid {
           gap: 16px;
           padding: 16px;
         }
@@ -578,6 +586,292 @@ function App() {
         animation: float 3s ease-in-out infinite;
       }
       
+      /* 🔥 풀파워 VIP 이팩트 - 진짜 게임 보스급! */
+      
+      /* 1위 - 전설의 황금 제왕 (최고급 풀파워!) */
+      .rank-gold-premium {
+        position: relative;
+        animation: 
+          gold-emperor-majesty 1.5s ease-in-out infinite,
+          gold-divine-float 3s ease-in-out infinite,
+          gold-power-pulse 2s ease-in-out infinite;
+        filter: 
+          drop-shadow(0 0 25px rgba(255, 215, 0, 1))
+          drop-shadow(0 0 50px rgba(255, 193, 7, 0.8));
+        transform-origin: center;
+      }
+      
+      @keyframes gold-emperor-majesty {
+        0%, 100% { 
+          box-shadow: 
+            0 0 30px rgba(255, 215, 0, 1),
+            0 0 60px rgba(255, 193, 7, 0.9),
+            0 0 90px rgba(255, 165, 0, 0.6),
+            inset 0 0 30px rgba(255, 255, 255, 0.4),
+            inset 0 0 60px rgba(255, 215, 0, 0.2);
+        }
+        50% { 
+          box-shadow: 
+            0 0 45px rgba(255, 215, 0, 1),
+            0 0 90px rgba(255, 193, 7, 1),
+            0 0 135px rgba(255, 165, 0, 0.8),
+            inset 0 0 45px rgba(255, 255, 255, 0.6),
+            inset 0 0 90px rgba(255, 215, 0, 0.3);
+        }
+      }
+      
+      @keyframes gold-divine-float {
+        0%, 100% { transform: translateY(0px) scale(1); }
+        33% { transform: translateY(-4px) scale(1.01); }
+        66% { transform: translateY(-2px) scale(1.005); }
+      }
+      
+      @keyframes gold-power-pulse {
+        0%, 100% { filter: brightness(1) contrast(1); }
+        50% { filter: brightness(1.1) contrast(1.1); }
+      }
+      
+      .rank-gold-sparkle {
+        position: absolute;
+        top: -5px; left: -5px; right: -5px; bottom: -5px;
+        background: 
+          radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.9) 1px, transparent 3px),
+          radial-gradient(circle at 85% 25%, rgba(255, 215, 0, 0.8) 1px, transparent 3px),
+          radial-gradient(circle at 25% 85%, rgba(255, 255, 255, 0.7) 1px, transparent 3px),
+          radial-gradient(circle at 75% 75%, rgba(255, 165, 0, 0.6) 1px, transparent 3px),
+          radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.5) 1px, transparent 3px),
+          radial-gradient(circle at 20% 60%, rgba(255, 215, 0, 0.4) 1px, transparent 3px);
+        animation: gold-ultimate-sparkle 2s linear infinite;
+        border-radius: inherit;
+        overflow: hidden;
+        pointer-events: none;
+      }
+      
+      @keyframes gold-ultimate-sparkle {
+        0% { 
+          background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%, 50% 0%, 0% 50%;
+          opacity: 1;
+          transform: rotate(0deg);
+        }
+        25% { 
+          background-position: 25% 25%, 75% 25%, 25% 75%, 75% 75%, 75% 25%, 25% 75%;
+          opacity: 0.8;
+          transform: rotate(5deg);
+        }
+        50% { 
+          background-position: 50% 50%, 50% 50%, 50% 50%, 50% 50%, 100% 50%, 50% 100%;
+          opacity: 1;
+          transform: rotate(0deg);
+        }
+        75% { 
+          background-position: 75% 25%, 25% 75%, 75% 25%, 25% 75%, 25% 75%, 75% 25%;
+          opacity: 0.9;
+          transform: rotate(-3deg);
+        }
+        100% { 
+          background-position: 100% 100%, 0% 100%, 100% 0%, 0% 0%, 0% 100%, 100% 0%;
+          opacity: 1;
+          transform: rotate(0deg);
+        }
+      }
+      
+      /* 2위 - 달빛 기사 (풀파워!) */
+      .rank-silver {
+        position: relative;
+        animation: 
+          silver-moonlight-majesty 2s ease-in-out infinite,
+          silver-noble-float 4s ease-in-out infinite,
+          silver-gleaming-pulse 3s ease-in-out infinite;
+        filter: 
+          drop-shadow(0 0 20px rgba(192, 192, 192, 0.9))
+          drop-shadow(0 0 40px rgba(156, 163, 175, 0.7));
+      }
+      
+      @keyframes silver-moonlight-majesty {
+        0%, 100% { 
+          box-shadow: 
+            0 0 25px rgba(192, 192, 192, 0.9),
+            0 0 50px rgba(156, 163, 175, 0.7),
+            0 0 75px rgba(148, 163, 184, 0.5),
+            inset 0 0 25px rgba(255, 255, 255, 0.3),
+            inset 0 0 50px rgba(192, 192, 192, 0.2);
+        }
+        50% { 
+          box-shadow: 
+            0 0 35px rgba(192, 192, 192, 1),
+            0 0 70px rgba(156, 163, 175, 0.9),
+            0 0 105px rgba(148, 163, 184, 0.7),
+            inset 0 0 35px rgba(255, 255, 255, 0.5),
+            inset 0 0 70px rgba(192, 192, 192, 0.3);
+        }
+      }
+      
+      @keyframes silver-noble-float {
+        0%, 100% { transform: translateY(0px) scale(1); }
+        50% { transform: translateY(-3px) scale(1.008); }
+      }
+      
+      @keyframes silver-gleaming-pulse {
+        0%, 100% { filter: brightness(1) contrast(1); }
+        50% { filter: brightness(1.08) contrast(1.05); }
+      }
+      
+      .rank-silver-shimmer {
+        position: absolute;
+        top: -3px; left: -3px; right: -3px; bottom: -3px;
+        background: linear-gradient(
+          90deg, 
+          transparent 20%, 
+          rgba(255, 255, 255, 0.8) 35%,
+          rgba(192, 192, 192, 0.6) 50%,
+          rgba(255, 255, 255, 0.8) 65%,
+          transparent 80%
+        );
+        animation: silver-moonbeam-sweep 3s ease-in-out infinite;
+        border-radius: inherit;
+        overflow: hidden;
+        pointer-events: none;
+      }
+      
+      @keyframes silver-moonbeam-sweep {
+        0% { 
+          transform: translateX(-120%) skewX(20deg) scale(1.1);
+          opacity: 0;
+        }
+        20% { 
+          opacity: 1;
+        }
+        80% { 
+          opacity: 1;
+        }
+        100% { 
+          transform: translateX(120%) skewX(20deg) scale(1.1);
+          opacity: 0;
+        }
+      
+      /* 🏆 전용 스파클 이팩트 - LEGENDARY/MASTER/DIAMOND만 */
+      .rank-gold-sparkle {
+        position: absolute;
+        top: -5px; left: -5px; right: -5px; bottom: -5px;
+        background: 
+          radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.9) 1px, transparent 3px),
+          radial-gradient(circle at 85% 25%, rgba(255, 215, 0, 0.8) 1px, transparent 3px),
+          radial-gradient(circle at 25% 85%, rgba(147, 51, 234, 0.6) 1px, transparent 3px),
+          radial-gradient(circle at 75% 75%, rgba(255, 165, 0, 0.6) 1px, transparent 3px),
+          radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.5) 1px, transparent 3px),
+          radial-gradient(circle at 20% 60%, rgba(147, 51, 234, 0.4) 1px, transparent 3px);
+        animation: legendary-ultimate-sparkle 2s linear infinite;
+        border-radius: inherit;
+        overflow: hidden;
+        pointer-events: none;
+      }
+      
+      @keyframes legendary-ultimate-sparkle {
+        0% { 
+          background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%, 50% 0%, 0% 50%;
+          opacity: 1;
+          transform: rotate(0deg);
+        }
+        25% { 
+          background-position: 25% 25%, 75% 25%, 25% 75%, 75% 75%, 75% 25%, 25% 75%;
+          opacity: 0.8;
+          transform: rotate(8deg);
+        }
+        50% { 
+          background-position: 50% 50%, 50% 50%, 50% 50%, 50% 50%, 100% 50%, 50% 100%;
+          opacity: 1;
+          transform: rotate(0deg);
+        }
+        75% { 
+          background-position: 75% 25%, 25% 75%, 75% 25%, 25% 75%, 25% 75%, 75% 25%;
+          opacity: 0.9;
+          transform: rotate(-5deg);
+        }
+        100% { 
+          background-position: 100% 100%, 0% 100%, 100% 0%, 0% 0%, 0% 100%, 100% 0%;
+          opacity: 1;
+          transform: rotate(0deg);
+        }
+      }
+      
+      .rank-silver-shimmer {
+        position: absolute;
+        top: -3px; left: -3px; right: -3px; bottom: -3px;
+        background: linear-gradient(
+          90deg, 
+          transparent 15%, 
+          rgba(6, 182, 212, 0.6) 25%,
+          rgba(255, 255, 255, 0.8) 35%,
+          rgba(59, 130, 246, 0.6) 45%,
+          rgba(255, 255, 255, 0.8) 55%,
+          rgba(6, 182, 212, 0.6) 65%,
+          transparent 85%
+        );
+        animation: master-crystal-sweep 3.5s ease-in-out infinite;
+        border-radius: inherit;
+        overflow: hidden;
+        pointer-events: none;
+      }
+      
+      @keyframes master-crystal-sweep {
+        0% { 
+          transform: translateX(-130%) skewX(25deg) scale(1.2);
+          opacity: 0;
+        }
+        15% { 
+          opacity: 1;
+        }
+        85% { 
+          opacity: 1;
+        }
+        100% { 
+          transform: translateX(130%) skewX(25deg) scale(1.2);
+          opacity: 0;
+        }
+      }
+      
+      .rank-bronze-gleam {
+        position: absolute;
+        top: -2px; left: -2px; right: -2px; bottom: -2px;
+        background: linear-gradient(
+          45deg, 
+          transparent 25%, 
+          rgba(59, 130, 246, 0.4) 35%,
+          rgba(99, 102, 241, 0.6) 45%,
+          rgba(147, 197, 253, 0.4) 50%,
+          rgba(99, 102, 241, 0.6) 55%,
+          rgba(59, 130, 246, 0.4) 65%,
+          transparent 75%
+        );
+        animation: diamond-prism-sweep 4.5s ease-in-out infinite;
+        border-radius: inherit;
+        overflow: hidden;
+        pointer-events: none;
+      }
+      
+      @keyframes diamond-prism-sweep {
+        0% { 
+          transform: translateX(-250%) translateY(-250%) rotate(45deg) scale(1.3);
+          opacity: 0;
+        }
+        20% { 
+          opacity: 1;
+        }
+        80% { 
+          opacity: 1;
+        }
+        100% { 
+          transform: translateX(250%) translateY(250%) rotate(45deg) scale(1.3);
+          opacity: 0;
+        }
+      }
+      
+      /* 모든 VIP 랭킹 에 overflow 방지 */
+      .vip-rank-container {
+        overflow: hidden;
+        position: relative;
+      }
+      
 
     `;
     
@@ -607,7 +901,7 @@ function App() {
   return (
     <div className="pokemon-screen">
       {/* 포켓몬 스타일 메인 윈도우 */}
-      <div className="pokemon-window max-w-[1400px] mx-auto my-8 relative">
+      <div className="pokemon-window max-w-[1500px] mx-auto my-8 relative">
         
         {/* 🎮 시간 낭비 마스터 헤더 */}
         <div className="text-center py-6 border-b-4 border-black relative">
@@ -746,7 +1040,7 @@ function App() {
               시간낭비 명예의 전당
             </div>
             
-            <div className="pokemon-ranking">
+            <div className="pokemon-ranking overflow-hidden">
               <RankingSection 
                 isVisible={true}
                 currentUser={currentUser}
@@ -766,6 +1060,9 @@ function App() {
             💻 시간 낭비 마스터 v2.8
           </div>
         </div>
+
+        {/* 푸터 */}
+        <Footer />
 
       </div>
 

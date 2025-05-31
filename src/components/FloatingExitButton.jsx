@@ -15,7 +15,7 @@ const FloatingExitButton = ({ elapsedTime, onExit, inline = false, showAlways = 
         title="현실로 돌아가기"
       >
         <DoorOpen className="w-5 h-5" />
-        <span>현실 탈출</span>
+        <span>현실로 탈출</span>
       </button>
     );
   }
