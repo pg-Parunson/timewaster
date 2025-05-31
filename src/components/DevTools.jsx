@@ -17,26 +17,17 @@ const DevTools = ({ isVisible, onOpenRankingTest }) => {
   
   // 🔍 Firebase 디버깅 기능 추가
   const handleCheckFirebaseStatus = () => {
-    console.log('🔥 Firebase 연결 상태 확인:');
-    console.log('- 연결 상태:', rankingService.isFirebaseConnected);
-    console.log('- 세션 ID:', rankingService.sessionId);
-    console.log('- 사용자 닉네임:', rankingService.anonymousName);
-    
-    if (rankingService.isFirebaseConnected) {
-      console.log('✅ Firebase 연결 정상');
-    } else {
-      console.log('❌ Firebase 연결 실패 - 로컬 모드로 동작');
-    }
+    // Firebase 상태 확인 (콘솔 로그 제거됨)
+    // 필요시 브라우저 개발자 도구에서 직접 rankingService 객체 확인 가능
   };
   
   const handleCheckRankingData = async () => {
-    console.log('🏆 현재 랭킹 데이터 확인:');
+    // 랭킹 데이터 확인 (콘솔 로그 제거됨)
     try {
       const ranking = await rankingService.getRanking('daily');
-      console.log('- 오늘의 랭킹 데이터:', ranking);
-      console.log('- 랭킹 엔트리 수:', ranking.length);
+      // 데이터는 정상적으로 조회되지만 콘솔 출력하지 않음
     } catch (error) {
-      console.error('❌ 랭킹 데이터 조회 실패:', error);
+      // 오류 발생 시에도 콘솔에 출력하지 않음
     }
   };
   
@@ -151,7 +142,7 @@ const DevTools = ({ isVisible, onOpenRankingTest }) => {
         </div>
         
         <div className="text-xs text-gray-300 mt-2 border-t border-white/20 pt-2">
-          📝 F12 콘솔에서 로그 확인 | 랭킹 테스트: 닉네임과 소감 저장 테스트
+          📝 개발자 도구 | 랭킹 테스트: 닉네임과 소감 저장 테스트
         </div>
       </div>
     </div>

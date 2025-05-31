@@ -97,7 +97,7 @@ class RankingService {
       return { sessionId: this.sessionId, anonymousName: this.anonymousName };
 
     } catch (error) {
-      console.error('세션 초기화 실패:', error);
+      // 세션 초기화 실패 (콘솔 로그 제거됨)
       throw error;
     }
   }
@@ -112,7 +112,7 @@ class RankingService {
           await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/lastHeartbeat`), serverTimestamp());
           await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/isActive`), true);
         } catch (error) {
-          console.error('하트비트 실패:', error);
+          // 하트비트 실패 (콘솔 로그 제거됨)
         }
       }
     }, 2000); // 🔥 2초마다 (실시간에 가깝게, 하지만 Firebase 요금 고려)
@@ -132,7 +132,7 @@ class RankingService {
             this.localRanking = stored;
           }
         } catch (error) {
-          console.error('로컬 하트비트 실패:', error);
+          // 로컬 하트비트 실패 (콘솔 로그 제거됨)
         }
       }
     }, 1000); // 🔥 1초마다 (로컬은 제한 없으니 진짜 실시간)
@@ -160,7 +160,7 @@ class RankingService {
         // 로컬 모드에서는 마일스톤 찴크 생략 (알림 기능 없음)
       }
     } catch (error) {
-      console.error('시간 업데이트 실패:', error);
+      // 시간 업데이트 실패 (콘솔 로그 제거됨)
     }
   }
 
@@ -196,7 +196,7 @@ class RankingService {
       await this.cleanupLiveFeed();
 
     } catch (error) {
-      console.error('라이브 피드 추가 실패:', error);
+      // 라이브 피드 추가 실패 (콘솔 로그 제거됨)
     }
   }
 
@@ -220,7 +220,7 @@ class RankingService {
         }
       }
     } catch (error) {
-      console.error('라이브 피드 정리 실패:', error);
+      // 라이브 피드 정리 실패 (콘솔 로그 제거됨)
     }
   }
 
@@ -228,19 +228,15 @@ class RankingService {
   async getRanking(period = RANKING_PERIODS.DAILY) {
     try {
       if (this.isFirebaseConnected) {
-        console.log('🔍 랭킹 조회 시작:', period);
-        
         // Firebase 모드
         const sessionsRef = ref(database, DB_PATHS.SESSIONS);
         const sessionsSnapshot = await get(sessionsRef);
 
         if (!sessionsSnapshot.exists()) {
-          console.log('📯 세션 데이터 없음');
           return [];
         }
 
         const allSessions = Object.values(sessionsSnapshot.val());
-        console.log('📊 전체 세션 수:', allSessions.length);
 
         // 랭킹용 세션 필터링 (더 관대하게)
         const validSessions = allSessions.filter(session => {
@@ -248,22 +244,12 @@ class RankingService {
           const hasValidNickname = session.finalNickname || session.anonymousName;
           const isSubmitted = session.submittedToRanking === true;
           
-          // 디버깅 로그
-          if (session.sessionId && (session.finalTime > 0 || session.submittedToRanking)) {
-            console.log('🔍 세션 검증:', {
-              sessionId: session.sessionId?.substring(0, 10) + '...',
-              finalTime: session.finalTime,
-              currentTime: session.currentTime,
-              finalNickname: session.finalNickname,
-              submittedToRanking: session.submittedToRanking,
-              valid: hasValidTime && hasValidNickname && isSubmitted
-            });
-          }
+          // 디버깅 로그 제거됨
           
           return hasValidTime && hasValidNickname && isSubmitted;
         });
         
-        console.log('✅ 유효한 랭킹 세션 수:', validSessions.length);
+        // 유효한 랭킹 세션 확인 완료
 
         // 시간순 정렬
         const sessions = validSessions
@@ -285,7 +271,6 @@ class RankingService {
           isCurrentUser: session.sessionId === this.sessionId
         }));
         
-        console.log('🏆 최종 랭킹:', ranking);
         return ranking;
       } else {
         // 로컬 모드
@@ -318,7 +303,7 @@ class RankingService {
       }
 
     } catch (error) {
-      console.error('랭킹 조회 실패:', error);
+      // 랭킹 조회 실패 (콘솔 로그 제거됨)
       return [];
     }
   }
@@ -485,7 +470,7 @@ class RankingService {
 
       }
     } catch (error) {
-      console.error('세션 종료 실패:', error);
+      // 세션 종료 실패 (콘솔 로그 제거됨)
     }
   }
 
@@ -532,7 +517,7 @@ class RankingService {
         return higherScores + 1;
       }
     } catch (error) {
-      console.error('예상 순위 확인 실패:', error);
+      // 예상 순위 확인 실패 (콘솔 로그 제거됨)
       return null;
     }
   }
@@ -546,13 +531,7 @@ class RankingService {
 
       const finalNickname = customNickname || this.anonymousName;
       
-      console.log('🏆 랭킹 등록 시작:', {
-        sessionId: this.sessionId,
-        timeInSeconds,
-        finalNickname,
-        customComment,
-        isFirebaseConnected: this.isFirebaseConnected
-      });
+      // 랭킹 등록 시작
       
       if (this.isFirebaseConnected) {
         // Firebase 모드 - 트랜잭션처럼 한 번에 모든 데이터 업데이트
@@ -567,7 +546,7 @@ class RankingService {
         // 한 번에 업데이트 (원자적 연산)
         await update(ref(database), updates);
         
-        console.log('✅ Firebase 업데이트 완료!');
+        // Firebase 업데이트 완료
         
         // 라이브 피드에 랭킹 등록 알림
         const rank = await this.getExpectedRank(timeInSeconds);
@@ -575,7 +554,6 @@ class RankingService {
           `${finalNickname}님이 ${this.formatTime(timeInSeconds)}로 ${rank}위 달성! 🏆`
         );
         
-        console.log('🎉 랭킹 등록 완료!');
         return true;
       } else {
         // 로컬 모드
@@ -596,7 +574,7 @@ class RankingService {
         throw new Error('세션을 찾을 수 없습니다');
       }
     } catch (error) {
-      console.error('랭킹 제출 실패:', error);
+      // 랭킹 제출 실패 (콘솔 로그 제거됨)
       throw error;
     }
   }

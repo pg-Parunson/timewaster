@@ -32,7 +32,7 @@ export const useModalLogic = ({
 
   // 활동 선택 핸들러
   const handleActivitySelect = (activity) => {
-    console.log('🎯 사용자가 활동을 선택했습니다:', activity);
+    // 사용자가 활동을 선택하였습니다 (콘솔 로그 제거됨)
     
     if (activity === 'start_activity') {
       showModernModal(

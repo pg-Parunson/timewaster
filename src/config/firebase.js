@@ -25,7 +25,7 @@ try {
   database = getDatabase(app);
   isFirebaseConnected = true;
 } catch (error) {
-  console.warn('⚠️ Firebase 연결 실패:', error.message);
+  // Firebase 연결 실패 (콘솔 로그 제거됨)
   isFirebaseConnected = false;
 }
 

@@ -212,7 +212,6 @@ function App() {
   
   // 🏆 랭킹 테스트 함수 추가 - 시간 매개변수 추가
   const handleRankingTest = (customTime = 300) => {
-    console.log(`🏆 랭킹 테스트 모드 활성화! 시간: ${customTime}초 (${Math.floor(customTime/60)}분)`);
     setIsRankingTestMode(true);
     // 테스트용 시간 저장
     setTestElapsedTime(customTime);
@@ -223,7 +222,6 @@ function App() {
   };
   
   const handleRankingTestConfirm = () => {
-    console.log('🏆 랭킹 테스트 완료!');
     setIsRankingTestMode(false);
     // 다른 입력이 없으면 그냥 종료
   };
@@ -917,13 +915,13 @@ function App() {
             id={9999} 
             message="💬 강제 테스트 메시지 - 내 메시지!" 
             isMyMessage={true} 
-            onComplete={() => console.log('테스트 메시지 완료')} 
+            onComplete={() => {}} 
           />
           <FlyingChatMessage 
             id={9998} 
             message="💭 다른 사람 메시지 테스트!" 
             isMyMessage={false} 
-            onComplete={() => console.log('테스트 메시지 완료')} 
+            onComplete={() => {}} 
           />
         </>
       )}

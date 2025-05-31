@@ -166,7 +166,7 @@ const FlyingMessageManager = ({
           }
         }
       } catch (error) {
-        console.warn('😨 채팅 리스너 오류 (계속 진행):', error);
+        // 채팅 리스너 오류 (콘솔 로그 제거됨)
         // 오류가 발생해도 Firebase 리스너를 유지
       }
     });
@@ -284,10 +284,8 @@ const FlyingMessageManager = ({
       // 성공 시 로그 없음
     })
     .catch((error) => {
-      // 운영 환경에서는 에러 로그를 줄이고 사용자 피드백에 집중
-      if (import.meta.env.DEV) {
-        console.error('❌ Firebase 전송 실패:', error);
-      }
+      // 운영 환경에서는 에러 로그 제거됨
+      // 콘솔 로그를 사용자 피드백으로 대체
       
       // 오류 상황에서도 피드백 - 종류에 따라 다른 메시지
       if (error.code === 'PERMISSION_DENIED') {

@@ -50,7 +50,6 @@ export const useTimerLogic = () => {
     }
     
     if (!message || typeof message !== 'string') {
-      console.warn('Invalid message:', message);
       setDisplayMessage("오류가 발생했습니다. 다시 시도해주세요.");
       setIsTyping(false);
       return;
@@ -98,7 +97,7 @@ export const useTimerLogic = () => {
         }
       }
     } catch (error) {
-      console.error('랭킹 확인 실패:', error);
+      // 랭킹 확인 실패 (콘솔 로그 제거됨)
     }
   }, [isRankingInitialized, currentRank, currentUser, typeMessage]);
 
@@ -174,7 +173,7 @@ export const useTimerLogic = () => {
           unsubscribeSessions();
         };
       } catch (error) {
-        console.error('통계 초기화 실패:', error);
+        // 통계 초기화 실패 (콘솔 로그 제거됨)
         // 폴백: 로컬 데이터 사용
         const visits = storage.incrementVisits();
         const storedData = storage.getAllData();
@@ -198,7 +197,7 @@ export const useTimerLogic = () => {
         setCurrentUser(user);
         setIsRankingInitialized(true);
       } catch (error) {
-        console.error('Firebase 랭킹 시스템 초기화 실패:', error);
+        // Firebase 랭킹 시스템 초기화 실패 (콘솔 로그 제거됨)
         setIsRankingInitialized(false);
       }
     };

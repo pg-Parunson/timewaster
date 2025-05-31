@@ -4,7 +4,6 @@ import { ref, push, set, get, update } from 'firebase/database';
 // 실시간 피드에 알림 추가
 export const addLiveFeedNotification = async (type, message, additionalData = {}) => {
   if (!database) {
-    console.warn('Firebase가 초기화되지 않았습니다.');
     return;
   }
 
@@ -21,7 +20,7 @@ export const addLiveFeedNotification = async (type, message, additionalData = {}
 
     await set(newNotificationRef, notificationData);
   } catch (error) {
-    console.error('❌ 실시간 피드 알림 추가 실패:', error);
+    // 실시간 피드 알림 추가 실패 (콘솔 로그 제거됨)
   }
 };
 
@@ -136,6 +135,6 @@ export const cleanupOldNotifications = async (maxAge = 24 * 60 * 60 * 1000) => {
       }
     }
   } catch (error) {
-    console.error('❌ 피드 정리 실패:', error);
+    // 피드 정리 실패 (콘솔 로그 제거됨)
   }
 };

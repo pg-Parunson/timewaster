@@ -43,7 +43,7 @@ class StatsService {
         return this.localStats.totalVisits;
       }
     } catch (error) {
-      console.warn('😨 방문 횟수 증가 실패 (계속 진행):', error.code || error.message);
+      // 방문 횟수 증가 실패 (콘솔 로그 제거됨)
       // 실패해도 기본값 반환
       return this.localStats.totalVisits || 1;
     }
@@ -66,7 +66,7 @@ class StatsService {
         return this.localStats.totalTimeWasted;
       }
     } catch (error) {
-      console.error('시간낭비 추가 실패:', error);
+      // 시간낭비 추가 실패 (콘솔 로그 제거됨)
       return 0;
     }
   }
@@ -118,7 +118,7 @@ class StatsService {
         return Math.max(1, Math.min(12, Math.round(baseUsers * timeWeight + variation)));
       }
     } catch (error) {
-      console.error('활성 세션 조회 실패:', error);
+      // 활성 세션 조회 실패 (콘솔 로그 제거됨)
       return 1;
     }
   }
@@ -138,7 +138,7 @@ class StatsService {
             lastUpdated: Date.now() // serverTimestamp 대신 일반 타임스탬프
           };
           await set(statsRef, initialStats).catch(err => {
-            console.warn('초기 통계 설정 실패:', err);
+            // 초기 통계 설정 실패 (콘솔 로그 제거됨)
           });
           return { ...initialStats, activeSessions: 1 };
         }
@@ -169,7 +169,7 @@ class StatsService {
         };
       }
     } catch (error) {
-      console.warn('😨 전체 통계 조회 실패 (기본값 사용):', error.code || error.message);
+      // 전체 통계 조회 실패 (콘솔 로그 제거됨)
       return {
         totalVisits: 1,
         totalTimeWasted: 0,
@@ -279,7 +279,7 @@ class StatsService {
         await this.addTimeWasted(elapsedTime);
       }
     } catch (error) {
-      console.error('세션 종료 통계 업데이트 실패:', error);
+      // 세션 종료 통계 업데이트 실패 (콘솔 로그 제거됨)
     }
   }
 }
