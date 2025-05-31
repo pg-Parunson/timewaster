@@ -33,7 +33,7 @@
       // 카카오 SDK 초기화
       if (typeof Kakao !== 'undefined') {
         Kakao.init('84b139568db535b25f4b6762c95ed5d0');
-        console.log('카카오 SDK 초기화 완료:', Kakao.isInitialized());
+        // Production 빌드에서는 로그 제거됨
       }
     </script>
     
@@ -58,7 +58,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="/assets/index-cb3e135d.js"></script>
+    <script type="module" crossorigin src="/assets/index-b501c6b5.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/vendor-b3ded5a3.js">
+    <link rel="modulepreload" crossorigin href="/assets/firebase-c7f72d93.js">
     <link rel="stylesheet" href="/assets/index-e5bcf2f2.css">
   </head>
   <body>
