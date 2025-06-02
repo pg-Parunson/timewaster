@@ -409,48 +409,63 @@ class RankingService {
     
     switch (period) {
       case RANKING_PERIODS.DAILY:
-        // 오늘 날짜와 같은지 확인 (🔥 더 유연하게)
-        const todayStart = new Date(currentDate);
-        todayStart.setHours(0, 0, 0, 0);
-        const todayEnd = new Date(currentDate);
-        todayEnd.setHours(23, 59, 59, 999);
+        // 🔥 한국 시간대(KST) 기준으로 오늘 00시-23시59분 계산
+        const koreaOffset = 9 * 60; // 한국은 UTC+9
+        const nowKorea = new Date(now + (koreaOffset * 60 * 1000));
         
-        const isDailyEligible = sessionDate >= todayStart && sessionDate <= todayEnd;
-        logger.debug(`일간 필터 결과: ${isDailyEligible}`, {
-          todayStart: todayStart.toISOString(),
-          todayEnd: todayEnd.toISOString()
+        const todayStartKorea = new Date(nowKorea);
+        todayStartKorea.setUTCHours(0, 0, 0, 0);
+        const todayEndKorea = new Date(nowKorea);
+        todayEndKorea.setUTCHours(23, 59, 59, 999);
+        
+        // 세션 시간도 한국 시간대로 변환
+        const sessionKorea = new Date(sessionDate.getTime() + (koreaOffset * 60 * 1000));
+        
+        const isDailyEligible = sessionKorea >= todayStartKorea && sessionKorea <= todayEndKorea;
+        logger.debug(`일간 필터 결과 (한국시간 기준): ${isDailyEligible}`, {
+          한국현재시간: nowKorea.toISOString(),
+          한국오늘시작: todayStartKorea.toISOString(),
+          한국오늘끝: todayEndKorea.toISOString(),
+          세션한국시간: sessionKorea.toISOString(),
+          원본세션시간: sessionDate.toISOString()
         });
         return isDailyEligible;
         
       case RANKING_PERIODS.WEEKLY:
-        // 이번 주에 포함되는지 확인 (월요일 기준)
-        const startOfWeek = this.getStartOfWeek(currentDate);
-        const endOfWeek = this.getEndOfWeek(currentDate);
-        const isThisWeek = sessionDate >= startOfWeek && sessionDate <= endOfWeek;
-        logger.debug(`주간 필터 결과: ${isThisWeek}`, {
+        // 🔥 한국 시간대 기준 주간 계산 (월요일 기준)
+        const nowKoreaWeek = new Date(now + (9 * 60 * 60 * 1000)); // UTC+9
+        const startOfWeek = this.getStartOfWeek(nowKoreaWeek);
+        const endOfWeek = this.getEndOfWeek(nowKoreaWeek);
+        const sessionKoreaWeek = new Date(sessionDate.getTime() + (9 * 60 * 60 * 1000)); // UTC+9
+        const isThisWeek = sessionKoreaWeek >= startOfWeek && sessionKoreaWeek <= endOfWeek;
+        logger.debug(`주간 필터 결과 (한국시간 기준): ${isThisWeek}`, {
           startOfWeek: startOfWeek.toISOString(),
-          endOfWeek: endOfWeek.toISOString()
+          endOfWeek: endOfWeek.toISOString(),
+          세션한국시간: sessionKoreaWeek.toISOString()
         });
         return isThisWeek;
         
       case RANKING_PERIODS.MONTHLY:
-        // 이번 달에 포함되는지 확인 - 🔥 유연한 월간 필터링
+        // 🔥 한국 시간대 기준 월간 계산 - 유연한 월간 필터링
+        const nowKoreaMonth = new Date(now + (9 * 60 * 60 * 1000)); // UTC+9
         // 월 초반(15일 이하)에는 이전 달도 포함하여 충분한 데이터 보장
-        const isEarlyMonth = currentDate.getDate() <= 15;
+        const isEarlyMonth = nowKoreaMonth.getUTCDate() <= 15;
         const monthlyStartDate = isEarlyMonth 
-          ? new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1) // 이전 달 1일부터
-          : new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);     // 이번 달 1일부터
+          ? new Date(Date.UTC(nowKoreaMonth.getUTCFullYear(), nowKoreaMonth.getUTCMonth() - 1, 1)) // 이전 달 1일부터
+          : new Date(Date.UTC(nowKoreaMonth.getUTCFullYear(), nowKoreaMonth.getUTCMonth(), 1));     // 이번 달 1일부터
         
-        const monthlyEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59, 999);
+        const monthlyEndDate = new Date(Date.UTC(nowKoreaMonth.getUTCFullYear(), nowKoreaMonth.getUTCMonth() + 1, 0, 23, 59, 59, 999));
         
-        const isMonthlyEligible = sessionDate >= monthlyStartDate && sessionDate <= monthlyEndDate;
+        const sessionKoreaMonth = new Date(sessionDate.getTime() + (9 * 60 * 60 * 1000)); // UTC+9
+        const isMonthlyEligible = sessionKoreaMonth >= monthlyStartDate && sessionKoreaMonth <= monthlyEndDate;
         
-        logger.debug(`월간 필터 결과 (${isEarlyMonth ? '이전달 포함' : '이번달만'}): ${isMonthlyEligible}`, {
-          현재일: currentDate.getDate(),
+        logger.debug(`월간 필터 결과 (한국시간, ${isEarlyMonth ? '이전달 포함' : '이번달만'}): ${isMonthlyEligible}`, {
+          한국현재일: nowKoreaMonth.getUTCDate(),
           월초반여부: isEarlyMonth,
           monthlyStartDate: monthlyStartDate.toISOString(),
           monthlyEndDate: monthlyEndDate.toISOString(),
-          sessionDate: sessionDate.toISOString()
+          세션한국시간: sessionKoreaMonth.toISOString(),
+          원본세션시간: sessionDate.toISOString()
         });
         return isMonthlyEligible;
                
