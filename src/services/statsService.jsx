@@ -90,23 +90,23 @@ class StatsService {
 
         const sessions = Object.values(snapshot.val());
         const now = Date.now();
-        const tenSecondsAgo = now - (10 * 1000); // 🔥 10초로 변경 (더 안정적)
+        const fifteenSecondsAgo = now - (15 * 1000); // 🔥 15초로 변경 (하트비트와 매칭)
         
         logger.critical('🚨 동시접속자 분석:', {
           전체세션수: sessions.length,
           현재시간: new Date().toLocaleTimeString(),
-          기준시간: new Date(tenSecondsAgo).toLocaleTimeString(),
+          기준시간: new Date(fifteenSecondsAgo).toLocaleTimeString(),
           서비스상태: 'Firebase 연결됨'
         });
 
-        // 10초 이내에 활동한 세션 수
+        // 15초 이내에 활동한 세션 수
         const activeSessions = sessions.filter((session, index) => {
           if (!session.isActive) {
             logger.critical(`세션 ${index}: 비활성 (isActive: false)`);
             return false;
           }
           
-          // lastHeartbeat가 10초 이내인지 확인
+          // lastHeartbeat가 15초 이내인지 확인
           const lastHeartbeat = session.lastHeartbeat;
           let heartbeatTime = 0;
           
@@ -116,7 +116,7 @@ class StatsService {
             heartbeatTime = lastHeartbeat;
           }
           
-          const isRecent = heartbeatTime > tenSecondsAgo;
+          const isRecent = heartbeatTime > fifteenSecondsAgo;
           
           logger.critical(`세션 ${index} (${session.anonymousName}):`, {
             isActive: session.isActive,
