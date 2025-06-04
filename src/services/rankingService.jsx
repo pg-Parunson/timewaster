@@ -103,6 +103,16 @@ class RankingService {
           });
           
           this.startHeartbeat();
+          
+          // 🔥 페이지 가시성 변화 감지 추가
+          document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+              this.onPageHidden();
+            } else {
+              this.onPageVisible();
+            }
+          });
+          
           await this.addLiveFeedEvent('join', `${this.anonymousName}님이 접속했습니다`);
         } catch (firebaseError) {
           logger.critical('❌ Firebase 세션 저장 실패:', {
@@ -142,20 +152,99 @@ class RankingService {
     }
   }
 
-  // 하트비트 시작 (Firebase 모드) - 🔥 실시간급 처리
-  startHeartbeat() {
+  // 하트비트 시작 (Firebase 모드) - 🔥 실시간급 처리 + PC 안정성 개선
+  startHeartbeat(interval = null) {
     if (!this.isFirebaseConnected) return;
+    
+    // 브라우저별 최적화된 간격 사용
+    const heartbeatInterval = interval || this.getOptimalHeartbeatInterval();
     
     this.heartbeatInterval = setInterval(async () => {
       if (this.sessionId) {
         try {
-          await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/lastHeartbeat`), serverTimestamp());
-          await set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/isActive`), true);
+          // 🔥 다중 업데이트로 안정성 향상
+          await Promise.all([
+            set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/lastHeartbeat`), serverTimestamp()),
+            set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/isActive`), true)
+          ]);
+          
         } catch (error) {
-          logger.error('하트비트 실패:', error);
+          logger.error('하트비트 실패, 재시도 중:', error);
+          // 🔥 실패 시 재연결 시도
+          setTimeout(() => this.reconnectSession(), 1000);
         }
       }
-    }, 5000); // 🔥 5초마다 (안정적인 간격)
+    }, heartbeatInterval);
+  }
+
+
+
+  // 🔥 브라우저별 최적 하트비트 간격 계산
+  getOptimalHeartbeatInterval() {
+    const userAgent = navigator.userAgent;
+    const isChrome = userAgent.includes('Chrome');
+    const isEdge = userAgent.includes('Edge');
+    const isSafari = userAgent.includes('Safari') && !userAgent.includes('Chrome');
+    const isFirefox = userAgent.includes('Firefox');
+    
+    // PC 브라우저는 더 자주 하트비트
+    if (isChrome || isEdge) {
+      return 2500; // Chrome/Edge: 2.5초
+    } else if (isFirefox) {
+      return 3000; // Firefox: 3초
+    } else if (isSafari) {
+      return 4000; // Safari: 4초
+    } else {
+      return 3000; // 기타: 3초
+    }
+  }
+
+  // 🔥 세션 재연결 메서드
+  async reconnectSession() {
+    try {
+      if (this.sessionId && this.isFirebaseConnected) {
+        await Promise.all([
+          set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/isActive`), true),
+          set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/lastHeartbeat`), serverTimestamp())
+        ]);
+        logger.info('세션 재연결 완료');
+      }
+    } catch (error) {
+      logger.error('세션 재연결 실패:', error);
+    }
+  }
+
+  // 🔥 페이지 가시성 변화 처리
+  onPageHidden() {
+    // 백그라운드로 갈 때 하트비트 간격 늘리기
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+      this.startHeartbeat(10000); // 10초 간격으로 변경
+    }
+  }
+
+  onPageVisible() {
+    // 다시 활성화될 때 즉시 하트비트 재시작
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+      // 즉시 하트비트 한 번 전송
+      this.sendHeartbeat();
+      // 정상 간격으로 재시작
+      this.startHeartbeat();
+    }
+  }
+
+  async sendHeartbeat() {
+    if (this.sessionId && this.isFirebaseConnected) {
+      try {
+        await Promise.all([
+          set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/lastHeartbeat`), serverTimestamp()),
+          set(ref(database, `${DB_PATHS.SESSIONS}/${this.sessionId}/isActive`), true)
+        ]);
+      } catch (error) {
+        logger.error('하트비트 전송 실패:', error);
+      }
+    }
   }
 
   // 로컬 하트비트 시작 (로컬 모드) - 🔥 실시간급 처리
