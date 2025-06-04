@@ -15,7 +15,7 @@ const FlyingRankingMessage = ({ message, id, onComplete }) => {
     hasStarted.current = true;
     
     const startTime = Date.now();
-    const duration = 8000; // 8초 동안 날아감
+    const duration = 7000; // 7초 동안 날아감 (채팅 메시지와 동일한 속도)
     const startX = -300;
     const endX = window.innerWidth + 300;
     const initialY = position.y; // 초기 Y 위치 고정

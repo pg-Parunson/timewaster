@@ -6,7 +6,7 @@ import StatsBar from './components/StatsBar.jsx';
 import AdSection from './components/AdSection.jsx';
 import ModernModal from './components/ModernModal.jsx';
 import RankingRegistrationModal from './components/RankingRegistrationModal.jsx';
-import CelebrationEffect from './components/CelebrationEffect.jsx';
+// import CelebrationEffect from './components/CelebrationEffect.jsx'; // 축하 이펙트 비활성화
 import ShareSection from './components/ShareSection.jsx';
 import EasterEgg from './components/EasterEgg.jsx';
 import FloatingExitButton from './components/FloatingExitButton.jsx';
@@ -24,7 +24,7 @@ import Footer from './components/Footer.jsx';
 import { Heart, Share2, MessageCircle, Copy } from 'lucide-react';
 
 // 훅스 imports
-import { useCelebrationSystem } from './hooks/useCelebrationSystem.jsx';
+// import { useCelebrationSystem } from './hooks/useCelebrationSystem.jsx'; // 축하 시스템 비활성화
 import { useTimerLogic } from './hooks/useTimerLogic.jsx';
 import { useModalLogic } from './hooks/useModalLogic.jsx';
 
@@ -238,8 +238,8 @@ function App() {
     // 다른 입력이 없으면 그냥 종료
   };
 
-  // 축하 시스템 초기화 (범위 제한)
-  const { showCelebration, currentCelebration, handleCelebrationComplete } = useCelebrationSystem(elapsedTime);
+  // 축하 시스템 비활성화
+  // const { showCelebration, currentCelebration, handleCelebrationComplete } = useCelebrationSystem(elapsedTime);
 
   // 포켓몬 골드 버전 스타일 주입
   useEffect(() => {
@@ -734,10 +734,31 @@ function App() {
     styleElement.textContent = pokemonStyles;
     document.head.appendChild(styleElement);
     
+    // 🎵 스페이스바 효과음 재생 함수
+    const playSpaceSound = () => {
+      try {
+        const audio = new Audio('/sounds/space.mp3');
+        audio.volume = 0.3; // 적당한 볼륨 (30%)
+        audio.play().catch((error) => {
+          // 자동재생 정책으로 인한 에러는 무시 (사용자가 직접 키를 눌렀으므로 대부분 재생됨)
+          console.log('효과음 재생 실패 (정상적인 경우):', error.message);
+        });
+      } catch (error) {
+        // 파일이 없거나 다른 오류 시 무시
+        console.log('space.mp3 파일을 찾을 수 없습니다.');
+      }
+    };
+
     // 키보드 단축키 지원
     const handleKeyPress = (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault(); // 🔥 브라우저 기본 동작 방지 (스페이스바 스크롤 등)
+        
+        // 🎵 스페이스바 효과음 재생
+        if (e.key === ' ') {
+          playSpaceSound();
+        }
+        
         refreshMessage();
       } else if (e.key === 'Escape') {
         e.preventDefault(); // ESC 기본 동작도 방지
@@ -771,7 +792,7 @@ function App() {
           
           {/* 키보드 단축키 안내 */}
           <div className="mt-4 pokemon-font text-sm">
-            🔄 <kbd className="px-2 py-1 bg-black text-white border-2 border-white rounded text-xs font-bold shadow-lg">SPACE</kbd> 메시지 새로고침 | 
+            🔄🎵 <kbd className="px-2 py-1 bg-black text-white border-2 border-white rounded text-xs font-bold shadow-lg">SPACE</kbd> 메시지 새로고침 (효과음) | 
             💫 <kbd className="px-2 py-1 bg-black text-white border-2 border-white rounded text-xs font-bold shadow-lg ml-2">ESC</kbd> 게임 종료
           </div>
         </div>
@@ -831,10 +852,20 @@ function App() {
               
               <div className="text-center">
                 <button 
-                  onClick={refreshMessage}
+                  onClick={() => {
+                    // 🎵 버튼 클릭 시에도 효과음 재생
+                    try {
+                      const audio = new Audio('/sounds/space.mp3');
+                      audio.volume = 0.3;
+                      audio.play().catch(() => {});
+                    } catch (error) {
+                      // 파일이 없어도 무시
+                    }
+                    refreshMessage();
+                  }}
                   className="pokemon-button"
                 >
-                  다른 조언 듣기
+                  🎵 다른 조언 듣기
                 </button>
               </div>
             </div>
@@ -962,11 +993,14 @@ function App() {
       />
 
       {/* 🎉 축하 이펙트 - 포켓몬 스타일 */}
+      {/* 축하 이팩트 비활성화 */}
+      {/*
       <CelebrationEffect 
         isActive={showCelebration}
         celebration={currentCelebration}
         onComplete={handleCelebrationComplete}
       />
+      */}
 
       {/* 모달들 */}
       <RankingRegistrationModal

@@ -35,6 +35,58 @@ const FlyingMessageManager = ({
   const mySentMessagesRef = useRef(new Set()); // useRef로 변경 - 실시간 참조 가능
   const [recentlySentMessage, setRecentlySentMessage] = useState(null); // 최근 전송 메시지
 
+  // 🎵 광고 클릭 효과음 재생 함수
+  const playAdClickSound = () => {
+    try {
+      const audio = new Audio('/sounds/ad_click.mp3');
+      audio.volume = 0.5; // 광고 보상이므로 크게 (50%)
+      audio.play().catch((error) => {
+        console.log('광고 클릭 효과음 재생 실패:', error.message);
+      });
+    } catch (error) {
+      console.log('ad_click.mp3 파일을 찾을 수 없습니다.');
+    }
+  };
+
+  // 🎵 프리미엄 채팅 전송 효과음 재생 함수
+  const playPremiumChatSound = () => {
+    try {
+      const audio = new Audio('/sounds/premium_chat.mp3');
+      audio.volume = 0.45; // 프리미엄이므로 조금 크게 (45%)
+      audio.play().catch((error) => {
+        console.log('프리미엄 채팅 효과음 재생 실패:', error.message);
+      });
+    } catch (error) {
+      console.log('premium_chat.mp3 파일을 찾을 수 없습니다.');
+    }
+  };
+
+  // 🎵 일반 채팅 전송 효과음 재생 함수
+  const playChatSendSound = () => {
+    try {
+      const audio = new Audio('/sounds/chat_send.mp3');
+      audio.volume = 0.35; // 채팅 효과음이므로 적당히 (35%)
+      audio.play().catch((error) => {
+        console.log('일반 채팅 효과음 재생 실패:', error.message);
+      });
+    } catch (error) {
+      console.log('chat_send.mp3 파일을 찾을 수 없습니다.');
+    }
+  };
+
+  // 🎵 1분 체류 보상 효과음 재생 함수
+  const playOneMinuteRewardSound = () => {
+    try {
+      const audio = new Audio('/sounds/1min_sound.mp3');
+      audio.volume = 0.4; // 보상 효과음이므로 조금 크게 (40%)
+      audio.play().catch((error) => {
+        console.log('1분 체류 보상 효과음 재생 실패:', error.message);
+      });
+    } catch (error) {
+      console.log('1min_sound.mp3 파일을 찾을 수 없습니다.');
+    }
+  };
+
   // 체류 시간 추적 및 1분마다 채팅 권한 자동 지급 (쌓이지 않음)
   useEffect(() => {
     const interval = setInterval(() => {
@@ -48,6 +100,9 @@ const FlyingMessageManager = ({
             if (prevTokens > 0) {
               return prevTokens; // 그대로 유지
             }
+            
+            // 🎵 1분 체류 보상 효과음 재생!
+            playOneMinuteRewardSound();
             
             addFlyingChatMessage('🎁 1분 체류 보상! 일반 채팅 권한 획득!', false);
             return 1; // 정확히 1개만
@@ -176,6 +231,9 @@ const FlyingMessageManager = ({
   const handleAdClick = () => {
     if (adChatCooldown === 0) {
       // 🎯 랜덤 쿠팡 상품 선택
+      // 🎵 광고 클릭 효과음 재생
+      playAdClickSound();
+      
       const randomProduct = getRandomCoupangProduct();
       
       // 쿠팡 링크 열기
@@ -221,6 +279,13 @@ const FlyingMessageManager = ({
     // 권한이 없으면 전송 불가
     if (messageType === 'none') {
       return;
+    }
+    
+    // 🎵 채팅 타입에 따른 효과음 재생
+    if (messageType === 'basic') {
+      playChatSendSound(); // 일반 채팅 효과음
+    } else if (messageType === 'premium') {
+      playPremiumChatSound(); // 프리미엄 채팅 효과음
     }
     
     // 최근 전송 메시지 기록
@@ -320,26 +385,37 @@ const FlyingMessageManager = ({
         {(import.meta.env.DEV || import.meta.env.MODE === 'development') && (
           <button
             onClick={() => {
+              // 🎵 광고 클릭 효과음 테스트
+              playAdClickSound();
+              
               setChatTokens(prev => prev + 2);
               setPremiumTokens(prev => prev + 3);
+              
+              // 🎵 1분 체류 보상 효과음 테스트
+              playOneMinuteRewardSound();
+              
               addFlyingChatMessage('🎁 테스트 토큰 지급! 일반 2개 + 프리미엄 3개', false);
               // 강제 테스트 메시지도 추가
               setTimeout(() => {
+                // 🎵 일반 채팅 효과음 테스트
+                playChatSendSound();
                 addFlyingChatMessage('💬 일반 메시지 테스트!', true, 'basic'); // 일반 메시지
               }, 1000);
               setTimeout(() => {
+                // 🎵 프리미엄 채팅 효과음 테스트
+                playPremiumChatSound();
                 addFlyingChatMessage('🎆 프리미엄 메시지 테스트!', true, 'premium'); // 프리미엄 메시지
               }, 2000);
             }}
             className="pokemon-button bg-yellow-400 hover:bg-yellow-500 text-sm px-3 py-2 border-4 border-black"
-            title="개발용 토큰 지급 + 테스트 메시지"
+            title="개발용 토큰 지급 + 테스트 메시지 + 다양한 효과음"
             style={{
               background: 'linear-gradient(135deg, #FFD700 0%, #FF6B35 100%)',
               boxShadow: '4px 4px 0px rgba(0, 0, 0, 0.5)',
               animation: 'pulse 2s infinite'
             }}
           >
-            🚀 테스트!
+            🚀🎵 테스트!
           </button>
         )}
       </div>

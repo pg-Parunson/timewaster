@@ -119,7 +119,7 @@ const FlyingChatMessage = ({ message, id, isMyMessage, messageType = 'basic', on
   useEffect(() => {
     startTimeRef.current = Date.now();
     
-    const duration = 5000; // 5초 동안 이동
+    const duration = 7000; // 7초 동안 이동 (기존보다 40% 느리게)
     
     const animate = () => {
       const now = Date.now();
