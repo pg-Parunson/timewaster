@@ -1,0 +1,12 @@
+# ads.txt for timetrash.net
+# This file is required by Google AdSense for programmatic advertising
+# Generated on: 2025-06-05
+
+# Google AdSense
+google.com, pub-4595865601157350, DIRECT, f08c47fec0942fa0
+
+# 추가 광고 파트너가 있다면 여기에 추가
+# 예: other-ad-provider.com, pub-id, DIRECT/RESELLER, [certification_authority_id]
+
+# 문의: timetrash.net 관리자
+# 업데이트: Publisher ID 설정 완료 (pub-4595865601157350)
